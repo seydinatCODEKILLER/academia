@@ -1,20 +1,31 @@
 {
   "absences": [
     {
-      "id_absence": 1,
-      "id_etudiant": 1,
+      "id_absence": 9,
+      "id_etudiant": 4,
       "id_cours": 1,
-      "date_absence": "2023-09-18",
-      "heure_marquage": "2025-03-29 16:00:43",
-      "id_marqueur": 2
+      "date_absence": "2025-04-15",
+      "heure_marquage": "2025-04-15 14:22:50",
+      "id_marqueur": 2,
+      "justified": "justifier"
+    }
+  ],
+  "annee_scolaire": [
+    {
+      "id_annee": 1,
+      "libelle": "2024-2025",
+      "date_debut": "2024-09-01",
+      "date_fin": "2025-08-31",
+      "est_active": 1,
+      "date_creation": "2025-04-15 09:57:29"
     },
     {
-      "id_absence": 2,
-      "id_etudiant": 3,
-      "id_cours": 3,
-      "date_absence": "2023-09-19",
-      "heure_marquage": "2025-03-29 16:00:43",
-      "id_marqueur": 2
+      "id_annee": 2,
+      "libelle": "2023-2024",
+      "date_debut": "2023-09-01",
+      "date_fin": "2024-08-31",
+      "est_active": 0,
+      "date_creation": "2025-04-15 09:57:29"
     }
   ],
   "attaches": [
@@ -30,7 +41,7 @@
       "libelle": "L1 Info",
       "id_filiere": 1,
       "id_niveau": 1,
-      "annee_scolaire": "2023-2024",
+      "id_annee": 1,
       "capacite_max": 30,
       "state": "disponible"
     },
@@ -39,7 +50,7 @@
       "libelle": "L2 Info",
       "id_filiere": 1,
       "id_niveau": 2,
-      "annee_scolaire": "2023-2024",
+      "id_annee": 2,
       "capacite_max": 30,
       "state": "disponible"
     },
@@ -48,16 +59,16 @@
       "libelle": "L1 Maths",
       "id_filiere": 2,
       "id_niveau": 1,
-      "annee_scolaire": "2023-2024",
+      "id_annee": 2,
       "capacite_max": 25,
       "state": "disponible"
     },
     {
       "id_classe": 4,
-      "libelle": "L1 Designe",
+      "libelle": "L1 Designes",
       "id_filiere": 1,
       "id_niveau": 1,
-      "annee_scolaire": "2024-2025",
+      "id_annee": 1,
       "capacite_max": 26,
       "state": "disponible"
     },
@@ -66,35 +77,115 @@
       "libelle": "L1 IA",
       "id_filiere": 2,
       "id_niveau": 3,
-      "annee_scolaire": "2024-2025",
+      "id_annee": 1,
       "capacite_max": 10,
       "state": "disponible"
+    },
+    {
+      "id_classe": 6,
+      "libelle": "L1 Marketing",
+      "id_filiere": 1,
+      "id_niveau": 1,
+      "id_annee": 1,
+      "capacite_max": 20,
+      "state": "disponible"
+    },
+    {
+      "id_classe": 7,
+      "libelle": "L3 Dev",
+      "id_filiere": 1,
+      "id_niveau": 3,
+      "id_annee": 1,
+      "capacite_max": 26,
+      "state": "disponible"
+    }
+  ],
+  "classes_attaches": [
+    {
+      "id_classe": 1,
+      "id_attache": 1
+    },
+    {
+      "id_classe": 2,
+      "id_attache": 1
+    },
+    {
+      "id_classe": 3,
+      "id_attache": 1
     }
   ],
   "classes_professeur": [
     {
       "id_classe": 1,
       "id_professeur": 1,
-      "date_affectation": "2023-09-01",
-      "est_principal": 1
+      "date_affectation": "2025-04-05",
+      "est_principal": 0
     },
     {
       "id_classe": 1,
       "id_professeur": 2,
-      "date_affectation": "2023-09-01",
+      "date_affectation": "2025-04-05",
+      "est_principal": 0
+    },
+    {
+      "id_classe": 1,
+      "id_professeur": 3,
+      "date_affectation": "2025-04-04",
       "est_principal": 0
     },
     {
       "id_classe": 2,
       "id_professeur": 1,
-      "date_affectation": "2023-09-01",
-      "est_principal": 1
+      "date_affectation": "2025-04-05",
+      "est_principal": 0
+    },
+    {
+      "id_classe": 2,
+      "id_professeur": 2,
+      "date_affectation": "2025-04-05",
+      "est_principal": 0
     },
     {
       "id_classe": 3,
       "id_professeur": 2,
-      "date_affectation": "2023-09-01",
-      "est_principal": 1
+      "date_affectation": "2025-04-05",
+      "est_principal": 0
+    },
+    {
+      "id_classe": 5,
+      "id_professeur": 1,
+      "date_affectation": "2025-04-05",
+      "est_principal": 0
+    }
+  ],
+  "config": [
+    {
+      "id": 1,
+      "cle": "periode_inscription_debut",
+      "valeur": "2024-11-01",
+      "description": "Date début inscriptions nouvelles",
+      "date_modification": "2025-04-13 09:12:51"
+    },
+    {
+      "id": 2,
+      "cle": "periode_inscription_fin",
+      "valeur": "2025-04-15",
+      "description": "Date fin inscriptions nouvelles",
+      "date_modification": "2025-04-13 09:15:21"
+    },
+    {
+      "id": 3,
+      "cle": "periode_reinscription_debut",
+      "valeur": "2024-11-02",
+      "description": "Date début réinscriptions",
+      "date_modification": "2025-04-13 22:04:21"
+    },
+    {
+      "id": 4,
+      "cle": "periode_reinscription_fin",
+      "valeur": "2025-04-20",
+      "description": "Date fin réinscriptions",
+      "date_modification": "2025-04-13 22:04:14"
     }
   ],
   "cours": [
@@ -103,7 +194,7 @@
       "id_module": 1,
       "id_professeur": 1,
       "id_semestre": 1,
-      "date_cours": "2025-03-18",
+      "date_cours": "2025-04-08",
       "heure_debut": "08:00:00",
       "heure_fin": "10:00:00",
       "nombre_heures": 2,
@@ -113,10 +204,10 @@
     },
     {
       "id_cours": 2,
-      "id_module": 1,
+      "id_module": 2,
       "id_professeur": 1,
       "id_semestre": 1,
-      "date_cours": "2025-03-25",
+      "date_cours": "2025-04-10",
       "heure_debut": "08:00:00",
       "heure_fin": "10:00:00",
       "nombre_heures": 2,
@@ -134,8 +225,34 @@
       "heure_fin": "12:00:00",
       "nombre_heures": 2,
       "salle": "Salle B2",
-      "statut": "planifié",
+      "statut": "effectué",
       "date_creation": "2025-03-29 15:59:04"
+    },
+    {
+      "id_cours": 5,
+      "id_module": 3,
+      "id_professeur": 2,
+      "id_semestre": 2,
+      "date_cours": "2025-04-06",
+      "heure_debut": "16:34:00",
+      "heure_fin": "17:34:00",
+      "nombre_heures": 2,
+      "salle": "Salle A1",
+      "statut": "planifié",
+      "date_creation": "2025-04-05 16:34:47"
+    },
+    {
+      "id_cours": 6,
+      "id_module": 2,
+      "id_professeur": 1,
+      "id_semestre": 1,
+      "date_cours": "2025-04-14",
+      "heure_debut": "08:00:00",
+      "heure_fin": "10:00:00",
+      "nombre_heures": 2,
+      "salle": "Salle A1",
+      "statut": "planifié",
+      "date_creation": "2025-04-14 19:20:48"
     }
   ],
   "cours_classes": [
@@ -150,6 +267,14 @@
     {
       "id_cours": 3,
       "id_classe": 3
+    },
+    {
+      "id_cours": 5,
+      "id_classe": 1
+    },
+    {
+      "id_cours": 6,
+      "id_classe": 1
     }
   ],
   "etudiants": [
@@ -157,19 +282,29 @@
       "id_etudiant": 1,
       "id_utilisateur": 5,
       "matricule": "ET20230001",
-      "date_inscription": "2023-09-01"
+      "date_inscription": "2025-01-01",
+      "id_classe": 1
     },
     {
       "id_etudiant": 2,
       "id_utilisateur": 6,
       "matricule": "ET20230002",
-      "date_inscription": "2023-09-01"
+      "date_inscription": "2025-01-02",
+      "id_classe": 1
     },
     {
       "id_etudiant": 3,
       "id_utilisateur": 7,
       "matricule": "ET20230003",
-      "date_inscription": "2023-09-01"
+      "date_inscription": "2025-01-03",
+      "id_classe": 1
+    },
+    {
+      "id_etudiant": 4,
+      "id_utilisateur": 9,
+      "matricule": "ET20250001",
+      "date_inscription": "2025-04-13",
+      "id_classe": 1
     }
   ],
   "filieres": [
@@ -186,6 +321,20 @@
       "description": "Mathématiques appliquées",
       "date_creation": "2020-01-01",
       "state": "disponible"
+    },
+    {
+      "id_filiere": 3,
+      "libelle": "Physique quantique",
+      "description": "",
+      "date_creation": "2025-04-03",
+      "state": "disponible"
+    },
+    {
+      "id_filiere": 4,
+      "libelle": "Histoire v2",
+      "description": "",
+      "date_creation": "2025-04-04",
+      "state": "disponible"
     }
   ],
   "inscriptions": [
@@ -193,41 +342,64 @@
       "id_inscription": 1,
       "id_etudiant": 1,
       "id_classe": 1,
-      "annee_scolaire": "2023-2024",
-      "date_inscription": "2023-09-01",
+      "annee_scolaire": "2024-2025",
+      "date_inscription": "2025-04-14",
       "est_reinscription": 0,
-      "statut": "validée"
+      "statut": "validée",
+      "redoublement": 0
     },
     {
       "id_inscription": 2,
       "id_etudiant": 2,
       "id_classe": 1,
-      "annee_scolaire": "2023-2024",
-      "date_inscription": "2023-09-01",
+      "annee_scolaire": "2024-2025",
+      "date_inscription": "2025-04-14",
       "est_reinscription": 0,
-      "statut": "validée"
+      "statut": "en attente",
+      "redoublement": 1
     },
     {
       "id_inscription": 3,
       "id_etudiant": 3,
       "id_classe": 3,
       "annee_scolaire": "2023-2024",
-      "date_inscription": "2023-09-02",
+      "date_inscription": "2023-01-03",
       "est_reinscription": 0,
-      "statut": "validée"
+      "statut": "validée",
+      "redoublement": 0
+    },
+    {
+      "id_inscription": 4,
+      "id_etudiant": 4,
+      "id_classe": 1,
+      "annee_scolaire": "2024-2025",
+      "date_inscription": "2025-04-13",
+      "est_reinscription": 0,
+      "statut": "validée",
+      "redoublement": 0
+    },
+    {
+      "id_inscription": 9,
+      "id_etudiant": 3,
+      "id_classe": 2,
+      "annee_scolaire": "2024-2025",
+      "date_inscription": "2025-04-14",
+      "est_reinscription": 0,
+      "statut": "en attente",
+      "redoublement": 0
     }
   ],
   "justifications": [
     {
-      "id_justification": 1,
-      "id_absence": 1,
-      "id_etudiant": 1,
-      "date_justification": "2025-03-29 16:00:43",
-      "motif": "Maladie avec certificat médical",
-      "pieces_jointes": null,
-      "statut": "acceptée",
-      "id_traitant": 4,
-      "date_traitement": "2023-09-20 00:00:00",
+      "id_justification": 2,
+      "id_absence": 9,
+      "id_etudiant": 4,
+      "date_justification": "2025-04-15 16:09:32",
+      "motif": "J'etais fortement malade avec de grave fievre",
+      "pieces_jointes": "jr_67fe84bc23acd.jpg",
+      "statut": "en attente",
+      "id_traitant": null,
+      "date_traitement": null,
       "commentaire_traitement": null
     }
   ],
@@ -275,8 +447,14 @@
       "id_niveau": 3,
       "libelle": "Licence 3",
       "state": "disponible"
+    },
+    {
+      "id_niveau": 4,
+      "libelle": "Master 2",
+      "state": "disponible"
     }
   ],
+  "notifications": [],
   "professeurs": [
     {
       "id_professeur": 1,
@@ -291,6 +469,13 @@
       "specialite": "Mathématiques",
       "grade": "Maître Assistant",
       "date_embauche": "2021-10-15"
+    },
+    {
+      "id_professeur": 3,
+      "id_utilisateur": 8,
+      "specialite": "Neurologue",
+      "grade": "principal",
+      "date_embauche": "2025-04-05"
     }
   ],
   "responsables_pedagogiques": [
@@ -340,11 +525,12 @@
       "nom": "Ndiaye",
       "prenom": "Aminata",
       "email": "rp@ecole221.com",
-      "password": "liverpool",
+      "password": "liverppol",
       "id_role": 1,
       "avatar": "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600",
       "telephone": "771234567",
-      "adresse": "yeumbeul,comico"
+      "adresse": "yeumbeul,comico",
+      "state": "disponible"
     },
     {
       "id_utilisateur": 2,
@@ -353,9 +539,10 @@
       "email": "m.sow@ecole221.com",
       "password": "password123",
       "id_role": 2,
-      "avatar": "profiles/prof_moussa.jpg",
+      "avatar": "pro_67f07ea574587.jpg",
       "telephone": "772345678",
-      "adresse": "yeumbeul,comico"
+      "adresse": "yeumbeul,comico",
+      "state": "disponible"
     },
     {
       "id_utilisateur": 3,
@@ -364,9 +551,10 @@
       "email": "f.diallo@ecole221.com",
       "password": "password",
       "id_role": 2,
-      "avatar": "profiles/prof_fatou.jpg",
+      "avatar": "pro_67f07e7457829.jpg",
       "telephone": "773456789",
-      "adresse": "yeumbeul,comico"
+      "adresse": "yeumbeul,comico",
+      "state": "disponible"
     },
     {
       "id_utilisateur": 4,
@@ -375,9 +563,10 @@
       "email": "attache@ecole221.com",
       "password": "Attachepass",
       "id_role": 3,
-      "avatar": "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "avatar": "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600",
       "telephone": "774567890",
-      "adresse": "yeumbeul,comico"
+      "adresse": "yeumbeul,comico",
+      "state": "disponible"
     },
     {
       "id_utilisateur": 5,
@@ -386,9 +575,10 @@
       "email": "a.fall@ecole221.com",
       "password": "Etud1pass",
       "id_role": 4,
-      "avatar": "profiles/etud_aicha.jpg",
+      "avatar": "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600",
       "telephone": "775678901",
-      "adresse": "yeumbeul,comico"
+      "adresse": "yeumbeul,comico",
+      "state": "disponible"
     },
     {
       "id_utilisateur": 6,
@@ -397,9 +587,10 @@
       "email": "m.diop@ecole221.com",
       "password": "Etud2pass",
       "id_role": 4,
-      "avatar": "profiles/etud_mamadou.jpg",
+      "avatar": "https://images.pexels.com/photos/846741/pexels-photo-846741.jpeg?auto=compress&cs=tinysrgb&w=600",
       "telephone": "776789012",
-      "adresse": "yeumbeul,comico"
+      "adresse": "yeumbeul,comico",
+      "state": "disponible"
     },
     {
       "id_utilisateur": 7,
@@ -408,9 +599,34 @@
       "email": "r.gueye@ecole221.com",
       "password": "Etud3pass",
       "id_role": 4,
-      "avatar": "profiles/etud_rokhaya.jpg",
+      "avatar": "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600",
       "telephone": "777890123",
-      "adresse": "yeumbeul,comico"
+      "adresse": "yeumbeul,comico",
+      "state": "disponible"
+    },
+    {
+      "id_utilisateur": 8,
+      "nom": "lo",
+      "prenom": "Souleymane",
+      "email": "ridendo040@gmail.com",
+      "password": "$2y$10$HRyZyWzjGW1l6B93yH9gg.7BWMD.YEzffGg8aQqlNMY2XipqvIDZC",
+      "id_role": 2,
+      "avatar": "pro_67f0708c61d03.jpg",
+      "telephone": "770986789",
+      "adresse": "yeumbeul",
+      "state": "disponible"
+    },
+    {
+      "id_utilisateur": 9,
+      "nom": "Ndiaye",
+      "prenom": "Fallou",
+      "email": "Falou020@gmail.com",
+      "password": "liverpool",
+      "id_role": 4,
+      "avatar": "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "telephone": "958777095",
+      "adresse": "Yeumbeul",
+      "state": "disponible"
     }
   ]
 }
