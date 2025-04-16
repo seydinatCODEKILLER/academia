@@ -25,31 +25,30 @@ export function initRouter() {
   let currentPath = window.location.pathname;
 
   if (!user) {
-    return navigateTo(loginPage);
+    return navigateToAndReplace(loginPage);
   }
 
   if (!ROLE_PATHS[user.id_role]) {
     console.error("Rôle utilisateur invalide :", user.id_role);
-    return navigateTo(loginPage);
+    return navigateToAndReplace(loginPage);
   }
 
   const userBasePath = `${basePath}${ROLE_PATHS[user.id_role]}`;
   if (!currentPath.startsWith(userBasePath)) {
     console.warn(`Accès non autorisé : ${currentPath}`);
-    return navigateTo(`${userBasePath}dashboard.html`);
+    return navigateToAndReplace(`${userBasePath}dashboard.html`);
   }
-
-  setupLogout();
 }
 
-function setupLogout() {
-  document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    clearUser();
-    navigateTo(getEnvironmentConfig().loginPage);
-  });
+export function setupLogout() {
+  clearUser();
+  navigateToAndReplace(getEnvironmentConfig().loginPage);
 }
 
 export function navigateTo(path) {
+  window.location.href = path;
+}
+
+export function navigateToAndReplace(path) {
   window.location.replace(path);
 }
