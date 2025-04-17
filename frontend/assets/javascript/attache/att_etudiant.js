@@ -1,9 +1,21 @@
 import { initRouter } from "../../../router/router.js";
+import { getIdAttacherByUserId } from "../../../services/attacherService.js";
 import { getCurrentUser } from "../../../store/authStore.js";
-import { handleSidebar } from "./sidebar.js";
+import {
+  handleSidebar,
+  renderAbsencesTable,
+  renderAbsencesTableFilter,
+  renderAttacheHeader,
+  renderBannerForAbsence,
+} from "./utils.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initRouter();
   const user = getCurrentUser();
   handleSidebar(user);
+  renderAttacheHeader(user, "Absences");
+  const idAttacher = await getIdAttacherByUserId(user.id_utilisateur);
+  renderBannerForAbsence();
+  await renderAbsencesTableFilter(idAttacher);
+  await renderAbsencesTable(idAttacher);
 });

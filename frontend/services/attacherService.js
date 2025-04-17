@@ -266,3 +266,124 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
     return [];
   }
 }
+
+export async function getEtudiantsAvecAbsences(idAttache) {
+  try {
+    // Récupération de toutes les données nécessaires en parallèle
+    const [
+      classesAttaches,
+      classes,
+      filieres,
+      anneeScolaires,
+      inscriptions,
+      etudiants,
+      utilisateurs,
+      absences,
+      cours,
+      modules,
+    ] = await Promise.all([
+      fetchData("classes_attaches"),
+      fetchData("classes"),
+      fetchData("filieres"),
+      fetchData("annee_scolaire"),
+      fetchData("inscriptions"),
+      fetchData("etudiants"),
+      fetchData("utilisateurs"),
+      fetchData("absences"),
+      fetchData("cours"),
+      fetchData("modules"),
+    ]);
+
+    // 1. Trouver l'année scolaire en cours (est_active = 1)
+    const anneeEnCours = anneeScolaires.find((a) => a.est_active === 1);
+    if (!anneeEnCours) throw new Error("Aucune année scolaire active trouvée");
+
+    // 2. Filtrer les classes assignées à cet attaché
+    const classesAttache = classesAttaches
+      .filter((ca) => ca.id_attache == idAttache)
+      .map((ca) => ca.id_classe);
+
+    // 3. Récupérer les classes de l'année en cours
+    const classesFiltrees = classes.filter(
+      (c) =>
+        classesAttache.includes(c.id_classe) &&
+        c.id_annee === anneeEnCours.id_annee
+    );
+
+    // 4. Récupérer les étudiants inscrits et validés dans ces classes
+    const etudiantsAvecInfos = etudiants
+      .filter((etudiant) => {
+        // Vérifier l'inscription validée dans une classe gérée
+        const inscriptionValide = inscriptions.find(
+          (i) =>
+            i.id_etudiant === etudiant.id_etudiant &&
+            i.statut === "validée" &&
+            classesFiltrees.some((c) => c.id_classe === i.id_classe)
+        );
+        return !!inscriptionValide;
+      })
+      .map((etudiant) => {
+        const utilisateur = utilisateurs.find(
+          (u) => u.id_utilisateur === etudiant.id_utilisateur
+        );
+        const classe = classes.find((c) => c.id_classe === etudiant.id_classe);
+        const filiere = filieres.find(
+          (f) => f.id_filiere === classe?.id_filiere
+        );
+
+        // Récupérer les absences de l'étudiant
+        const absencesEtudiant = absences
+          .filter((a) => a.id_etudiant === etudiant.id_etudiant)
+          .map((absence) => {
+            const coursAbsence = cours.find(
+              (c) => c.id_cours === absence.id_cours
+            );
+            const moduleAbsence = modules.find(
+              (m) => m.id_module === coursAbsence?.id_module
+            );
+
+            return {
+              id_absence: absence.id_absence,
+              date_absence: absence.date_absence,
+              heure_marquage: absence.heure_marquage,
+              justified: absence.justified,
+              cours: {
+                id_cours: coursAbsence?.id_cours,
+                module: moduleAbsence?.libelle || "Inconnu",
+                date_cours: coursAbsence?.date_cours,
+                heure_debut: coursAbsence?.heure_debut,
+                salle: coursAbsence?.salle,
+              },
+            };
+          });
+
+        return {
+          id_etudiant: etudiant.id_etudiant,
+          matricule: etudiant.matricule,
+          nom: utilisateur?.nom || "Inconnu",
+          prenom: utilisateur?.prenom || "Inconnu",
+          email: utilisateur?.email || "",
+          avatar: utilisateur?.avatar || "",
+          classeLibelle: classe?.libelle,
+          idNiveau: classe?.id_niveau,
+          filiereLibelle: filiere?.libelle,
+          absences: absencesEtudiant,
+          nombreAbsences: absencesEtudiant.length,
+          heuresAbsences: absencesEtudiant.reduce((total, abs) => {
+            const duree =
+              cours.find((c) => c.id_cours === abs.cours?.id_cours)
+                ?.nombre_heures || 0;
+            return total + (abs.justified === "justifier" ? 0 : duree);
+          }, 0),
+        };
+      });
+
+    return etudiantsAvecInfos;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des étudiants avec absences:",
+      error
+    );
+    return [];
+  }
+}

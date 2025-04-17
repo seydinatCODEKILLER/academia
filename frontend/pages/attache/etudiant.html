@@ -14,13 +14,22 @@
       href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.min.css"
       rel="stylesheet"
     />
-    <title>Etudiants | Attache</title>
+    <title>Classes | Attache</title>
   </head>
   <body
     class="flex h-screen inset-0 bg-gradient-to-r from-indigo-50/50 to-white"
   >
     <div id="sidebar-container"></div>
-    <div class="w-full"></div>
+    <div class="w-full lg:ml-56">
+      <div id="header"></div>
+      <div class="px-3">
+        <div class="bg-white shadow-sm rounded p-3 mt-5">
+          <div id="banner-container"></div>
+          <div id="filters-container"></div>
+          <div id="absences-container" class=""></div>
+        </div>
+      </div>
+    </div>
     <div id="notifications" class="fixed top-4 right-4 space-y-2"></div>
   </body>
   <script

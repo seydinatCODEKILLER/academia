@@ -1,4 +1,7 @@
-import { updateClassesTableWithFilters } from "../../assets/javascript/attache/utils.js";
+import {
+  updateAbsencesTableWithFilters,
+  updateClassesTableWithFilters,
+} from "../../assets/javascript/attache/utils.js";
 
 /**
  * Crée une barre de filtres pour le tableau des classes
@@ -17,7 +20,7 @@ export function createClassFilters(config) {
   } = config;
 
   const filtersContainer = document.createElement("div");
-  filtersContainer.className = "bg-base-200 p-4 rounded-lg mb-6";
+  filtersContainer.className = "bg-base-200 p-3 rounded-lg mb-6";
 
   const title = document.createElement("h3");
   title.className = "font-bold text-lg mb-4";
@@ -88,6 +91,70 @@ export function createClassFilters(config) {
   filtersGrid.appendChild(searchInput);
   filtersGrid.appendChild(filiereSelect);
   filtersGrid.appendChild(anneeSelect);
+  filtersGrid.appendChild(resetButton);
+  filtersContainer.appendChild(filtersGrid);
+
+  return filtersContainer;
+}
+
+export function createAbsencesFilters(config) {
+  const {
+    niveaux = [],
+    idAttache,
+    onFilter = (filters) => updateAbsencesTableWithFilters(idAttache, filters),
+  } = config;
+
+  const filtersContainer = document.createElement("div");
+  filtersContainer.className = "bg-base-200 p-3 rounded-lg mb-6";
+
+  const title = document.createElement("h3");
+  title.className = "font-bold text-lg mb-4";
+  title.textContent = "Filtrer les absences";
+  filtersContainer.appendChild(title);
+
+  const filtersGrid = document.createElement("div");
+  filtersGrid.className = "grid grid-cols-1 md:grid-cols-4 gap-4";
+
+  // Champ de recherche
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.placeholder = "Rechercher un étudiant...";
+  searchInput.className = "input input-bordered w-full";
+  searchInput.addEventListener("input", (e) =>
+    onFilter({
+      search: e.target.value,
+      niveau: niveauSelect.value,
+    })
+  );
+
+  // Filtre par niveau
+  const niveauSelect = document.createElement("select");
+  niveauSelect.className = "select select-bordered w-full";
+  niveauSelect.innerHTML = `
+    <option value="">Tous les niveaux</option>
+    ${niveaux
+      .map((n) => `<option value="${n.id}">${n.libelle}</option>`)
+      .join("")}
+  `;
+  niveauSelect.addEventListener("change", (e) =>
+    onFilter({
+      niveau: e.target.value,
+      search: searchInput.value,
+    })
+  );
+
+  // Bouton réinitialiser
+  const resetButton = document.createElement("button");
+  resetButton.className = "btn btn-outline";
+  resetButton.innerHTML = '<i class="ri-refresh-line mr-2"></i> Réinitialiser';
+  resetButton.addEventListener("click", () => {
+    searchInput.value = "";
+    niveauSelect.value = "";
+    onFilter({ search: "", niveau: "" });
+  });
+
+  filtersGrid.appendChild(searchInput);
+  filtersGrid.appendChild(niveauSelect);
   filtersGrid.appendChild(resetButton);
   filtersContainer.appendChild(filtersGrid);
 

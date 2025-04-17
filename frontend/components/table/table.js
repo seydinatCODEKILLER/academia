@@ -38,6 +38,20 @@ export function createDaisyUITable(config) {
   table.className = "table table-zebra w-full";
   table.id = tableId;
 
+  // Stockage direct des configurations et données
+  table._tableConfig = {
+    columns,
+    actions,
+    itemsPerPage,
+    emptyMessage,
+  };
+
+  table.currentData = data;
+
+  if (onAction) {
+    table.handleAction = onAction;
+  }
+
   // En-tête
   const thead = document.createElement("thead");
   thead.className = "bg-base-200 text-base-content";
@@ -58,8 +72,6 @@ export function createDaisyUITable(config) {
 
   // Ajouter colonne Actions si configurée
   if (actions) {
-    console.log(actions);
-
     const actionsTh = document.createElement("th");
     actionsTh.className = "text-right text-sm";
     actionsTh.textContent = "Actions";
@@ -105,37 +117,12 @@ export function createDaisyUITable(config) {
   pagination.appendChild(paginationInfo);
   pagination.appendChild(paginationControls);
 
-  // Stockage des métadonnées
-  table.dataset.config = JSON.stringify({
-    columns,
-    actions: actions
-      ? {
-          type: actions.type,
-          idField: actions.idField,
-          items: actions.items.map((item) => ({
-            name: item.name,
-            label: item.label,
-            icon: item.icon,
-            className: item.className,
-            showLabel: item.showLabel,
-          })),
-        }
-      : null,
-    itemsPerPage,
-    emptyMessage,
-    onAction,
-  });
-
-  if (onAction) {
-    table.handleAction = onAction;
-  }
-
-  console.log(actions);
-
   // Assemblage
   tableContainer.appendChild(table);
   tableContainer.appendChild(pagination);
-  console.log(tableId);
+
+  // Initialisation des données
+  // updateDaisyUITableData(tableId, data, 1, onAction);
 
   return tableContainer;
 }
@@ -150,20 +137,21 @@ export function updateDaisyUITableData(
   onAction = null
 ) {
   const table = document.getElementById(tableId);
-
   if (!table) {
     console.log("Table not found");
     return;
   }
 
-  const config = JSON.parse(table.dataset.config);
-  console.log(config);
-
+  const config = table._tableConfig;
   const tbody = document.getElementById(`${tableId}-body`);
   tbody.innerHTML = "";
 
-  // Stocker les données pour la pagination
-  table.dataset.currentData = JSON.stringify(newData);
+  // Mise à jour des données
+  table.currentData = newData;
+
+  if (onAction) {
+    table.handleAction = onAction;
+  }
 
   // Calcul de la pagination
   const startIndex = (currentPage - 1) * config.itemsPerPage;
@@ -311,17 +299,16 @@ function updateDaisyUIPagination(tableId, currentPage, totalPages) {
 
   // Gestion des événements
   const table = document.getElementById(tableId);
-  const data = JSON.parse(table.dataset.currentData || "[]");
 
   prevBtn.onclick = () => {
     if (currentPage > 1) {
-      updateDaisyUITableData(tableId, data, currentPage - 1);
+      updateDaisyUITableData(tableId, table.currentData, currentPage - 1);
     }
   };
 
   nextBtn.onclick = () => {
     if (currentPage < totalPages) {
-      updateDaisyUITableData(tableId, data, currentPage + 1);
+      updateDaisyUITableData(tableId, table.currentData, currentPage + 1);
     }
   };
 }
