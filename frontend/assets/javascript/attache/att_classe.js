@@ -5,6 +5,7 @@ import {
   handleSidebar,
   renderAttacheHeader,
   renderClassesTable,
+  renderClasseTableFilter,
 } from "./utils.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -13,5 +14,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   handleSidebar(user);
   renderAttacheHeader(user);
   const idAttacher = await getIdAttacherByUserId(user.id_utilisateur);
+  await renderClasseTableFilter(idAttacher);
   await renderClassesTable(idAttacher);
 });

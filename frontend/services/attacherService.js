@@ -188,6 +188,7 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
       utilisateurs,
       filieres,
       niveaux,
+      // scolarite,
     ] = await Promise.all([
       fetchData("classes_attaches"),
       fetchData("classes"),
@@ -195,6 +196,7 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
       fetchData("utilisateurs"),
       fetchData("filieres"),
       fetchData("niveaux"),
+      // fetchData("annee_scolaire"),
     ]);
 
     // 1. Filtrer les classes assignées à cet attaché
@@ -202,7 +204,7 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
       .filter((ca) => ca.id_attache == idAttache)
       .map((ca) => ca.id_classe);
 
-    // 2. Récupérer les classes complètes avec filière et niveau
+    // 2. Récupérer les classes complètes avec filière et niveau et annee scolaire
     const classesCompletes = classes
       .filter((c) => classesAttache.includes(c.id_classe))
       .map((classe) => {
@@ -210,8 +212,13 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
           (f) => f.id_filiere === classe.id_filiere
         );
         const niveau = niveaux.find((n) => n.id_niveau === classe.id_niveau);
+        // const annee_scolaire = scolarite.find(
+        //   (s) => s.id_annee === classe.id_annee
+        // );
         return {
           ...classe,
+          // idFiliere: filiere?.id_filiere,
+          // idAnnee: annee_scolaire?.id_annee,
           nomFiliere: filiere?.libelle || "Inconnu",
           nomNiveau: niveau?.libelle || "Inconnu",
         };
@@ -240,6 +247,8 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
         id_classe: classe.id_classe,
         libelle: classe.libelle,
         statut: classe.state,
+        idFiliere: classe.id_filiere,
+        idAnnee: classe.id_annee,
         nomFiliere: classe.nomFiliere,
         nomNiveau: classe.nomNiveau,
         capacite_max: classe.capacite_max,

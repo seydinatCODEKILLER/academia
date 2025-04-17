@@ -2,6 +2,7 @@ import {
   createAbsenteesCard,
   createStatsCard,
 } from "../../../components/card/card.js";
+import { createClassFilters } from "../../../components/filter/filter.js";
 import { createResponsiveAttacheHeader } from "../../../components/header/header.js";
 import {
   createSidebar,
@@ -18,11 +19,13 @@ import {
   showOrUpdateModal,
 } from "../../../helpers/attacher/classeHelpers.js";
 import { navigateTo, navigateToAndReplace } from "../../../router/router.js";
+import { getAllAnneesScolaires } from "../../../services/annees_scolaireService.js";
 import {
   getClassesEtEtudiantsParAttache,
   getDashboardStatsAttacher,
   getTop5Absentees,
 } from "../../../services/attacherService.js";
+import { getAllFilieres } from "../../../services/filiereService.js";
 import { createStyledElement } from "../../../utils/function.js";
 
 export function handleSidebar(user) {
@@ -163,8 +166,25 @@ export function renderCalendar() {
   document.getElementById("calendar").appendChild(calendar);
 }
 
-export async function renderClassesTable(idAttache) {
-  const classes = await getClassesEtEtudiantsParAttache(idAttache);
+export async function renderClassesTable(idAttache, filters = {}) {
+  let classes = await getClassesEtEtudiantsParAttache(idAttache);
+
+  if (filters.search) {
+    const searchTerm = filters.search.toLowerCase();
+    classes = classes.filter((classe) =>
+      classe.libelle.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  if (filters.filiere) {
+    console.log(filters.filiere);
+
+    classes = classes.filter((classe) => classe.idFiliere == filters.filiere);
+  }
+
+  if (filters.annee) {
+    classes = classes.filter((classe) => classe.idAnnee == filters.annee);
+  }
 
   const columns = [
     {
@@ -224,7 +244,9 @@ export async function renderClassesTable(idAttache) {
       }
     },
   });
-  document.getElementById("classes-container").appendChild(table);
+  const container = document.getElementById("classes-container");
+  container.innerHTML = "";
+  container.appendChild(table);
   updateDaisyUITableData("classes-table", classes, 1, (action, id) => {
     if (action === "details") {
       showClassDetails(id, classes);
@@ -241,4 +263,22 @@ export function showClassDetails(classId, allClasses) {
 
   const modalContent = createModalContent(classe);
   showOrUpdateModal(modalContent, classe.libelle);
+}
+
+export async function updateClassesTableWithFilters(idAttache, filters = {}) {
+  await renderClassesTable(idAttache, filters);
+}
+
+export async function renderClasseTableFilter(idAttacher) {
+  const [filieres, anneesScolaires] = await Promise.all([
+    getAllFilieres(),
+    getAllAnneesScolaires(),
+  ]);
+  const filters = createClassFilters({
+    filieres,
+    anneesScolaires,
+    idAttache: idAttacher,
+    onFilter: (filters) => updateClassesTableWithFilters(idAttacher, filters),
+  });
+  document.getElementById("filters-container").appendChild(filters);
 }
