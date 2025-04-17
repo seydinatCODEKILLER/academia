@@ -4,6 +4,7 @@ import { getCurrentUser } from "../../../store/authStore.js";
 import {
   handleSidebar,
   renderAttacheHeader,
+  renderBannerForClasse,
   renderClassesTable,
   renderClasseTableFilter,
 } from "./utils.js";
@@ -12,7 +13,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   initRouter();
   const user = getCurrentUser();
   handleSidebar(user);
-  renderAttacheHeader(user);
+  renderAttacheHeader(user, "Mes classes");
+  renderBannerForClasse();
   const idAttacher = await getIdAttacherByUserId(user.id_utilisateur);
   await renderClasseTableFilter(idAttacher);
   await renderClassesTable(idAttacher);

@@ -1,3 +1,4 @@
+import { createModernBanner } from "../../../components/banner/banner.js";
 import {
   createAbsenteesCard,
   createStatsCard,
@@ -115,9 +116,9 @@ export async function renderAttacheStatsCards(idAttache) {
   document.getElementById("stats-section").appendChild(container);
 }
 
-export function renderAttacheHeader(user) {
+export function renderAttacheHeader(user, currentPage = "Dashboard") {
   const header = createResponsiveAttacheHeader({
-    currentPage: "Dashboard",
+    currentPage: currentPage,
     userName: user.prenom,
     notificationCount: 2,
   });
@@ -281,4 +282,15 @@ export async function renderClasseTableFilter(idAttacher) {
     onFilter: (filters) => updateClassesTableWithFilters(idAttacher, filters),
   });
   document.getElementById("filters-container").appendChild(filters);
+}
+
+export function renderBannerForClasse() {
+  const bannerWithAction = createModernBanner({
+    title: "Gestion des classes",
+    subtitle: "Consulter et gérez les classe de votre établissement",
+    imageUrl: "/frontend/assets/images/main.png",
+    altText: "Icône gestion des cours",
+    badgeColor: "primary",
+  });
+  document.getElementById("banner-container").appendChild(bannerWithAction);
 }
