@@ -79,7 +79,7 @@ export async function renderAttacheStatsCards(idAttache) {
     description: "Total des classes sous votre responsabilité",
     icon: "ri-building-line",
     color: "purple",
-    onClick: () => navigateToAndReplace("/frontend/pages/attache/classes.html"),
+    onClick: () => navigateToAndReplace("/frontend/pages/attache/classe.html"),
   });
 
   const justificationsCard = createStatsCard({
@@ -97,7 +97,7 @@ export async function renderAttacheStatsCards(idAttache) {
     description: "Étudiants dans vos classes",
     icon: "ri-user-line",
     color: "green",
-    onClick: () => navigateTo("/frontend/pages/attache/etudiants.html"),
+    onClick: () => navigateTo("/frontend/pages/attache/etudiant.html"),
   });
 
   container.appendChild(classesCard);
@@ -159,6 +159,7 @@ export function renderCalendar() {
 
 export async function renderClassesTable(idAttache) {
   const classes = await getClassesEtEtudiantsParAttache(idAttache);
+
   const columns = [
     {
       header: "Classe",
@@ -193,6 +194,7 @@ export async function renderClassesTable(idAttache) {
   // Configuration des actions (juste un bouton Détails)
   const actionsConfig = {
     type: "direct",
+    idField: "id_classe", // Champ unique pour tout le tableau
     items: [
       {
         name: "details",
@@ -212,7 +214,9 @@ export async function renderClassesTable(idAttache) {
     actions: actionsConfig,
     onAction: (action, id) => {
       if (action === "details") {
-        console.log(id);
+        alert(id);
+
+        // showClassDetails(id, classes);
       }
     },
   });

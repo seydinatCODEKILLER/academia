@@ -58,6 +58,8 @@ export function createDaisyUITable(config) {
 
   // Ajouter colonne Actions si configurée
   if (actions) {
+    console.log(actions);
+
     const actionsTh = document.createElement("th");
     actionsTh.className = "text-right text-sm";
     actionsTh.textContent = "Actions";
@@ -106,10 +108,29 @@ export function createDaisyUITable(config) {
   // Stockage des métadonnées
   table.dataset.config = JSON.stringify({
     columns,
-    actions,
+    actions: actions
+      ? {
+          type: actions.type,
+          idField: actions.idField,
+          items: actions.items.map((item) => ({
+            name: item.name,
+            label: item.label,
+            icon: item.icon,
+            className: item.className,
+            showLabel: item.showLabel,
+          })),
+        }
+      : null,
     itemsPerPage,
     emptyMessage,
+    onAction,
   });
+
+  if (onAction) {
+    table.handleAction = onAction;
+  }
+
+  console.log(actions);
 
   // Assemblage
   tableContainer.appendChild(table);
@@ -136,6 +157,8 @@ export function updateDaisyUITableData(
   }
 
   const config = JSON.parse(table.dataset.config);
+  console.log(config);
+
   const tbody = document.getElementById(`${tableId}-body`);
   tbody.innerHTML = "";
 
@@ -212,9 +235,7 @@ export function updateDaisyUITableData(
   );
 
   // Configuration des événements
-  if (onAction) {
-    setupDaisyUIEvents(tableId, onAction);
-  }
+  setupDaisyUIEvents(tableId);
 }
 
 /**
@@ -250,25 +271,26 @@ function renderDaisyUIDropdown(item, actionsConfig, tableId) {
  * Rend des boutons d'actions directs avec DaisyUI
  */
 function renderDaisyUIDirectActions(item, actionsConfig) {
-  return `
-    <div class="flex justify-end space-x-1">
-      ${actionsConfig.items
-        .map(
-          (action) => `
-        <button class="btn btn-sm ${
-          action.className || "btn-ghost"
-        } action-item" 
-                data-action="${action.name}" data-id="${item.id}" title="${
-            action.label
-          }">
-          <i class="${action.icon}"></i>
-          ${action.showLabel ? action.label : ""}
-        </button>
-      `
-        )
-        .join("")}
-    </div>
-  `;
+  const itemId = item[actionsConfig.idField];
+
+  if (!itemId) {
+    console.warn("ID manquant pour:", item);
+    return "";
+  }
+
+  return actionsConfig.items
+    .map(
+      (action) => `
+    <button class="btn btn-sm ${action.className || "btn-ghost"}"
+            data-action="${action.name}"
+            data-id="${itemId}"
+            title="${action.label}">
+      <i class="${action.icon}"></i>
+      ${action.showLabel ? action.label : ""}
+    </button>
+  `
+    )
+    .join("");
 }
 
 /**
@@ -307,17 +329,16 @@ function updateDaisyUIPagination(tableId, currentPage, totalPages) {
 /**
  * Configure les événements avec DaisyUI
  */
-function setupDaisyUIEvents(tableId, onAction) {
+function setupDaisyUIEvents(tableId) {
+  const table = document.getElementById(tableId);
   const tbody = document.getElementById(`${tableId}-body`);
-  if (!tbody) return;
+  if (!tbody || !table.handleAction) return;
 
   tbody.addEventListener("click", (e) => {
     const actionItem = e.target.closest("[data-action]");
     if (actionItem) {
       e.preventDefault();
-      const action = actionItem.dataset.action;
-      const id = actionItem.dataset.id;
-      onAction(action, id);
+      table.handleAction(actionItem.dataset.action, actionItem.dataset.id);
     }
   });
 }
