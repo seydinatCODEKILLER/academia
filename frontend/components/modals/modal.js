@@ -76,3 +76,31 @@ export function createModal(config) {
 
   return modal;
 }
+
+/**
+ * Affiche un modal avec un état vide
+ * @param {string} message - Message à afficher
+ * @param {string} modalId - ID du modal existant ou nouveau
+ */
+export function showEmptyStateModal(message, modalId = null) {
+  const emptyContent = `
+    <div class="text-center py-8">
+      <img src="/frontend/assets/images/recherche.png" alt="Tableau vide" class="w-32 h-32 mx-auto mb-4 opacity-50">
+      <p class="text-gray-500">${message}</p>
+    </div>
+  `;
+
+  if (modalId && document.getElementById(modalId)) {
+    const modal = document.getElementById(modalId);
+    modal.querySelector(".modal-box div:nth-child(2)").innerHTML = emptyContent;
+    modal.showModal();
+  } else {
+    const modal = createModal({
+      id: modalId || `empty-modal-${Math.random().toString(36).substr(2, 4)}`,
+      title: "Information",
+      content: emptyContent,
+    });
+    document.body.appendChild(modal);
+    modal.showModal();
+  }
+}

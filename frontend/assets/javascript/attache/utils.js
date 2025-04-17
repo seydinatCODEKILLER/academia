@@ -11,6 +11,12 @@ import {
   createDaisyUITable,
   updateDaisyUITableData,
 } from "../../../components/table/table.js";
+import {
+  createModalContent,
+  findClassById,
+  showClassNotFound,
+  showOrUpdateModal,
+} from "../../../helpers/attacher/classeHelpers.js";
 import { navigateTo, navigateToAndReplace } from "../../../router/router.js";
 import {
   getClassesEtEtudiantsParAttache,
@@ -214,16 +220,25 @@ export async function renderClassesTable(idAttache) {
     actions: actionsConfig,
     onAction: (action, id) => {
       if (action === "details") {
-        alert(id);
-
-        // showClassDetails(id, classes);
+        showClassDetails(id, classes);
       }
     },
   });
   document.getElementById("classes-container").appendChild(table);
   updateDaisyUITableData("classes-table", classes, 1, (action, id) => {
     if (action === "details") {
-      console.log(id);
+      showClassDetails(id, classes);
     }
   });
+}
+
+export function showClassDetails(classId, allClasses) {
+  const classe = findClassById(classId, allClasses);
+  if (!classe) {
+    showClassNotFound();
+    return;
+  }
+
+  const modalContent = createModalContent(classe);
+  showOrUpdateModal(modalContent, classe.libelle);
 }
