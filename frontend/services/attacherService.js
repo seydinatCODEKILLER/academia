@@ -177,3 +177,83 @@ export async function getTop5Absentees(idAttache) {
     return [];
   }
 }
+
+export async function getClassesEtEtudiantsParAttache(idAttache) {
+  try {
+    // Récupération de toutes les données nécessaires en parallèle
+    const [
+      classesAttaches,
+      classes,
+      etudiants,
+      utilisateurs,
+      filieres,
+      niveaux,
+    ] = await Promise.all([
+      fetchData("classes_attaches"),
+      fetchData("classes"),
+      fetchData("etudiants"),
+      fetchData("utilisateurs"),
+      fetchData("filieres"),
+      fetchData("niveaux"),
+    ]);
+
+    // 1. Filtrer les classes assignées à cet attaché
+    const classesAttache = classesAttaches
+      .filter((ca) => ca.id_attache == idAttache)
+      .map((ca) => ca.id_classe);
+
+    // 2. Récupérer les classes complètes avec filière et niveau
+    const classesCompletes = classes
+      .filter((c) => classesAttache.includes(c.id_classe))
+      .map((classe) => {
+        const filiere = filieres.find(
+          (f) => f.id_filiere === classe.id_filiere
+        );
+        const niveau = niveaux.find((n) => n.id_niveau === classe.id_niveau);
+        return {
+          ...classe,
+          nomFiliere: filiere?.libelle || "Inconnu",
+          nomNiveau: niveau?.libelle || "Inconnu",
+        };
+      });
+
+    // 3. Récupérer les étudiants pour chaque classe avec leurs infos utilisateur
+    const resultat = classesCompletes.map((classe) => {
+      const etudiantsClasse = etudiants
+        .filter((e) => e.id_classe === classe.id_classe)
+        .map((etudiant) => {
+          const utilisateur = utilisateurs.find(
+            (u) => u.id_utilisateur === etudiant.id_utilisateur
+          );
+          return {
+            id_etudiant: etudiant.id_etudiant,
+            matricule: etudiant.matricule,
+            nom: utilisateur?.nom || "Inconnu",
+            prenom: utilisateur?.prenom || "Inconnu",
+            email: utilisateur?.email || "",
+            telephone: utilisateur?.telephone || "",
+            date_inscription: etudiant.date_inscription,
+          };
+        });
+
+      return {
+        id_classe: classe.id_classe,
+        libelle: classe.libelle,
+        statut: classe.state,
+        nomFiliere: classe.nomFiliere,
+        nomNiveau: classe.nomNiveau,
+        capacite_max: classe.capacite_max,
+        etudiants: etudiantsClasse,
+        nombreEtudiants: etudiantsClasse.length || 0,
+      };
+    });
+
+    return resultat;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des classes et étudiants:",
+      error
+    );
+    return [];
+  }
+}

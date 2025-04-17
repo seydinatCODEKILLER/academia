@@ -7,11 +7,17 @@ import {
   createSidebar,
   setActiveLink,
 } from "../../../components/sidebar/sidebar.js";
+import {
+  createDaisyUITable,
+  updateDaisyUITableData,
+} from "../../../components/table/table.js";
 import { navigateTo, navigateToAndReplace } from "../../../router/router.js";
 import {
+  getClassesEtEtudiantsParAttache,
   getDashboardStatsAttacher,
   getTop5Absentees,
 } from "../../../services/attacherService.js";
+import { createStyledElement } from "../../../utils/function.js";
 
 export function handleSidebar(user) {
   const { avatar, nom, prenom } = user;
@@ -149,4 +155,71 @@ export function renderCalendar() {
             </calendar-date>
   `;
   document.getElementById("calendar").appendChild(calendar);
+}
+
+export async function renderClassesTable(idAttache) {
+  const classes = await getClassesEtEtudiantsParAttache(idAttache);
+  const columns = [
+    {
+      header: "Classe",
+      key: "libelle",
+      render: (classe) =>
+        createStyledElement("span", "text-sm", classe.libelle),
+    },
+    {
+      header: "Niveau",
+      key: "nomNiveau",
+      render: (classe) =>
+        createStyledElement("span", "text-sm", classe.nomNiveau),
+    },
+    {
+      header: "Filiere",
+      key: "nomFiliere",
+      render: (classe) =>
+        createStyledElement("span", "text-sm", classe.nomFiliere),
+    },
+    {
+      header: "Capacité",
+      key: "capacite_max",
+      render: (classe) =>
+        createStyledElement("span", "badge badge-soft ", classe.capacite_max),
+    },
+    {
+      header: "Statut",
+      key: "statut",
+      render: (classe) => createStyledElement("span", `badge`, classe.statut),
+    },
+  ];
+  // Configuration des actions (juste un bouton Détails)
+  const actionsConfig = {
+    type: "direct",
+    items: [
+      {
+        name: "details",
+        label: "Détails",
+        icon: "ri-eye-line",
+        className: "btn-sm btn-primary",
+        showLabel: true,
+      },
+    ],
+  };
+
+  const table = createDaisyUITable({
+    tableId: "classes-table",
+    columns,
+    itemsPerPage: 2,
+    data: classes,
+    actions: actionsConfig,
+    onAction: (action, id) => {
+      if (action === "details") {
+        console.log(id);
+      }
+    },
+  });
+  document.getElementById("classes-container").appendChild(table);
+  updateDaisyUITableData("classes-table", classes, 1, (action, id) => {
+    if (action === "details") {
+      console.log(id);
+    }
+  });
 }
