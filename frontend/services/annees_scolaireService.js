@@ -18,3 +18,12 @@ export async function getAllAnneesScolaires() {
     return [];
   }
 }
+
+export async function getCurrentAcademicYear() {
+  const annees = await fetchData("annee_scolaire");
+  const anneeActive = annees.find((a) => a.est_active === 1);
+  return (
+    anneeActive?.libelle ||
+    `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`
+  );
+}

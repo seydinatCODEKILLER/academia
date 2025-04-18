@@ -479,3 +479,68 @@ export async function getClassesByAttache(idAttache) {
     return [];
   }
 }
+
+export async function getEtudiantsParAttache(idAttache) {
+  try {
+    // Récupération des données en parallèle
+    const [classesAttaches, classes, etudiants, utilisateurs, inscriptions] =
+      await Promise.all([
+        fetchData("classes_attaches"),
+        fetchData("classes"),
+        fetchData("etudiants"),
+        fetchData("utilisateurs"),
+        fetchData("inscriptions"),
+      ]);
+
+    // 1. Trouver les classes gérées par l'attaché
+    const idClassesAttache = classesAttaches
+      .filter((ca) => ca.id_attache === idAttache)
+      .map((ca) => ca.id_classe);
+
+    // 2. Filtrer les étudiants inscrits dans ces classes
+    return etudiants
+      .filter((etudiant) => {
+        // Vérifier que l'étudiant est dans une classe gérée
+        const estDansClasseAttache = idClassesAttache.includes(
+          etudiant.id_classe
+        );
+
+        // Vérifier qu'il a une inscription validée
+        const inscriptionValide = inscriptions.some(
+          (i) => i.id_etudiant === etudiant.id && i.statut === "validée"
+        );
+
+        return estDansClasseAttache && inscriptionValide;
+      })
+      .map((etudiant) => {
+        const utilisateur = utilisateurs.find(
+          (u) => u.id === etudiant.id_utilisateur
+        );
+        const classe = classes.find((c) => c.id == etudiant.id_classe);
+        const inscription = inscriptions.find(
+          (i) => i.id_etudiant == etudiant.id
+        );
+
+        return {
+          id: etudiant.id,
+          matricule: etudiant.matricule,
+          nom: utilisateur?.nom || "Inconnu",
+          prenom: utilisateur?.prenom || "Inconnu",
+          email: utilisateur?.email || "",
+          telephone: utilisateur?.telephone || "",
+          avatar: utilisateur?.avatar,
+          id_classe: etudiant.id_classe,
+          idAnnee: classe?.id_annee,
+          classe_libelle: classe?.libelle || "Inconnu",
+          date_inscription: inscription?.date_inscription || "Inconnu",
+          est_reinscription: inscription?.est_reinscription || false,
+        };
+      });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des étudiants par attaché:",
+      error
+    );
+    return [];
+  }
+}

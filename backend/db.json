@@ -179,7 +179,7 @@
     },
     {
       "cle": "periode_reinscription_fin",
-      "valeur": "2025-04-20",
+      "valeur": "2025-04-22",
       "description": "Date fin réinscriptions",
       "date_modification": "2025-04-13 22:04:14"
     }
@@ -278,7 +278,7 @@
       "id_utilisateur": "5",
       "matricule": "ET20230001",
       "date_inscription": "2025-01-01",
-      "id_classe": "1",
+      "id_classe": "2",
       "id": "1"
     },
     {
@@ -383,6 +383,16 @@
       "statut": "en attente",
       "redoublement": 0,
       "id": "9"
+    },
+    {
+      "id": "10",
+      "id_etudiant": "1",
+      "id_classe": "2",
+      "redoublement": false,
+      "annee_scolaire": "2024-2025",
+      "date_inscription": "2025-04-18T17:41:46.261Z",
+      "est_reinscription": 1,
+      "statut": "validée"
     }
   ],
   "justifications": [

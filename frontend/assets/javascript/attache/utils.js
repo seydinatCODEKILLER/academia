@@ -6,6 +6,7 @@ import {
 import {
   createAbsencesFilters,
   createClassFilters,
+  createInscriptionsFilters,
   createJustificationsFilters,
 } from "../../../components/filter/filter.js";
 import { createResponsiveAttacheHeader } from "../../../components/header/header.js";
@@ -25,6 +26,7 @@ import {
   showClassNotFound,
   showOrUpdateModal,
 } from "../../../helpers/attacher/classeHelpers.js";
+import { handleReinscriptionClick } from "../../../helpers/attacher/inscriptionHelpers.js";
 import {
   getActionConfig,
   getAvailableActions,
@@ -40,8 +42,10 @@ import {
   getDashboardStatsAttacher,
   getDemandesJustificationAttache,
   getEtudiantsAvecAbsences,
+  getEtudiantsParAttache,
   getTop5Absentees,
 } from "../../../services/attacherService.js";
+import { getEtudiantById } from "../../../services/etudiantService.js";
 import { getAllFilieres } from "../../../services/filiereService.js";
 import { updateJustificationStatus } from "../../../services/justificationService.js";
 import { getAllNiveaux } from "../../../services/niveauxServices.js";
@@ -354,7 +358,6 @@ export async function renderAbsencesTable(idAttache, filters = {}) {
     );
   }
 
-  // Configuration des colonnes
   const columns = [
     {
       header: "Profil",
@@ -652,4 +655,157 @@ export function renderBannerForJustification() {
     showBadge: true,
   });
   document.getElementById("banner-container").appendChild(bannerWithAction);
+}
+
+//Gestion des inscriptions
+
+export async function renderInscriptionTable(idAttache, filters = {}) {
+  let etudiants = await getEtudiantsParAttache(idAttache);
+  if (filters.search) {
+    const searchTerm = filters.search.toLowerCase();
+    etudiants = etudiants.filter(
+      (etudiant) =>
+        etudiant.nom.toLowerCase().includes(searchTerm) ||
+        etudiant.prenom.toLowerCase().includes(searchTerm)
+    );
+  }
+  if (filters.classe) {
+    etudiants = etudiants.filter(
+      (etudiant) => etudiant.id_classe == filters.classe
+    );
+  }
+  if (filters.annee) {
+    etudiants = etudiants.filter(
+      (etudiant) => etudiant.idAnnee == filters.annee
+    );
+  }
+
+  const columns = [
+    {
+      header: "Profil",
+      key: "avatar",
+      render: (etudiant) => `
+        <div>
+          <img src="${etudiant.avatar}" class="w-10 h-10 rounded object-cover" />
+        </div>
+      `,
+    },
+    {
+      header: "Matricule",
+      key: "matricule",
+      render: (etudiant) =>
+        createStyledElement(
+          "span",
+          "text-sm font-mono badge",
+          etudiant.matricule
+        ),
+    },
+    {
+      header: "Étudiant",
+      key: "nom_complet",
+      render: (etudiant) =>
+        createStyledElement(
+          "span",
+          "text-sm font-medium",
+          `${etudiant.prenom} ${etudiant.nom}`
+        ),
+    },
+    {
+      header: "Classe",
+      key: "classe_libelle",
+      render: (etudiant) =>
+        createStyledElement("span", "text-sm", etudiant.classe_libelle),
+    },
+    {
+      header: "Email",
+      key: "email",
+      render: (etudiant) =>
+        createStyledElement("span", "text-sm", etudiant.email),
+    },
+    {
+      header: "Date inscription",
+      key: "date_inscription",
+      render: (etudiant) =>
+        createStyledElement("span", "text-sm", etudiant.date_inscription),
+    },
+    {
+      header: "Type",
+      key: "est_reinscription",
+      render: (etudiant) => {
+        const type =
+          etudiant.est_reinscription == 1 ? "Réinscription" : "Nouveau";
+        const badgeClass =
+          etudiant.est_reinscription == 1 ? "badge-info" : "badge-success";
+        return createStyledElement(
+          "span",
+          `badge badge-soft ${badgeClass}`,
+          type
+        );
+      },
+    },
+  ];
+
+  // Configuration des actions
+  const actionsConfig = {
+    type: "direct",
+    items: [
+      {
+        name: "reinscription",
+        label: "Reinscription",
+        icon: "ri-eye-line",
+        className: "btn-sm btn-neutral",
+        showLabel: true,
+      },
+    ],
+  };
+
+  // Gestionnaire d'actions unifié
+  const handleAction = async (action, id) => {
+    if (action === "reinscription") {
+      const student = await getEtudiantById(id);
+      await handleReinscriptionClick(student, idAttache);
+    }
+  };
+
+  const table = createDaisyUITable({
+    tableId: "inscriptions-table",
+    columns,
+    itemsPerPage: 5,
+    data: etudiants,
+    actions: actionsConfig,
+    emptyMessage: "Aucun étudiant trouvé",
+    onAction: handleAction,
+  });
+
+  // Rendu dans le conteneur
+  const container = document.getElementById("inscriptions-container");
+  container.innerHTML = "";
+  container.appendChild(table);
+
+  // Mise à jour initiale des données (avec le même gestionnaire)
+  updateDaisyUITableData("inscriptions-table", etudiants, 1, handleAction);
+}
+
+export async function updateInscriptionsTableWithFilters(
+  idAttache,
+  filters = {}
+) {
+  await renderInscriptionTable(idAttache, filters);
+}
+
+export async function renderInscriptionsFilters(idAttacher) {
+  const [classes, annees] = await Promise.all([
+    getClassesByAttache(idAttacher),
+    getAllAnneesScolaires(),
+  ]);
+
+  const filters = createInscriptionsFilters({
+    classes,
+    annees,
+    idAttache: idAttacher,
+    onFilter: (filters) =>
+      updateInscriptionsTableWithFilters(idAttacher, filters),
+  });
+
+  document.getElementById("filters-container").appendChild(filters);
 }

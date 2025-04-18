@@ -266,6 +266,8 @@ function renderDaisyUIDropdown(item, actionsConfig, tableId) {
  * Rend des boutons d'actions directs avec DaisyUI
  */
 function renderDaisyUIDirectActions(item, actionsConfig) {
+  console.log(item);
+
   return actionsConfig.items
     .map(
       (action) => `

@@ -3,14 +3,6 @@ import {
   updateClassesTableWithFilters,
 } from "../../assets/javascript/attache/utils.js";
 
-/**
- * Crée une barre de filtres pour le tableau des classes
- * @param {Object} config - Configuration des filtres
- * @param {Array} config.filieres - Liste des filières disponibles
- * @param {Array} config.anneesScolaires - Liste des années scolaires
- * @param {Function} config.onFilter - Callback quand les filtres changent
- * @returns {HTMLElement} La barre de filtres
- */
 export function createClassFilters(config) {
   const {
     filieres = [],
@@ -233,6 +225,87 @@ export function createJustificationsFilters(config) {
 
   filtersGrid.appendChild(searchInput);
   filtersGrid.appendChild(statutSelect);
+  filtersGrid.appendChild(classeSelect);
+  filtersGrid.appendChild(resetButton);
+  filtersContainer.appendChild(filtersGrid);
+
+  return filtersContainer;
+}
+
+export function createInscriptionsFilters(config) {
+  const { classes = [], annees = [], idAttache, onFilter = () => {} } = config;
+
+  const filtersContainer = document.createElement("div");
+  filtersContainer.className = "bg-base-200 p-4 rounded-lg mb-6";
+
+  const title = document.createElement("h3");
+  title.className = "font-bold text-lg mb-4";
+  title.textContent = "Filtrer les inscriptions";
+  filtersContainer.appendChild(title);
+
+  const filtersGrid = document.createElement("div");
+  filtersGrid.className = "grid grid-cols-1 md:grid-cols-4 gap-4";
+
+  // Champ de recherche
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.placeholder = "Rechercher un étudiant...";
+  searchInput.className = "input input-bordered w-full";
+  searchInput.addEventListener("input", (e) =>
+    onFilter({
+      search: e.target.value,
+      classe: classeSelect.value,
+      annee: anneeSelect.value,
+    })
+  );
+
+  // Filtre par classe
+  const classeSelect = document.createElement("select");
+  classeSelect.className = "select select-bordered w-full";
+  classeSelect.innerHTML = `
+    <option value="">Toutes les classes</option>
+    ${classes
+      .map((c) => `<option value="${c.id_classe}">${c.libelle}</option>`)
+      .join("")}
+  `;
+  classeSelect.addEventListener("change", (e) =>
+    onFilter({
+      classe: e.target.value,
+      search: searchInput.value,
+      annee: anneeSelect.value,
+    })
+  );
+
+  // Filtre par année scolaire
+  const anneeSelect = document.createElement("select");
+  anneeSelect.className = "select select-bordered w-full";
+  anneeSelect.innerHTML = `
+    <option value="">Toutes les années</option>
+    ${annees
+      .map((a) => `<option value="${a.id}">${a.libelle}</option>`)
+      .join("")}
+  `;
+  anneeSelect.addEventListener("change", (e) => {
+    onFilter({
+      annee: e.target.value,
+      search: searchInput.value,
+      classe: classeSelect.value,
+    });
+  });
+
+  // Bouton réinitialiser
+  const resetButton = document.createElement("button");
+  resetButton.className = "btn btn-outline";
+  resetButton.innerHTML = '<i class="ri-refresh-line mr-2"></i> Réinitialiser';
+  resetButton.addEventListener("click", () => {
+    searchInput.value = "";
+    classeSelect.value = "";
+    anneeSelect.value = "";
+    onFilter({ search: "", filiere: "", annee: "" });
+  });
+
+  filtersGrid.appendChild(searchInput);
+  filtersGrid.appendChild(anneeSelect);
   filtersGrid.appendChild(classeSelect);
   filtersGrid.appendChild(resetButton);
   filtersContainer.appendChild(filtersGrid);
