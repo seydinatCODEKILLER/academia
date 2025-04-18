@@ -5,7 +5,7 @@ export async function getIdAttacherByUserId(id_utilisateur) {
   const attache = attaches.find(
     (item) => item.id_utilisateur == id_utilisateur
   );
-  const actorId = attache ? attache.id_attache : null;
+  const actorId = attache ? attache.id : null;
   return actorId;
 }
 
@@ -18,7 +18,7 @@ export async function getNombreClassesGerees(idAttache) {
 
     const classes = await fetchData("classes");
     const classesGerees = classes.filter((c) =>
-      classesAttache.some((ca) => ca.id_classe === c.id_classe)
+      classesAttache.some((ca) => ca.id_classe == c.id)
     );
 
     return classesGerees.length;
@@ -39,16 +39,16 @@ export async function getNombreJustificationsEnAttenteByAttache(idAttache) {
       ]);
 
     const classesIds = classesAttaches
-      .filter((item) => item.id_attache === idAttache)
+      .filter((item) => item.id_attache == idAttache)
       .map((item) => item.id_classe);
 
     const etudiantsIds = etudiants
       .filter((etud) => classesIds.includes(etud.id_classe))
-      .map((etud) => etud.id_etudiant);
+      .map((etud) => etud.id);
 
     const absencesIds = absences
       .filter((abs) => etudiantsIds.includes(abs.id_etudiant))
-      .map((abs) => abs.id_absence);
+      .map((abs) => abs.id);
 
     const justifsEnAttente = justifications.filter(
       (justif) =>
@@ -75,7 +75,7 @@ export async function getNombreEtudiantsGeres(idAttache) {
 
     const etudiants = await fetchData("etudiants");
     const etudiantsGeres = etudiants.filter((e) =>
-      classesAttache.some((ca) => ca.id_classe === e.id_classe)
+      classesAttache.some((ca) => ca.id_classe == e.id_classe)
     );
 
     return etudiantsGeres.length;
@@ -113,7 +113,6 @@ export async function getDashboardStatsAttacher(idAttache) {
 
 export async function getTop5Absentees(idAttache) {
   try {
-    // 1. Récupérer les données nécessaires
     const [classesAttaches, etudiants, absences, classes, utilisateurs] =
       await Promise.all([
         fetchData("classes_attaches"),
@@ -123,22 +122,21 @@ export async function getTop5Absentees(idAttache) {
         fetchData("utilisateurs"),
       ]);
 
-    // 2. Filtrer les classes gérées par l'attaché
     const classesAttache = classesAttaches.filter(
       (ca) => ca.id_attache == idAttache
     );
     const idClassesGerees = classesAttache.map((ca) => ca.id_classe);
 
-    // 3. Récupérer les étudiants de ces classes avec leurs infos utilisateur
     const etudiantsAvecInfos = etudiants
       .filter((e) => idClassesGerees.includes(e.id_classe))
       .map((etudiant) => {
         const utilisateur = utilisateurs.find(
-          (u) => u.id_utilisateur == etudiant.id_utilisateur
+          (u) => u.id == etudiant.id_utilisateur
         );
-        const classe = classes.find((c) => c.id_classe == etudiant.id_classe);
+        const classe = classes.find((c) => c.id == etudiant.id_classe);
         return {
           ...etudiant,
+          id: etudiant.id,
           nom: utilisateur?.nom || "Inconnu",
           prenom: utilisateur?.prenom || "Inconnu",
           avatar: utilisateur?.avatar || "Inconnu",
@@ -146,29 +144,24 @@ export async function getTop5Absentees(idAttache) {
         };
       });
 
-    // 4. Compter les absences non justifiées par étudiant
     const absencesParEtudiant = etudiantsAvecInfos.map((etudiant) => {
       const absencesEtudiant = absences.filter(
-        (a) =>
-          a.id_etudiant === etudiant.id_etudiant && a.justified !== "justifier"
+        (a) => a.id_etudiant == etudiant.id && a.justified !== "justifier"
       );
       return {
-        id_etudiant: etudiant.id_etudiant,
+        id: etudiant.id,
         matricule: etudiant.matricule,
         nom: etudiant.nom,
         prenom: etudiant.prenom,
         classe: etudiant.nomClasse,
         avatar: etudiant.avatar,
         nombreAbsences: absencesEtudiant.length,
-        // Ajout des heures d'absence si nécessaire
         heuresAbsences: absencesEtudiant.reduce((total, absence) => {
-          const cours = absences.find((a) => a.id_cours === absence.id_cours);
-          return total + (cours?.nombre_heures || 0);
+          return total + (absence?.nombre_heures || 0); // correction ici
         }, 0),
       };
     });
 
-    // 5. Trier par nombre d'absences et retourner les top 5
     return absencesParEtudiant
       .sort((a, b) => b.nombreAbsences - a.nombreAbsences)
       .slice(0, 5);
@@ -180,7 +173,6 @@ export async function getTop5Absentees(idAttache) {
 
 export async function getClassesEtEtudiantsParAttache(idAttache) {
   try {
-    // Récupération de toutes les données nécessaires en parallèle
     const [
       classesAttaches,
       classes,
@@ -188,7 +180,6 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
       utilisateurs,
       filieres,
       niveaux,
-      // scolarite,
     ] = await Promise.all([
       fetchData("classes_attaches"),
       fetchData("classes"),
@@ -196,7 +187,6 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
       fetchData("utilisateurs"),
       fetchData("filieres"),
       fetchData("niveaux"),
-      // fetchData("annee_scolaire"),
     ]);
 
     // 1. Filtrer les classes assignées à cet attaché
@@ -204,21 +194,15 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
       .filter((ca) => ca.id_attache == idAttache)
       .map((ca) => ca.id_classe);
 
-    // 2. Récupérer les classes complètes avec filière et niveau et annee scolaire
+    // 2. Récupérer les classes complètes avec filière et niveau
     const classesCompletes = classes
-      .filter((c) => classesAttache.includes(c.id_classe))
+      .filter((c) => classesAttache.includes(c.id))
       .map((classe) => {
-        const filiere = filieres.find(
-          (f) => f.id_filiere === classe.id_filiere
-        );
-        const niveau = niveaux.find((n) => n.id_niveau === classe.id_niveau);
-        // const annee_scolaire = scolarite.find(
-        //   (s) => s.id_annee === classe.id_annee
-        // );
+        const filiere = filieres.find((f) => f.id == classe.id_filiere);
+        const niveau = niveaux.find((n) => n.id == classe.id_niveau);
+
         return {
           ...classe,
-          // idFiliere: filiere?.id_filiere,
-          // idAnnee: annee_scolaire?.id_annee,
           nomFiliere: filiere?.libelle || "Inconnu",
           nomNiveau: niveau?.libelle || "Inconnu",
         };
@@ -227,13 +211,13 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
     // 3. Récupérer les étudiants pour chaque classe avec leurs infos utilisateur
     const resultat = classesCompletes.map((classe) => {
       const etudiantsClasse = etudiants
-        .filter((e) => e.id_classe === classe.id_classe)
+        .filter((e) => e.id_classe == classe.id)
         .map((etudiant) => {
           const utilisateur = utilisateurs.find(
-            (u) => u.id_utilisateur === etudiant.id_utilisateur
+            (u) => u.id == etudiant.id_utilisateur
           );
           return {
-            id_etudiant: etudiant.id_etudiant,
+            id: etudiant.id,
             matricule: etudiant.matricule,
             nom: utilisateur?.nom || "Inconnu",
             prenom: utilisateur?.prenom || "Inconnu",
@@ -244,7 +228,7 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
         });
 
       return {
-        id_classe: classe.id_classe,
+        id: classe.id,
         libelle: classe.libelle,
         statut: classe.state,
         idFiliere: classe.id_filiere,
@@ -269,7 +253,6 @@ export async function getClassesEtEtudiantsParAttache(idAttache) {
 
 export async function getEtudiantsAvecAbsences(idAttache) {
   try {
-    // Récupération de toutes les données nécessaires en parallèle
     const [
       classesAttaches,
       classes,
@@ -294,61 +277,49 @@ export async function getEtudiantsAvecAbsences(idAttache) {
       fetchData("modules"),
     ]);
 
-    // 1. Trouver l'année scolaire en cours (est_active = 1)
     const anneeEnCours = anneeScolaires.find((a) => a.est_active === 1);
     if (!anneeEnCours) throw new Error("Aucune année scolaire active trouvée");
 
-    // 2. Filtrer les classes assignées à cet attaché
-    const classesAttache = classesAttaches
+    const idClassesAttache = classesAttaches
       .filter((ca) => ca.id_attache == idAttache)
       .map((ca) => ca.id_classe);
 
-    // 3. Récupérer les classes de l'année en cours
     const classesFiltrees = classes.filter(
-      (c) =>
-        classesAttache.includes(c.id_classe) &&
-        c.id_annee === anneeEnCours.id_annee
+      (c) => idClassesAttache.includes(c.id) && c.id_annee == anneeEnCours.id
     );
 
-    // 4. Récupérer les étudiants inscrits et validés dans ces classes
     const etudiantsAvecInfos = etudiants
       .filter((etudiant) => {
-        // Vérifier l'inscription validée dans une classe gérée
         const inscriptionValide = inscriptions.find(
           (i) =>
-            i.id_etudiant === etudiant.id_etudiant &&
+            i.id_etudiant == etudiant.id &&
             i.statut === "validée" &&
-            classesFiltrees.some((c) => c.id_classe === i.id_classe)
+            classesFiltrees.some((c) => c.id == i.id_classe)
         );
         return !!inscriptionValide;
       })
       .map((etudiant) => {
         const utilisateur = utilisateurs.find(
-          (u) => u.id_utilisateur === etudiant.id_utilisateur
+          (u) => u.id == etudiant.id_utilisateur
         );
-        const classe = classes.find((c) => c.id_classe === etudiant.id_classe);
-        const filiere = filieres.find(
-          (f) => f.id_filiere === classe?.id_filiere
-        );
+        const classe = classes.find((c) => c.id == etudiant.id_classe);
+        const filiere = filieres.find((f) => f.id == classe?.id_filiere);
 
-        // Récupérer les absences de l'étudiant
         const absencesEtudiant = absences
-          .filter((a) => a.id_etudiant === etudiant.id_etudiant)
+          .filter((a) => a.id_etudiant == etudiant.id)
           .map((absence) => {
-            const coursAbsence = cours.find(
-              (c) => c.id_cours === absence.id_cours
-            );
+            const coursAbsence = cours.find((c) => c.id == absence.id_cours);
             const moduleAbsence = modules.find(
-              (m) => m.id_module === coursAbsence?.id_module
+              (m) => m.id == coursAbsence?.id_module
             );
 
             return {
-              id_absence: absence.id_absence,
+              id: absence.id,
               date_absence: absence.date_absence,
               heure_marquage: absence.heure_marquage,
               justified: absence.justified,
               cours: {
-                id_cours: coursAbsence?.id_cours,
+                id: coursAbsence?.id,
                 module: moduleAbsence?.libelle || "Inconnu",
                 date_cours: coursAbsence?.date_cours,
                 heure_debut: coursAbsence?.heure_debut,
@@ -358,7 +329,7 @@ export async function getEtudiantsAvecAbsences(idAttache) {
           });
 
         return {
-          id_etudiant: etudiant.id_etudiant,
+          id: etudiant.id,
           matricule: etudiant.matricule,
           nom: utilisateur?.nom || "Inconnu",
           prenom: utilisateur?.prenom || "Inconnu",
@@ -371,8 +342,7 @@ export async function getEtudiantsAvecAbsences(idAttache) {
           nombreAbsences: absencesEtudiant.length,
           heuresAbsences: absencesEtudiant.reduce((total, abs) => {
             const duree =
-              cours.find((c) => c.id_cours === abs.cours?.id_cours)
-                ?.nombre_heures || 0;
+              cours.find((c) => c.id == abs.cours?.id)?.nombre_heures || 0;
             return total + (abs.justified === "justifier" ? 0 : duree);
           }, 0),
         };
@@ -382,6 +352,128 @@ export async function getEtudiantsAvecAbsences(idAttache) {
   } catch (error) {
     console.error(
       "Erreur lors de la récupération des étudiants avec absences:",
+      error
+    );
+    return [];
+  }
+}
+
+export async function getDemandesJustificationAttache(idAttache) {
+  try {
+    const [
+      anneeScolaires,
+      classesAttaches,
+      classes,
+      justifications,
+      absences,
+      etudiants,
+      utilisateurs,
+      cours,
+      modules,
+    ] = await Promise.all([
+      fetchData("annee_scolaire"),
+      fetchData("classes_attaches"),
+      fetchData("classes"),
+      fetchData("justifications"),
+      fetchData("absences"),
+      fetchData("etudiants"),
+      fetchData("utilisateurs"),
+      fetchData("cours"),
+      fetchData("modules"),
+    ]);
+
+    const anneeEnCours = anneeScolaires.find((a) => a.est_active == 1);
+    if (!anneeEnCours) throw new Error("Aucune année scolaire active trouvée");
+
+    const idClassesAttache = classesAttaches
+      .filter((ca) => ca.id_attache == idAttache)
+      .map((ca) => ca.id_classe);
+
+    const classesAttache = classes.filter(
+      (c) => idClassesAttache.includes(c.id) && c.id_annee == anneeEnCours.id
+    );
+
+    const idEtudiantsAttache = etudiants
+      .filter((e) => classesAttache.some((c) => c.id == e.id_classe))
+      .map((e) => e.id);
+
+    const demandes = justifications
+      .filter((j) => idEtudiantsAttache.includes(j.id_etudiant))
+      .map((j) => {
+        const absence = absences.find((a) => a.id == j.id_absence);
+        const etudiant = etudiants.find((e) => e.id == j.id_etudiant);
+        const utilisateur = utilisateurs.find(
+          (u) => u.id == etudiant?.id_utilisateur
+        );
+        const classe = classes.find((c) => c.id == etudiant?.id_classe);
+        const coursAbsence = cours.find((c) => c.id == absence?.id_cours);
+        const moduleAbsence = modules.find(
+          (m) => m.id == coursAbsence?.id_module
+        );
+
+        return {
+          id: j.id,
+          date_justification: j.date_justification,
+          motif: j.motif,
+          pieces_jointes: j.pieces_jointes,
+          statut: j.statut,
+          date_traitement: j.date_traitement,
+          commentaire_traitement: j.commentaire_traitement,
+          etudiant: {
+            id: etudiant?.id,
+            matricule: etudiant?.matricule,
+            nom: utilisateur?.nom || "Inconnu",
+            prenom: utilisateur?.prenom || "Inconnu",
+            classe: {
+              id: classe?.id,
+              libelle: classe?.libelle || "Inconnu",
+            },
+          },
+          absence: {
+            id: absence?.id,
+            date_absence: absence?.date_absence,
+            cours: {
+              id: coursAbsence?.id,
+              module: moduleAbsence?.libelle || "Inconnu",
+              date_cours: coursAbsence?.date_cours,
+              heure_debut: coursAbsence?.heure_debut,
+              professeur: coursAbsence?.id_professeur,
+            },
+          },
+        };
+      });
+
+    return demandes;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des demandes de justification:",
+      error
+    );
+    return [];
+  }
+}
+
+export async function getClassesByAttache(idAttache) {
+  try {
+    // Récupération des données nécessaires en parallèle
+    const [classesAttaches, classes] = await Promise.all([
+      fetchData("classes_attaches"),
+      fetchData("classes"),
+    ]);
+
+    // Filtrer et mapper les classes de l'attaché
+    return classesAttaches
+      .filter((ca) => ca.id_attache == idAttache)
+      .map((ca) => {
+        const classe = classes.find((c) => c.id == ca.id_classe);
+        return {
+          id_classe: ca.id_classe,
+          libelle: classe?.libelle || "Classe inconnue",
+        };
+      });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des classes simplifiées:",
       error
     );
     return [];

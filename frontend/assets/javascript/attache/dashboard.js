@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = getCurrentUser();
   handleSidebar(user);
   renderAttacheHeader(user);
-  const idAttacher = await getIdAttacherByUserId(user.id_utilisateur);
+  const idAttacher = await getIdAttacherByUserId(user.id);
   await renderAttacheStatsCards(idAttacher);
   await renderAbsenteesCard(idAttacher);
   renderCalendar();

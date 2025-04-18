@@ -160,3 +160,82 @@ export function createAbsencesFilters(config) {
 
   return filtersContainer;
 }
+
+export function createJustificationsFilters(config) {
+  const { classes = [], statuts = [], idAttache, onFilter = () => {} } = config;
+
+  const filtersContainer = document.createElement("div");
+  filtersContainer.className = "bg-base-200 p-4 rounded-lg mb-6";
+
+  const title = document.createElement("h3");
+  title.className = "font-bold text-lg mb-4";
+  title.textContent = "Filtrer les demandes";
+  filtersContainer.appendChild(title);
+
+  const filtersGrid = document.createElement("div");
+  filtersGrid.className = "grid grid-cols-1 md:grid-cols-4 gap-4";
+
+  // Champ de recherche
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.placeholder = "Rechercher un étudiant...";
+  searchInput.className = "input input-bordered w-full";
+  searchInput.addEventListener("input", (e) =>
+    onFilter({
+      search: e.target.value,
+      statut: statutSelect.value,
+      classe: classeSelect.value,
+    })
+  );
+
+  // Filtre par statut
+  const statutSelect = document.createElement("select");
+  statutSelect.className = "select select-bordered w-full";
+  statutSelect.innerHTML = `
+    <option value="">Tous les statuts</option>
+    ${statuts.map((s) => `<option value="${s}">${s}</option>`).join("")}
+  `;
+  statutSelect.addEventListener("change", (e) =>
+    onFilter({
+      statut: e.target.value,
+      search: searchInput.value,
+      classe: classeSelect.value,
+    })
+  );
+
+  // Filtre par classe
+  const classeSelect = document.createElement("select");
+  classeSelect.className = "select select-bordered w-full";
+  classeSelect.innerHTML = `
+    <option value="">Toutes les classes</option>
+    ${classes
+      .map((c) => `<option value="${c.id_classe}">${c.libelle}</option>`)
+      .join("")}
+  `;
+  classeSelect.addEventListener("change", (e) =>
+    onFilter({
+      classe: e.target.value,
+      search: searchInput.value,
+      statut: statutSelect.value,
+    })
+  );
+
+  // Bouton réinitialiser
+  const resetButton = document.createElement("button");
+  resetButton.className = "btn btn-outline";
+  resetButton.innerHTML = '<i class="ri-refresh-line mr-2"></i> Réinitialiser';
+  resetButton.addEventListener("click", () => {
+    searchInput.value = "";
+    statutSelect.value = "";
+    classeSelect.value = "";
+    onFilter({ search: "", statut: "", classe: "" });
+  });
+
+  filtersGrid.appendChild(searchInput);
+  filtersGrid.appendChild(statutSelect);
+  filtersGrid.appendChild(classeSelect);
+  filtersGrid.appendChild(resetButton);
+  filtersContainer.appendChild(filtersGrid);
+
+  return filtersContainer;
+}

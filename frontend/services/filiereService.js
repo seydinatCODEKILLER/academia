@@ -4,7 +4,7 @@ export async function getAllFilieres() {
   try {
     const filieres = await fetchData("filieres");
     return filieres.map((filiere) => ({
-      id: filiere.id_filiere,
+      id: filiere.id,
       libelle: filiere.libelle,
     }));
   } catch (error) {

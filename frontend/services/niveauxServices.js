@@ -4,7 +4,7 @@ export async function getAllNiveaux() {
   try {
     const niveaux = await fetchData("niveaux");
     return niveaux.map((niveau) => ({
-      id: niveau.id_niveau,
+      id: niveau.id,
       libelle: niveau.libelle,
     }));
   } catch (error) {

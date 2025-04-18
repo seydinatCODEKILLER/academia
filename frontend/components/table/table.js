@@ -84,6 +84,7 @@ export function createDaisyUITable(config) {
   // Corps
   const tbody = document.createElement("tbody");
   tbody.id = `${tableId}-body`;
+  tbody.className = "whitespace-nowrap";
   table.appendChild(tbody);
 
   // Pagination (avec DaisyUI)
@@ -122,7 +123,7 @@ export function createDaisyUITable(config) {
   tableContainer.appendChild(pagination);
 
   // Initialisation des données
-  // updateDaisyUITableData(tableId, data, 1, onAction);
+  updateDaisyUITableData(tableId, data, 1, onAction);
 
   return tableContainer;
 }
@@ -219,7 +220,8 @@ export function updateDaisyUITableData(
   updateDaisyUIPagination(
     tableId,
     currentPage,
-    Math.ceil(newData.length / config.itemsPerPage)
+    Math.ceil(newData.length / config.itemsPerPage),
+    table.handleAction
   );
 
   // Configuration des événements
@@ -232,13 +234,19 @@ export function updateDaisyUITableData(
 function renderDaisyUIDropdown(item, actionsConfig, tableId) {
   const dropdownId = `dropdown-${tableId}-${item.id}`;
 
+  // Si actionsConfig.items est une fonction, on l'appelle avec l'item
+  const actions =
+    typeof actionsConfig.items === "function"
+      ? actionsConfig.items(item)
+      : actionsConfig.items;
+
   return `
-    <div class="dropdown dropdown-end">
+    <div class="dropdown dropdown-end" id="${dropdownId}">
       <button tabindex="0" class="btn btn-sm btn-ghost">
         <i class="ri-more-2-fill"></i>
       </button>
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-        ${actionsConfig.items
+        ${actions
           .map(
             (action) => `
           <li>
@@ -254,24 +262,16 @@ function renderDaisyUIDropdown(item, actionsConfig, tableId) {
     </div>
   `;
 }
-
 /**
  * Rend des boutons d'actions directs avec DaisyUI
  */
 function renderDaisyUIDirectActions(item, actionsConfig) {
-  const itemId = item[actionsConfig.idField];
-
-  if (!itemId) {
-    console.warn("ID manquant pour:", item);
-    return "";
-  }
-
   return actionsConfig.items
     .map(
       (action) => `
     <button class="btn btn-sm ${action.className || "btn-ghost"}"
             data-action="${action.name}"
-            data-id="${itemId}"
+            data-id="${item.id}"
             title="${action.label}">
       <i class="${action.icon}"></i>
       ${action.showLabel ? action.label : ""}
@@ -284,7 +284,12 @@ function renderDaisyUIDirectActions(item, actionsConfig) {
 /**
  * Met à jour la pagination DaisyUI
  */
-function updateDaisyUIPagination(tableId, currentPage, totalPages) {
+function updateDaisyUIPagination(
+  tableId,
+  currentPage,
+  totalPages,
+  handleAction
+) {
   const prevBtn = document.getElementById(`${tableId}-prev`);
   const nextBtn = document.getElementById(`${tableId}-next`);
   const info = document.getElementById(`${tableId}-pagination-info`);
@@ -302,13 +307,25 @@ function updateDaisyUIPagination(tableId, currentPage, totalPages) {
 
   prevBtn.onclick = () => {
     if (currentPage > 1) {
-      updateDaisyUITableData(tableId, table.currentData, currentPage - 1);
+      currentPage--;
+      updateDaisyUITableData(
+        tableId,
+        table.currentData,
+        currentPage,
+        handleAction
+      );
     }
   };
 
   nextBtn.onclick = () => {
     if (currentPage < totalPages) {
-      updateDaisyUITableData(tableId, table.currentData, currentPage + 1);
+      currentPage++;
+      updateDaisyUITableData(
+        tableId,
+        table.currentData,
+        currentPage,
+        handleAction
+      );
     }
   };
 }

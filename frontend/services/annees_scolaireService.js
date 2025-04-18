@@ -5,7 +5,7 @@ export async function getAllAnneesScolaires() {
     const annees = await fetchData("annee_scolaire");
     return annees
       .map((annee) => ({
-        id: annee.id_annee,
+        id: annee.id,
         libelle: annee.libelle,
         est_active: annee.est_active,
       }))

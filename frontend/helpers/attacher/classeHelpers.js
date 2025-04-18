@@ -7,7 +7,7 @@ import {
  * Trouve une classe par son ID
  */
 export function findClassById(classId, allClasses) {
-  return allClasses.find((c) => c.id_classe == classId);
+  return allClasses.find((c) => c.id == classId);
 }
 
 /**

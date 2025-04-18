@@ -6,8 +6,10 @@ import {
 import {
   createAbsencesFilters,
   createClassFilters,
+  createJustificationsFilters,
 } from "../../../components/filter/filter.js";
 import { createResponsiveAttacheHeader } from "../../../components/header/header.js";
+import { showEmptyStateModal } from "../../../components/modals/modal.js";
 import {
   createSidebar,
   setActiveLink,
@@ -23,17 +25,29 @@ import {
   showClassNotFound,
   showOrUpdateModal,
 } from "../../../helpers/attacher/classeHelpers.js";
+import {
+  getActionConfig,
+  getAvailableActions,
+  getStatutsJustification,
+  processJustificationAction,
+  showConfirmationModal,
+} from "../../../helpers/attacher/justificationHelpers.js";
 import { navigateTo, navigateToAndReplace } from "../../../router/router.js";
 import { getAllAnneesScolaires } from "../../../services/annees_scolaireService.js";
 import {
+  getClassesByAttache,
   getClassesEtEtudiantsParAttache,
   getDashboardStatsAttacher,
+  getDemandesJustificationAttache,
   getEtudiantsAvecAbsences,
   getTop5Absentees,
 } from "../../../services/attacherService.js";
 import { getAllFilieres } from "../../../services/filiereService.js";
+import { updateJustificationStatus } from "../../../services/justificationService.js";
 import { getAllNiveaux } from "../../../services/niveauxServices.js";
 import { createStyledElement } from "../../../utils/function.js";
+
+//Dashboard de l'attacher
 
 export function handleSidebar(user) {
   const { avatar, nom, prenom } = user;
@@ -173,9 +187,13 @@ export function renderCalendar() {
   document.getElementById("calendar").appendChild(calendar);
 }
 
+//Gestion des classes
+
 export async function renderClassesTable(idAttache, filters = {}) {
+  // Chargement initial des données
   let classes = await getClassesEtEtudiantsParAttache(idAttache);
 
+  // Application des filtres
   if (filters.search) {
     const searchTerm = filters.search.toLowerCase();
     classes = classes.filter((classe) =>
@@ -184,8 +202,6 @@ export async function renderClassesTable(idAttache, filters = {}) {
   }
 
   if (filters.filiere) {
-    console.log(filters.filiere);
-
     classes = classes.filter((classe) => classe.idFiliere == filters.filiere);
   }
 
@@ -193,6 +209,7 @@ export async function renderClassesTable(idAttache, filters = {}) {
     classes = classes.filter((classe) => classe.idAnnee == filters.annee);
   }
 
+  // Configuration des colonnes
   const columns = [
     {
       header: "Classe",
@@ -216,25 +233,27 @@ export async function renderClassesTable(idAttache, filters = {}) {
       header: "Capacité",
       key: "capacite_max",
       render: (classe) =>
-        createStyledElement("span", "badge badge-soft ", classe.capacite_max),
+        createStyledElement("span", "badge badge-soft", classe.capacite_max),
     },
     {
       header: "Statut",
       key: "statut",
-      render: (classe) =>
-        createStyledElement(
+      render: (classe) => {
+        const badgeClass =
+          classe.statut == "disponible" ? "badge-success" : "badge-warning";
+        return createStyledElement(
           "span",
-          `badge badge-soft badge-${
-            classe.statut == "disponible" ? "success" : "warning"
-          }`,
+          `badge badge-soft ${badgeClass}`,
           classe.statut
-        ),
+        );
+      },
     },
   ];
-  // Configuration des actions (juste un bouton Détails)
+
+  // Configuration des actions
   const actionsConfig = {
     type: "direct",
-    idField: "id_classe", // Champ unique pour tout le tableau
+    idField: "id_classe",
     items: [
       {
         name: "details",
@@ -246,26 +265,31 @@ export async function renderClassesTable(idAttache, filters = {}) {
     ],
   };
 
+  // Gestionnaire d'actions unifié
+  const handleAction = (action, id) => {
+    if (action === "details") {
+      showClassDetails(id, classes);
+    }
+    // Ajouter d'autres actions si nécessaire
+  };
+
+  // Création du tableau
   const table = createDaisyUITable({
     tableId: "classes-table",
     columns,
     itemsPerPage: 2,
     data: classes,
     actions: actionsConfig,
-    onAction: (action, id) => {
-      if (action === "details") {
-        showClassDetails(id, classes);
-      }
-    },
+    onAction: handleAction,
   });
+
+  // Rendu dans le conteneur
   const container = document.getElementById("classes-container");
   container.innerHTML = "";
   container.appendChild(table);
-  updateDaisyUITableData("classes-table", classes, 1, (action, id) => {
-    if (action === "details") {
-      showClassDetails(id, classes);
-    }
-  });
+
+  // Mise à jour initiale des données
+  updateDaisyUITableData("classes-table", classes, 1, handleAction);
 }
 
 export function showClassDetails(classId, allClasses) {
@@ -308,10 +332,13 @@ export function renderBannerForClasse() {
   document.getElementById("banner-container").appendChild(bannerWithAction);
 }
 
-export async function renderAbsencesTable(idAttache, filters = {}) {
-  let etudiants = await getEtudiantsAvecAbsences(idAttache);
-  console.log(etudiants);
+//Gestion des absences
 
+export async function renderAbsencesTable(idAttache, filters = {}) {
+  // Chargement initial des données
+  let etudiants = await getEtudiantsAvecAbsences(idAttache);
+
+  // Gestion des filtres
   if (filters.search) {
     const searchTerm = filters.search.toLowerCase();
     etudiants = etudiants.filter(
@@ -322,21 +349,20 @@ export async function renderAbsencesTable(idAttache, filters = {}) {
   }
 
   if (filters.niveau) {
-    console.log(filters.niveau);
-
     etudiants = etudiants.filter(
       (etudiant) => etudiant.idNiveau == filters.niveau
     );
   }
 
+  // Configuration des colonnes
   const columns = [
     {
       header: "Profil",
       key: "avatar",
       render: (etudiant) => `
-      <div>
-      <img src="${etudiant.avatar}" class="w-10 h-10 rounded object-cover" />
-      </div>
+        <div>
+          <img src="${etudiant.avatar}" class="w-10 h-10 rounded object-cover" />
+        </div>
       `,
     },
     {
@@ -379,9 +405,9 @@ export async function renderAbsencesTable(idAttache, filters = {}) {
     },
   ];
 
+  // Configuration des actions
   const actionsConfig = {
     type: "direct",
-    idField: "id_etudiant",
     items: [
       {
         name: "details",
@@ -393,31 +419,34 @@ export async function renderAbsencesTable(idAttache, filters = {}) {
     ],
   };
 
+  // Gestionnaire d'actions unifié
+  const handleAction = (action, id) => {
+    if (action === "details") {
+      showAbsencesDetails(id, etudiants);
+    }
+  };
+
+  // Création du tableau
   const table = createDaisyUITable({
     tableId: "absences-table",
     columns,
     itemsPerPage: 4,
     data: etudiants,
     actions: actionsConfig,
-    onAction: (action, id) => {
-      if (action === "details") {
-        showAbsencesDetails(id, etudiants);
-      }
-    },
+    onAction: handleAction, // Utilisation du gestionnaire unifié
   });
 
+  // Rendu dans le conteneur
   const container = document.getElementById("absences-container");
   container.innerHTML = "";
   container.appendChild(table);
-  updateDaisyUITableData("absences-table", etudiants, 1, (action, id) => {
-    if (action === "details") {
-      showAbsencesDetails(id, etudiants);
-    }
-  });
+
+  // Mise à jour initiale des données (avec le même gestionnaire)
+  updateDaisyUITableData("absences-table", etudiants, 1, handleAction);
 }
 
 export function showAbsencesDetails(etudiantId, allEtudiants) {
-  const etudiant = allEtudiants.find((e) => e.id_etudiant == etudiantId);
+  const etudiant = allEtudiants.find((e) => e.id == etudiantId);
   if (!etudiant) {
     showEmptyStateModal("Étudiant introuvable");
     return;
@@ -450,6 +479,177 @@ export function renderBannerForAbsence() {
     imageUrl: "/frontend/assets/images/absence.png",
     altText: "Icône gestion des cours",
     badgeColor: "primary",
+  });
+  document.getElementById("banner-container").appendChild(bannerWithAction);
+}
+
+//Gestions des demandes de justifications
+
+export async function renderJustificationsTable(idAttache, filters = {}) {
+  let demandes = await getDemandesJustificationAttache(idAttache);
+
+  // Application des filtres
+  if (filters.search) {
+    const searchTerm = filters.search.toLowerCase();
+    demandes = demandes.filter(
+      (demande) =>
+        demande.etudiant.nom.toLowerCase().includes(searchTerm) ||
+        demande.etudiant.prenom.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  if (filters.statut) {
+    demandes = demandes.filter((demande) => demande.statut === filters.statut);
+  }
+
+  if (filters.classe) {
+    demandes = demandes.filter(
+      (demande) => demande.etudiant.classe.id == filters.classe
+    );
+  }
+
+  // Fonction pour rafraîchir les données
+  const refreshData = async () => {
+    const updatedDemandes = await getDemandesJustificationAttache(idAttache);
+    updateDaisyUITableData(
+      "justifications-table",
+      updatedDemandes,
+      currentPage,
+      handleAction
+    );
+  };
+
+  const columns = [
+    {
+      header: "Étudiant",
+      key: "etudiant",
+      render: (demande) =>
+        createStyledElement(
+          "span",
+          "text-sm",
+          `${demande.etudiant.prenom} ${demande.etudiant.nom}`
+        ),
+    },
+    {
+      header: "Matricule",
+      key: "matricule",
+      render: (demande) =>
+        createStyledElement("span", "text-sm", demande.etudiant.matricule),
+    },
+    {
+      header: "Classe",
+      key: "classe",
+      render: (demande) =>
+        createStyledElement("span", "text-sm", demande.etudiant.classe.libelle),
+    },
+    {
+      header: "Date absence",
+      key: "date_absence",
+      render: (demande) =>
+        createStyledElement("span", "text-sm", demande.absence.date_absence),
+    },
+    {
+      header: "Cours",
+      key: "cours",
+      render: (demande) =>
+        createStyledElement("span", "text-sm", demande.absence.cours.module),
+    },
+    {
+      header: "Statut",
+      key: "statut",
+      render: (demande) => {
+        const statusClass =
+          {
+            "en attente": "badge-warning",
+            validée: "badge-success",
+            rejetée: "badge-error",
+          }[demande.statut] || "badge-info";
+
+        return createStyledElement(
+          "span",
+          `badge ${statusClass}`,
+          demande.statut
+        );
+      },
+    },
+  ];
+
+  const actionsConfig = {
+    type: "dropdown",
+    items: (item) => {
+      return getAvailableActions(item.statut).map((action) => {
+        const config = getActionConfig(action);
+        return {
+          name: action,
+          label: config.label,
+          icon: config.icon,
+          className: config.className,
+        };
+      });
+    },
+  };
+
+  const handleAction = (action, id) => {
+    const config = getActionConfig(action);
+    if (config) {
+      showConfirmationModal({
+        title: config.title,
+        content: config.content,
+        confirmText: config.confirmText,
+        confirmClass: config.confirmClass,
+        onConfirm: () =>
+          processJustificationAction(action, id, idAttache, refreshData),
+      });
+    }
+  };
+
+  const table = createDaisyUITable({
+    tableId: "justifications-table",
+    columns,
+    itemsPerPage: 10,
+    data: demandes,
+    actions: actionsConfig,
+  });
+
+  const container = document.getElementById("justifications-container");
+  container.innerHTML = "";
+  container.appendChild(table);
+  updateDaisyUITableData("justifications-table", demandes, 1, handleAction);
+}
+
+export async function updateJustificationsTableWithFilters(
+  idAttache,
+  filters = {}
+) {
+  await renderJustificationsTable(idAttache, filters);
+}
+
+export async function renderJustificationsTableFilter(idAttacher) {
+  const [classes, statuts] = await Promise.all([
+    getClassesByAttache(idAttacher),
+    getStatutsJustification(),
+  ]);
+
+  const filters = createJustificationsFilters({
+    classes,
+    statuts,
+    idAttache: idAttacher,
+    onFilter: (filters) =>
+      updateJustificationsTableWithFilters(idAttacher, filters),
+  });
+
+  document.getElementById("filters-container").appendChild(filters);
+}
+
+export function renderBannerForJustification() {
+  const bannerWithAction = createModernBanner({
+    title: "Gestion des demandes",
+    subtitle: "Consulter et gérez les demandes de justifications",
+    imageUrl: "/frontend/assets/images/justification.png",
+    altText: "Icône gestion des cours",
+    badgeColor: "primary",
+    badgeText: "annee en cours",
+    showBadge: true,
   });
   document.getElementById("banner-container").appendChild(bannerWithAction);
 }

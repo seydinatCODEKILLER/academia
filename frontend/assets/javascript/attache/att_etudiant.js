@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = getCurrentUser();
   handleSidebar(user);
   renderAttacheHeader(user, "Absences");
-  const idAttacher = await getIdAttacherByUserId(user.id_utilisateur);
+  const idAttacher = await getIdAttacherByUserId(user.id);
   renderBannerForAbsence();
   await renderAbsencesTableFilter(idAttacher);
   await renderAbsencesTable(idAttacher);
