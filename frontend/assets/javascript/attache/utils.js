@@ -10,7 +10,10 @@ import {
   createJustificationsFilters,
 } from "../../../components/filter/filter.js";
 import { createResponsiveAttacheHeader } from "../../../components/header/header.js";
-import { showEmptyStateModal } from "../../../components/modals/modal.js";
+import {
+  createModal,
+  showEmptyStateModal,
+} from "../../../components/modals/modal.js";
 import {
   createSidebar,
   setActiveLink,
@@ -19,6 +22,7 @@ import {
   createDaisyUITable,
   updateDaisyUITableData,
 } from "../../../components/table/table.js";
+import { createFloatingButton } from "../../../components/ui/floatingButton.js";
 import { createAbsencesModalContent } from "../../../helpers/attacher/absenceHelpers.js";
 import {
   createModalContent,
@@ -26,13 +30,19 @@ import {
   showClassNotFound,
   showOrUpdateModal,
 } from "../../../helpers/attacher/classeHelpers.js";
-import { handleReinscriptionClick } from "../../../helpers/attacher/inscriptionHelpers.js";
+import {
+  createInscriptionForm,
+  handleInscriptionSubmit,
+  handleReinscriptionClick,
+  submitInscription,
+} from "../../../helpers/attacher/inscriptionHelpers.js";
 import {
   getActionConfig,
   getAvailableActions,
   getStatutsJustification,
   processJustificationAction,
   showConfirmationModal,
+  showLoadingModal,
 } from "../../../helpers/attacher/justificationHelpers.js";
 import { navigateTo, navigateToAndReplace } from "../../../router/router.js";
 import { getAllAnneesScolaires } from "../../../services/annees_scolaireService.js";
@@ -49,6 +59,7 @@ import { getEtudiantById } from "../../../services/etudiantService.js";
 import { getAllFilieres } from "../../../services/filiereService.js";
 import { updateJustificationStatus } from "../../../services/justificationService.js";
 import { getAllNiveaux } from "../../../services/niveauxServices.js";
+import { checkReinscriptionPeriod } from "../../../services/periodService.js";
 import { createStyledElement } from "../../../utils/function.js";
 
 //Dashboard de l'attacher
@@ -661,6 +672,8 @@ export function renderBannerForJustification() {
 
 export async function renderInscriptionTable(idAttache, filters = {}) {
   let etudiants = await getEtudiantsParAttache(idAttache);
+  console.log(etudiants);
+
   if (filters.search) {
     const searchTerm = filters.search.toLowerCase();
     etudiants = etudiants.filter(
@@ -770,7 +783,7 @@ export async function renderInscriptionTable(idAttache, filters = {}) {
   const table = createDaisyUITable({
     tableId: "inscriptions-table",
     columns,
-    itemsPerPage: 5,
+    itemsPerPage: 4,
     data: etudiants,
     actions: actionsConfig,
     emptyMessage: "Aucun étudiant trouvé",
@@ -808,4 +821,58 @@ export async function renderInscriptionsFilters(idAttacher) {
   });
 
   document.getElementById("filters-container").appendChild(filters);
+}
+
+export function renderBannerForInscription() {
+  const bannerWithAction = createModernBanner({
+    title: "Gestion des inscriptions",
+    subtitle: "Consulter et gérez les demandes d'inscription",
+    imageUrl: "/frontend/assets/images/inscription.png",
+    altText: "Icône gestion des cours",
+    badgeColor: "primary",
+    badgeText: "annee en cours",
+    showBadge: true,
+  });
+  document.getElementById("banner-container").appendChild(bannerWithAction);
+}
+
+export function renderFloatingButtonAdd(idAttache) {
+  const button = createFloatingButton({
+    id: "quick-add-btn",
+    icon: "ri-add-line",
+    title: "Création rapide",
+    color: "accent",
+    position: "bottom-right",
+    onClick: () => showInscriptionFormModal(idAttache),
+  });
+
+  document.getElementById("floatingButton").appendChild(button);
+}
+
+export async function showInscriptionFormModal(idAttache) {
+  const isPeriodOpen = await checkReinscriptionPeriod("inscription");
+
+  if (!isPeriodOpen) {
+    showEmptyStateModal("Les inscriptions sont actuellement fermées");
+    return;
+  }
+  const form = await createInscriptionForm(idAttache);
+  const modal = createModal({
+    title: "Nouvelle inscription",
+    content: form,
+    size: "xl",
+  });
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const result = await handleInscriptionSubmit(form);
+
+    if (result.success) {
+      modal.close();
+      updateInscriptionsTableWithFilters(idAttache, {});
+    }
+  };
+
+  document.getElementById("inscrit-container").appendChild(modal);
+  modal.showModal();
 }

@@ -1,6 +1,5 @@
-import { fetchData } from "./api.js";
+import { API_BASE_URL, fetchData, generateId } from "./api.js";
 
-// services/etudiantService.js
 export async function getEtudiantById(id) {
   try {
     // 1. Récupération de toutes les données nécessaires
@@ -53,5 +52,21 @@ export async function getEtudiantById(id) {
   } catch (error) {
     console.error(`Erreur dans getEtudiantById: ${error.message}`);
     return null;
+  }
+}
+
+export async function createStudent(studentData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/etudiants`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: String(await generateId("etudiants")),
+        ...studentData,
+      }),
+    });
+    return response.json();
+  } catch (error) {
+    throw new Error(`erreur lors de la creation de l'etudiant : ${error}`);
   }
 }

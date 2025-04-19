@@ -1,4 +1,4 @@
-import { API_BASE_URL, fetchData } from "./api.js";
+import { API_BASE_URL, fetchData, generateId } from "./api.js";
 
 export async function submitReinscription(data) {
   try {
@@ -7,7 +7,7 @@ export async function submitReinscription(data) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: String(await generateIdForInscription()),
+        id: String(await generateId("inscriptions")),
         ...data,
         est_reinscription: 1,
         statut: "validée",
@@ -62,8 +62,22 @@ export async function checkExistingReinscription(studentId, anneeScolaire) {
   );
 }
 
-export async function generateIdForInscription() {
-  const rv = await fetchData("inscriptions");
-  const id = rv.length > 0 ? parseInt(rv[rv.length - 1].id) + 1 : 1;
-  return id;
+export async function createInscription(inscriptionData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/inscriptions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: String(await generateId("inscriptions")),
+        ...inscriptionData,
+        est_reinscription: 0,
+        date_inscription: new Date().toISOString(),
+        redoublement: false,
+        statut: "validée",
+      }),
+    });
+    return response.json();
+  } catch (error) {
+    throw new Error(`erreur lors de l'inscription : ${error}`);
+  }
 }

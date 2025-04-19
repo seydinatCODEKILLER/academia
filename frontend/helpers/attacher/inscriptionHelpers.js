@@ -4,11 +4,18 @@ import {
 } from "../../components/modals/modal.js";
 import { getCurrentAcademicYear } from "../../services/annees_scolaireService.js";
 import { getClassesByAttache } from "../../services/attacherService.js";
+import { createStudent } from "../../services/etudiantService.js";
 import {
   checkExistingReinscription,
+  createInscription,
   submitReinscription,
 } from "../../services/inscriptionService.js";
 import { checkReinscriptionPeriod } from "../../services/periodService.js";
+import { createUser } from "../../services/utilisateurService.js";
+import {
+  setupRealTimeValidation,
+  validateInscriptionData,
+} from "../validations/validation.js";
 import { showLoadingModal } from "./justificationHelpers.js";
 
 // components/ReinscriptionForm.js
@@ -66,6 +73,126 @@ export function createReinscriptionForm(student, idAttache) {
     form.querySelector('select[name="new_class_id"]'),
     idAttache
   );
+
+  return form;
+}
+
+export async function createInscriptionForm(idAttache) {
+  const form = document.createElement("form");
+  form.className = "space-y-2 p-4 max-h-[70vh] overflow-y-auto";
+
+  form.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Section 1: Informations personnelles -->
+      <div class="col-span-full font-bold text-lg mb-2">Informations personnelles</div>
+      
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Nom *</span>
+        </label>
+        <input type="text" name="nom" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="nom"></div>
+      </div>
+      
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Prénom *</span>
+        </label>
+        <input type="text" name="prenom" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="prenom"></div>
+      </div>
+      
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Email *</span>
+        </label>
+        <input type="email" name="email" class="input input-bordered" >
+        <div class="text-error text-xs mt-1 hidden" data-error="email"></div>
+      </div>
+      
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Téléphone *</span>
+        </label>
+        <input type="tel" name="telephone" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="telephone"></div>
+      </div>
+      
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Adresse *</span>
+        </label>
+        <input type="text" name="adresse" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="adresse"></div>
+      </div>
+      
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Avatar</span>
+        </label>
+        <input type="text" name="avatar" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="avatar"></div>
+      </div>
+      
+      <!-- Section 2: Scolarité -->
+      <div class="col-span-full font-bold text-lg mb-2 mt-4">Scolarité</div>
+      
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Matricule *</span>
+        </label>
+        <input type="text" name="matricule" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="matricule"></div>
+      </div>
+      
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Classe *</span>
+        </label>
+        <select name="classe_id" class="select select-bordered">
+          <option value="">Sélectionner...</option>
+        </select>
+        <div class="text-error text-xs mt-1 hidden" data-error="classe_id"></div>
+      </div>
+      
+      <!-- Section 3: Sécurité -->
+      <div class="col-span-full font-bold text-lg mb-2 mt-4">Sécurité</div>
+      
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Mot de passe *</span>
+        </label>
+        <input type="password" name="password" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="password"></div>
+      </div>
+      
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Confirmer le mot de passe *</span>
+        </label>
+        <input type="password" name="confirm_password" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="password"></div>
+      </div>
+    </div>
+    
+    <div class="modal-action">
+      <button type="button" class="btn btn-ghost" onclick="this.closest('dialog').close()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary">
+        <i class="ri-save-line mr-2"></i> Enregistrer
+      </button>
+    </div>
+  `;
+
+  // Chargement des classes
+  await loadClassOptions(
+    form.querySelector('select[name="classe_id"]'),
+    idAttache
+  );
+
+  // Validation en temps réel
+  setupRealTimeValidation(form);
 
   return form;
 }
@@ -142,4 +269,97 @@ export async function handleReinscriptionClick(student, idAttache) {
     console.error("Erreur:", error);
     showEmptyStateModal("Une erreur est survenue");
   }
+}
+
+export async function submitInscription(data) {
+  // 1. Validation
+  const errors = await validateInscriptionData(data);
+  if (errors) throw { name: "ValidationError", errors };
+
+  // 2. Création utilisateur
+  const user = await createUser({
+    nom: data.nom,
+    prenom: data.prenom,
+    email: data.email,
+    telephone: data.telephone,
+    adresse: data.adresse,
+    avatar: data.avatar || "/assets/default-avatar.png",
+  });
+
+  // 3. Création étudiant
+  const student = await createStudent({
+    id_utilisateur: user.id,
+    matricule: data.matricule,
+    id_classe: data.classe_id,
+    date_inscription: new Date().toISOString(),
+  });
+
+  // 4. Création inscription
+  const inscription = await createInscription({
+    id_etudiant: student.id,
+    id_classe: data.classe_id,
+    annee_scolaire: await getCurrentAcademicYear(),
+  });
+
+  return { user, student, inscription };
+}
+
+export async function handleInscriptionSubmit(formElement) {
+  const loadingModal = showLoadingModal("Traitement en cours...");
+  clearFormErrors(formElement);
+
+  try {
+    const formData = new FormData(formElement);
+
+    // Préparation des données
+    const data = {
+      nom: formData.get("nom"),
+      prenom: formData.get("prenom"),
+      email: formData.get("email"),
+      telephone: formData.get("telephone"),
+      adresse: formData.get("adresse"),
+      password: formData.get("password"),
+      matricule: formData.get("matricule"),
+      classe_id: formData.get("classe_id"),
+      avatar: formData.get("avatar"),
+    };
+    const result = await submitInscription(data);
+    loadingModal.close();
+    return {
+      success: true,
+      data: {
+        matricule: result.student.matricule,
+        password: data.password,
+      },
+    };
+  } catch (error) {
+    loadingModal.close();
+
+    if (error.name === "ValidationError") {
+      showFormErrors(formElement, error.errors);
+      return { success: false, errors: error.errors };
+    }
+
+    console.error("Erreur inscription:", error);
+    showEmptyStateModal("Une erreur est survenue lors de l'inscription");
+    return { success: false };
+  }
+}
+
+function showFormErrors(form, errors = {}) {
+  Object.entries(errors).forEach(([field, message]) => {
+    const errorElement = form.querySelector(`[data-error="${field}"]`);
+    if (errorElement) {
+      errorElement.textContent = message;
+      errorElement.classList.remove("hidden");
+    }
+  });
+}
+
+function clearFormErrors(form) {
+  const errorElements = form.querySelectorAll("[data-error]");
+  errorElements.forEach((element) => {
+    element.textContent = "";
+    element.classList.add("hidden");
+  });
 }
