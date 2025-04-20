@@ -1,11 +1,8 @@
-import { createResponsiveRPHeader } from "../../../components/header/headerRp.js";
-import {
-  createSidebar,
-  setActiveLink,
-} from "../../../components/sidebar/sidebar.js";
-import { navigateTo } from "../../../router/router.js";
+import { createResponsiveRPHeader } from "../components/header/headerRp.js";
+import { createSidebar, setActiveLink } from "../components/sidebar/sidebar.js";
+import { navigateTo } from "../router/router.js";
 
-export function handleSidebar(user) {
+export function handleRpSidebar(user) {
   const { avatar, nom, prenom } = user;
   const sidebar = createSidebar({
     logo: {

@@ -1,4 +1,4 @@
-import { fetchData } from "./api.js";
+import { API_BASE_URL, fetchData, generateId } from "./api.js";
 
 export async function getAllClassesBasic() {
   try {
@@ -41,4 +41,26 @@ export async function getAllClassesBasic() {
     console.error("Erreur dans getAllClassesBasic:", error);
     throw error;
   }
+}
+
+export async function createClasse(data) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/classes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...data,
+        id: String(await generateId("classes")),
+      }),
+    });
+
+    if (!response.ok) throw new Error("Erreur API");
+  } catch (error) {
+    console.error("Erreur:", error);
+  }
+}
+
+export async function checkExistingClass(libelle) {
+  const classes = await fetchData("classes");
+  return classes.some((c) => c.libelle === libelle && c.state !== "archiver");
 }

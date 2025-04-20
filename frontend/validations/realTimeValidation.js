@@ -1,38 +1,7 @@
 import {
   checkEmailExists,
   checkMatriculeExists,
-} from "../../services/utilisateurService.js";
-
-export async function validateInscriptionData(data) {
-  const errors = {};
-
-  if (!data.nom) errors.nom = "un nom requis";
-  if (!data.prenom) errors.prenom = "un prenom requis";
-  if (!data.password) errors.password = "le mot de passe est requis";
-  if (!data.adresse) errors.adresse = "l'adresse est requis";
-  if (!data.avatar) errors.avatar = "l'avatar est requis";
-  if (!data.telephone) errors.telephone = "le telephone est requis";
-  if (!data.classe_id) errors.classe_id = "Vous devez selectionnez une classe";
-
-  // Validation email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!data.email) {
-    errors.email = "Email requis";
-  } else if (!emailRegex.test(data.email)) {
-    errors.email = "Email invalide";
-  } else if (await checkEmailExists(data.email)) {
-    errors.email = "Email déjà utilisé";
-  }
-
-  // Validation matricule
-  if (!data.matricule) {
-    errors.matricule = "Matricule requis";
-  } else if (await checkMatriculeExists(data.matricule)) {
-    errors.matricule = "Matricule déjà utilisé";
-  }
-
-  return Object.keys(errors).length ? errors : null;
-}
+} from "../services/utilisateurService.js";
 
 export function setupRealTimeValidation(form) {
   // Validation email

@@ -12,10 +12,8 @@ import {
 } from "../../services/inscriptionService.js";
 import { checkReinscriptionPeriod } from "../../services/periodService.js";
 import { createUser } from "../../services/utilisateurService.js";
-import {
-  setupRealTimeValidation,
-  validateInscriptionData,
-} from "../validations/validation.js";
+import { setupRealTimeValidation } from "../../validations/realTimeValidation.js";
+import { validateInscriptionData } from "../../validations/validation.js";
 import { showLoadingModal } from "./justificationHelpers.js";
 
 // components/ReinscriptionForm.js

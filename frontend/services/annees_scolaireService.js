@@ -27,3 +27,8 @@ export async function getCurrentAcademicYear() {
     `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`
   );
 }
+
+export async function getCurrentAcademicYearId() {
+  const annees = await fetchData("annee_scolaire");
+  return annees.find((a) => a.est_active === 1)?.id;
+}

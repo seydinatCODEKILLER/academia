@@ -98,6 +98,15 @@
       "capacite_max": 26,
       "state": "disponible",
       "id": "7"
+    },
+    {
+      "id": "8",
+      "libelle": "L2 Design",
+      "id_filiere": "1",
+      "id_niveau": "2",
+      "capacite_max": "30",
+      "state": "disponible",
+      "id_annee": "1"
     }
   ],
   "classes_attaches": [

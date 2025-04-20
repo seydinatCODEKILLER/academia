@@ -1,9 +1,15 @@
 import { createClassFiltersForRp } from "../../components/filter/filter.js";
-import { showEmptyStateModal } from "../../components/modals/modal.js";
+import { createClassForm } from "../../components/form/form.js";
+import {
+  createModal,
+  showEmptyStateModal,
+} from "../../components/modals/modal.js";
 import {
   createDaisyUITable,
   updateDaisyUITableData,
 } from "../../components/table/table.js";
+import { createFloatingButton } from "../../components/ui/floatingButton.js";
+import { handleClassRpSubmit } from "../../handler/rp/classeRp.handler.js";
 import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js";
 import { getAllClassesBasic } from "../../services/classeServices.js";
 import { getAllFilieres } from "../../services/filiereService.js";
@@ -162,4 +168,38 @@ export async function renderClasseTableFilterForRp() {
     onFilter: (filters) => updateClassesTableWithFiltersForRp(filters),
   });
   document.getElementById("filters-container").appendChild(filters);
+}
+
+export function renderFloatingButtonAddClasse() {
+  const button = createFloatingButton({
+    id: "quick-add-btn",
+    icon: "ri-add-line",
+    title: "Création rapide",
+    color: "accent",
+    position: "bottom-right",
+    onClick: () => showAddClassModalRp(),
+  });
+
+  document.getElementById("floatingButton").appendChild(button);
+}
+
+export async function showAddClassModalRp() {
+  const form = await createClassForm();
+  const modal = createModal({
+    title: "Ajouter une nouvelle classe",
+    content: form,
+    size: "xl",
+  });
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const result = await handleClassRpSubmit(form);
+    if (result.success) {
+      modal.close();
+      await renderClassesTableRp();
+    }
+  };
+
+  document.getElementById("modal-classes-container").appendChild(modal);
+  modal.showModal();
 }
