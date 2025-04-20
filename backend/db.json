@@ -103,15 +103,18 @@
   "classes_attaches": [
     {
       "id_classe": "1",
-      "id_attache": "1"
+      "id_attache": "1",
+      "id": "2eef"
     },
     {
       "id_classe": "2",
-      "id_attache": "1"
+      "id_attache": "1",
+      "id": "7483"
     },
     {
       "id_classe": "3",
-      "id_attache": "1"
+      "id_attache": "1",
+      "id": "5229"
     }
   ],
   "classes_professeur": [
@@ -119,43 +122,50 @@
       "id_classe": "1",
       "id_professeur": "1",
       "date_affectation": "2025-04-05",
-      "est_principal": 0
+      "est_principal": 0,
+      "id": "b701"
     },
     {
       "id_classe": "1",
       "id_professeur": "2",
       "date_affectation": "2025-04-05",
-      "est_principal": 0
+      "est_principal": 0,
+      "id": "4521"
     },
     {
       "id_classe": "1",
       "id_professeur": "3",
       "date_affectation": "2025-04-04",
-      "est_principal": 0
+      "est_principal": 0,
+      "id": "b57a"
     },
     {
       "id_classe": "2",
       "id_professeur": "1",
       "date_affectation": "2025-04-05",
-      "est_principal": 0
+      "est_principal": 0,
+      "id": "ac11"
     },
     {
       "id_classe": "2",
       "id_professeur": "2",
       "date_affectation": "2025-04-05",
-      "est_principal": 0
+      "est_principal": 0,
+      "id": "d2cf"
     },
     {
       "id_classe": "3",
       "id_professeur": "2",
       "date_affectation": "2025-04-05",
-      "est_principal": 0
+      "est_principal": 0,
+      "id": "2981"
     },
     {
       "id_classe": "5",
       "id_professeur": "1",
       "date_affectation": "2025-04-05",
-      "est_principal": 0
+      "est_principal": 0,
+      "id": "a1cc"
     }
   ],
   "config": [
@@ -163,25 +173,29 @@
       "cle": "periode_inscription_debut",
       "valeur": "2024-11-01",
       "description": "Date début inscriptions nouvelles",
-      "date_modification": "2025-04-13 09:12:51"
+      "date_modification": "2025-04-13 09:12:51",
+      "id": "ef35"
     },
     {
       "cle": "periode_inscription_fin",
       "valeur": "2025-04-15",
       "description": "Date fin inscriptions nouvelles",
-      "date_modification": "2025-04-13 09:15:21"
+      "date_modification": "2025-04-13 09:15:21",
+      "id": "68ec"
     },
     {
       "cle": "periode_reinscription_debut",
       "valeur": "2024-11-02",
       "description": "Date début réinscriptions",
-      "date_modification": "2025-04-13 22:04:21"
+      "date_modification": "2025-04-13 22:04:21",
+      "id": "1d01"
     },
     {
       "cle": "periode_reinscription_fin",
       "valeur": "2025-04-22",
       "description": "Date fin réinscriptions",
-      "date_modification": "2025-04-13 22:04:14"
+      "date_modification": "2025-04-13 22:04:14",
+      "id": "850d"
     }
   ],
   "cours": [
@@ -254,23 +268,28 @@
   "cours_classes": [
     {
       "id_cours": "1",
-      "id_classe": "1"
+      "id_classe": "1",
+      "id": "014c"
     },
     {
       "id_cours": "2",
-      "id_classe": "1"
+      "id_classe": "1",
+      "id": "71d7"
     },
     {
       "id_cours": "3",
-      "id_classe": "3"
+      "id_classe": "3",
+      "id": "2fee"
     },
     {
       "id_cours": "5",
-      "id_classe": "1"
+      "id_classe": "1",
+      "id": "9884"
     },
     {
       "id_cours": "6",
-      "id_classe": "1"
+      "id_classe": "1",
+      "id": "81f3"
     }
   ],
   "etudiants": [
@@ -438,7 +457,7 @@
       "pieces_jointes": "jr_67fe84bc23acd.jpg",
       "statut": "en attente",
       "id_traitant": "1",
-      "date_traitement": "2025-04-18 10:45:29",
+      "date_traitement": "2025-04-19 14:00:02",
       "commentaire_traitement": null,
       "id": "2"
     }
@@ -528,19 +547,23 @@
   "roles": [
     {
       "id_role": "1",
-      "libelle": "RP"
+      "libelle": "RP",
+      "id": "5633"
     },
     {
       "id_role": "2",
-      "libelle": "Professeur"
+      "libelle": "Professeur",
+      "id": "c2e7"
     },
     {
       "id_role": "3",
-      "libelle": "Attache"
+      "libelle": "Attache",
+      "id": "ba85"
     },
     {
       "id_role": "4",
-      "libelle": "Etudiant"
+      "libelle": "Etudiant",
+      "id": "a1b7"
     }
   ],
   "semestres": [

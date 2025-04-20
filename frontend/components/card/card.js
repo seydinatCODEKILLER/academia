@@ -282,3 +282,117 @@ export function createAbsenteesCard(config) {
 
   return card;
 }
+
+/**
+ * Crée une carte améliorée avec indicateurs pour les statistiques de classes
+ * @param {Object} config - Configuration de la carte
+ * @param {string} config.title - Titre principal
+ * @param {string} config.value - Valeur principale
+ * @param {string} [config.icon] - Icône Remix
+ * @param {number} config.totalClasses - Nombre total de classes
+ * @param {number} config.archivedClasses - Nombre de classes archivées
+ * @param {number} config.availableClasses - Nombre de classes disponibles
+ * @param {string} [config.trend] - Tendance ('up' ou 'down')
+ * @returns {HTMLElement} L'élément card
+ */
+export function createRpStatsCard(config) {
+  const {
+    title = "Classes",
+    value = "0",
+    icon = "ri-team-line",
+    totalData = 0,
+    archivedData = 0,
+    availableData = 0,
+    trend = "up",
+    key = "",
+  } = config;
+
+  // Création de la carte
+  const card = document.createElement("div");
+  card.className =
+    "bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex flex-col";
+
+  // En-tête de la carte
+  const cardHeader = document.createElement("div");
+  cardHeader.className = "flex justify-between items-start mb-4";
+
+  const titleElement = document.createElement("h3");
+  titleElement.className =
+    "text-lg font-medium text-gray-500 dark:text-gray-400";
+  titleElement.textContent = title;
+
+  const iconElement = document.createElement("i");
+  iconElement.className = `${icon} text-2xl text-blue-500 dark:text-blue-400`;
+
+  cardHeader.appendChild(titleElement);
+  cardHeader.appendChild(iconElement);
+
+  // Valeur principale
+  const valueElement = document.createElement("div");
+  valueElement.className =
+    "text-3xl font-bold text-gray-800 dark:text-white mb-2";
+  valueElement.textContent = value;
+
+  // Indicateur de tendance
+  const trendElement = document.createElement("div");
+  trendElement.className = `flex items-center text-sm ${
+    trend === "up" ? "text-green-500" : "text-red-500"
+  } mb-6`;
+  trendElement.innerHTML =
+    trend === "up"
+      ? `<i class="ri-arrow-up-line mr-1"></i> Augmentation`
+      : `<i class="ri-arrow-down-line mr-1"></i> Diminution`;
+
+  // Section des statistiques
+  const statsSection = document.createElement("div");
+  statsSection.className =
+    "mt-4 pt-4 border-t border-gray-200 dark:border-gray-700";
+
+  // Fonction pour créer un item de statistique
+  const createStatItem = (label, value, isGood) => {
+    const item = document.createElement("div");
+    item.className = "flex justify-between items-center py-1";
+
+    const labelSpan = document.createElement("span");
+    labelSpan.className = "text-sm text-gray-500 dark:text-gray-400";
+    labelSpan.textContent = label;
+
+    const valueContainer = document.createElement("div");
+    valueContainer.className = "flex items-center";
+
+    const valueSpan = document.createElement("span");
+    valueSpan.className = `text-sm font-medium ${
+      isGood ? "text-green-500" : "text-red-500"
+    }`;
+    valueSpan.textContent = value;
+
+    const indicator = document.createElement("span");
+    indicator.className = `ml-2 inline-block w-2 h-2 rounded-full ${
+      isGood ? "bg-green-500" : "bg-red-500"
+    }`;
+
+    valueContainer.appendChild(valueSpan);
+    valueContainer.appendChild(indicator);
+    item.appendChild(labelSpan);
+    item.appendChild(valueContainer);
+
+    return item;
+  };
+
+  // Ajout des statistiques
+  statsSection.appendChild(createStatItem(`Total des ${key}`, totalData, true));
+  statsSection.appendChild(
+    createStatItem(`${key} archivées`, archivedData, false)
+  );
+  statsSection.appendChild(
+    createStatItem(`${key} disponibles`, availableData, true)
+  );
+
+  // Assemblage final
+  card.appendChild(cardHeader);
+  card.appendChild(valueElement);
+  card.appendChild(trendElement);
+  card.appendChild(statsSection);
+
+  return card;
+}
