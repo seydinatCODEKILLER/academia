@@ -94,3 +94,25 @@ export async function getClasseById(id) {
     console.log(error);
   }
 }
+
+export async function handleArchiveClass(classId) {
+  const response = await fetch(`${API_BASE_URL}/classes/${classId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ state: "archiver" }),
+  });
+
+  if (!response.ok) throw new Error("Échec de l'archivage");
+  return await response.json();
+}
+
+export async function handleRestoreClass(classId) {
+  const response = await fetch(`${API_BASE_URL}/classes/${classId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ state: "disponible" }),
+  });
+
+  if (!response.ok) throw new Error("Échec de la restauration");
+  return await response.json();
+}

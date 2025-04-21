@@ -17,11 +17,16 @@ import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js"
 import {
   getAllClassesBasic,
   getClasseById,
+  handleArchiveClass,
+  handleRestoreClass,
 } from "../../services/classeServices.js";
 import { getAllFilieres } from "../../services/filiereService.js";
 import { getAllNiveaux } from "../../services/niveauxServices.js";
 import { createStyledElement } from "../../utils/function.js";
-import { showLoadingModal } from "../attacher/justificationHelpers.js";
+import {
+  showConfirmationModal,
+  showLoadingModal,
+} from "../attacher/justificationHelpers.js";
 
 export async function renderClassesTableRp(filters = {}) {
   try {
@@ -89,7 +94,7 @@ export async function renderClassesTableRp(filters = {}) {
             {
               disponible: "badge-success",
               complet: "badge-warning",
-              archivée: "badge-error",
+              archiver: "badge-error",
             }[item.statut] || "badge-neutral";
 
           return createStyledElement(
@@ -102,39 +107,55 @@ export async function renderClassesTableRp(filters = {}) {
     ];
     const actionsConfig = {
       type: "dropdown",
-      items: [
-        {
-          name: "edit",
-          label: "Modifier",
-          icon: "ri-edit-line",
-          className: "text-info",
-        },
-        {
-          name: "archive",
-          label: "Archiver",
-          icon: "ri-archive-line",
-          className: "text-error",
-        },
-        {
-          name: "details",
-          label: "Details",
-          icon: "ri-eye-line",
-          className: "text-primary",
-        },
-      ],
+      items: (item) => {
+        if (item.statut === "archiver") {
+          return [
+            {
+              name: "restore",
+              label: "Restaurer",
+              icon: "ri-arrow-go-back-line",
+              className: "text-success",
+              type: "direct",
+              showLabel: true,
+            },
+          ];
+        }
+        return [
+          {
+            name: "edit",
+            label: "Modifier",
+            icon: "ri-edit-line",
+            className: "text-info",
+          },
+          {
+            name: "archive",
+            label: "Archiver",
+            icon: "ri-archive-line",
+            className: "text-error",
+          },
+          {
+            name: "details",
+            label: "Détails",
+            icon: "ri-eye-line",
+            className: "text-primary",
+          },
+        ];
+      },
     };
+
     const handleAction = async (action, id) => {
+      const classe = await getClasseById(id);
       if (action === "edit") {
         await showEditClassModal(id);
-        return;
       }
       if (action === "archive") {
-        console.log(id);
-        return;
+        showArchiveConfirmation(id, classe.libelle);
       }
       if (action === "details") {
         console.log(id);
-        return;
+      }
+      if (action === "restore") {
+        showRestoreConfirmation(id, classe.libelle);
       }
     };
     const table = createDaisyUITable({
@@ -231,4 +252,43 @@ export async function showEditClassModal(classeId) {
 
   document.getElementById("modal-classes-container").appendChild(modal);
   modal.showModal();
+}
+
+export function showArchiveConfirmation(classId, classLibelle) {
+  showConfirmationModal({
+    title: `Archiver ${classLibelle}`,
+    content:
+      "Cette classe ne sera plus disponible pour les nouvelles inscriptions.",
+    confirmText: "Archiver",
+    confirmClass: "btn-error",
+    onConfirm: async () => {
+      const loading = showLoadingModal("Archivage en cours...");
+      try {
+        await handleArchiveClass(classId);
+      } catch (error) {
+        showEmptyStateModal("Erreur lors de l'archivage");
+      } finally {
+        loading.close();
+      }
+    },
+  });
+}
+
+export function showRestoreConfirmation(classId, classLibelle) {
+  showConfirmationModal({
+    title: `Restaurer ${classLibelle}`,
+    content: "La classe sera de nouveau disponible pour les inscriptions.",
+    confirmText: "Restaurer",
+    confirmClass: "btn-success",
+    onConfirm: async () => {
+      const loading = showLoadingModal("Restauration en cours...");
+      try {
+        await handleRestoreClass(classId);
+      } catch (error) {
+        showEmptyStateModal("Erreur lors de la restauration");
+      } finally {
+        loading.close();
+      }
+    },
+  });
 }

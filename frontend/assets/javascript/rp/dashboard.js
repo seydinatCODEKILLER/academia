@@ -6,13 +6,13 @@ import {
 import { initRouter } from "../../../router/router.js";
 import { getCurrentUser } from "../../../store/authStore.js";
 import { handleNotifications } from "../../../store/notificationStore.js";
-import { handleSidebar, renderRpHeader } from "../../../utils/rp.utils.js";
+import { handleRpSidebar, renderRpHeader } from "../../../utils/rp.utils.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   initRouter();
   handleNotifications();
   const user = getCurrentUser();
-  handleSidebar(user);
+  handleRpSidebar(user);
   renderRpHeader(user, "Dashboard");
   await renderRpStatsCards();
   await renderCourseChart();

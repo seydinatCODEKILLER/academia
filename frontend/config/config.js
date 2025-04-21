@@ -27,3 +27,13 @@ export const justificationActionConfigs = {
     className: "text-info",
   },
 };
+
+export const archiveAction = {
+  title: "Archiver la classe",
+  content: "Êtes-vous sûr de vouloir archiver cette classe ?",
+  confirmText: "Confirmer l'archivage",
+  confirmClass: "btn-error",
+  icon: "ri-archive-line",
+  label: "Archiver",
+  className: "text-error",
+};

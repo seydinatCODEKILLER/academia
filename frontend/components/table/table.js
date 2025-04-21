@@ -205,17 +205,27 @@ export function updateDaisyUITableData(
       const actionsCell = document.createElement("td");
       actionsCell.className = "text-right";
 
-      if (config.actions.type === "dropdown") {
+      const actions =
+        typeof config.actions.items === "function"
+          ? config.actions.items(item)
+          : config.actions.items;
+
+      const hasDirectOnly = actions.every((a) => a.type === "direct");
+      const hasDropdownOnly = actions.every(
+        (a) => !a.type || a.type === "dropdown"
+      );
+
+      if (hasDropdownOnly) {
         actionsCell.innerHTML = renderDaisyUIDropdown(
           item,
-          config.actions,
+          { ...config.actions, items: actions },
           tableId
         );
       } else {
-        actionsCell.innerHTML = renderDaisyUIDirectActions(
-          item,
-          config.actions
-        );
+        actionsCell.innerHTML = renderDaisyUIDirectActions(item, {
+          ...config.actions,
+          items: actions.filter((a) => a.type === "direct"),
+        });
       }
 
       row.appendChild(actionsCell);
