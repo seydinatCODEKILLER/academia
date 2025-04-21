@@ -9,9 +9,15 @@ import {
   updateDaisyUITableData,
 } from "../../components/table/table.js";
 import { createFloatingButton } from "../../components/ui/floatingButton.js";
-import { handleClassRpSubmit } from "../../handler/rp/classeRp.handler.js";
+import {
+  handleClassRpSubmit,
+  handleClassRpUpdate,
+} from "../../handler/rp/classeRp.handler.js";
 import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js";
-import { getAllClassesBasic } from "../../services/classeServices.js";
+import {
+  getAllClassesBasic,
+  getClasseById,
+} from "../../services/classeServices.js";
 import { getAllFilieres } from "../../services/filiereService.js";
 import { getAllNiveaux } from "../../services/niveauxServices.js";
 import { createStyledElement } from "../../utils/function.js";
@@ -117,9 +123,9 @@ export async function renderClassesTableRp(filters = {}) {
         },
       ],
     };
-    const handleAction = (action, id) => {
+    const handleAction = async (action, id) => {
       if (action === "edit") {
-        console.log(id);
+        await showEditClassModal(id);
         return;
       }
       if (action === "archive") {
@@ -194,6 +200,29 @@ export async function showAddClassModalRp() {
   form.onsubmit = async (e) => {
     e.preventDefault();
     const result = await handleClassRpSubmit(form);
+    if (result.success) {
+      modal.close();
+      await renderClassesTableRp();
+    }
+  };
+
+  document.getElementById("modal-classes-container").appendChild(modal);
+  modal.showModal();
+}
+
+export async function showEditClassModal(classeId) {
+  const classe = await getClasseById(classeId);
+  console.log(classe);
+  const form = await createClassForm(classe);
+  const modal = createModal({
+    title: `Modifier ${classe.libelle}`,
+    size: "xl",
+    content: form,
+  });
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const result = await handleClassRpUpdate(form, classeId);
     if (result.success) {
       modal.close();
       await renderClassesTableRp();

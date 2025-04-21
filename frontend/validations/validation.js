@@ -1,4 +1,7 @@
-import { checkExistingClass } from "../services/classeServices.js";
+import {
+  checkExistingClass,
+  getClasseById,
+} from "../services/classeServices.js";
 import {
   checkEmailExists,
   checkMatriculeExists,
@@ -35,15 +38,17 @@ export async function validateInscriptionData(data) {
   return Object.keys(errors).length ? errors : null;
 }
 
-export async function validateClassData(data) {
+export async function validateClassData(
+  data,
+  isUpdate = false,
+  classId = null
+) {
   const errors = {};
 
   if (!data.libelle?.trim()) {
     errors.libelle = "Le libellé est requis";
   } else if (data.libelle.length > 50) {
     errors.libelle = "Maximum 50 caractères";
-  } else if (await checkExistingClass(data.libelle)) {
-    errors.libelle = "La classe existe deja";
   }
   if (!data.id_filiere) {
     errors.id_filiere = "Sélectionnez une filière";
@@ -55,6 +60,21 @@ export async function validateClassData(data) {
 
   if (!data.capacite_max || data.capacite_max < 1) {
     errors.capacite_max = "Capacité invalide";
+  }
+
+  if (isUpdate) {
+    const originalClass = await getClasseById(classId);
+    if (data.libelle !== originalClass.libelle) {
+      const exists = await checkExistingClass(data.libelle, classId);
+      if (exists) {
+        errors.libelle = "Cette classe existe déjà pour cette filière";
+      }
+    }
+  } else {
+    const exists = await checkExistingClass(data.libelle);
+    if (exists) {
+      errors.libelle = "Cette classe existe déjà pour cette filière";
+    }
   }
 
   return Object.keys(errors).length > 0 ? errors : null;

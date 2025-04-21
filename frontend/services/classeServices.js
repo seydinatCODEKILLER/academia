@@ -60,7 +60,37 @@ export async function createClasse(data) {
   }
 }
 
-export async function checkExistingClass(libelle) {
+export async function updatedClasse(data, id) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/classes/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        libelle: data.libelle,
+        id_niveau: data.id_niveau,
+        id_filiere: data.id_filiere,
+        capacite_max: data.capacite_max,
+      }),
+    });
+
+    if (!response.ok) throw new Error("Erreur API");
+  } catch (error) {
+    console.error("Erreur:", error);
+  }
+}
+
+export async function checkExistingClass(libelle, excludeId = null) {
   const classes = await fetchData("classes");
-  return classes.some((c) => c.libelle === libelle && c.state !== "archiver");
+  return classes.some(
+    (c) => (excludeId ? c.id !== excludeId : true) && c.libelle === libelle
+  );
+}
+
+export async function getClasseById(id) {
+  try {
+    const response = await fetchData("classes", id);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
 }

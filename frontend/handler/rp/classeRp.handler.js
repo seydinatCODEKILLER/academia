@@ -1,7 +1,7 @@
 import { showEmptyStateModal } from "../../components/modals/modal.js";
 import { showLoadingModal } from "../../helpers/attacher/justificationHelpers.js";
 import { getCurrentAcademicYearId } from "../../services/annees_scolaireService.js";
-import { createClasse } from "../../services/classeServices.js";
+import { createClasse, updatedClasse } from "../../services/classeServices.js";
 import { validateClassData } from "../../validations/validation.js";
 
 export async function handleClassRpSubmit(formElement) {
@@ -61,4 +61,47 @@ function showFormErrors(form, errors = {}) {
       errorElement.classList.remove("hidden");
     }
   });
+}
+
+export async function handleClassRpUpdate(formElement, id) {
+  const loadingModal = showLoadingModal("Modifications de la classe...");
+  clearFormErrors(formElement);
+
+  try {
+    const formData = new FormData(formElement);
+    const data = {
+      libelle: formData.get("libelle"),
+      id_filiere: formData.get("id_filiere"),
+      id_niveau: formData.get("id_niveau"),
+      capacite_max: formData.get("capacite_max"),
+    };
+
+    const result = await submitClasseUpdateData(data, id);
+    console.log(result);
+
+    loadingModal.close();
+    return {
+      success: true,
+      data: { libelle: result.updateClasse.libelle },
+    };
+  } catch (error) {
+    loadingModal.close();
+    if (error.name === "ValidationError") {
+      showFormErrors(formElement, error.errors);
+      return { success: false, errors: error.errors };
+    }
+    // showEmptyStateModal(
+    //   "Une erreur est survenue lors de la modification de la classe"
+    // );
+    return { success: false };
+  }
+}
+
+async function submitClasseUpdateData(data, id) {
+  const errors = await validateClassData(data, true, id);
+  console.log(errors);
+
+  if (errors) throw { name: "ValidationError", errors };
+  const updateClasse = updatedClasse(data, id);
+  return { updateClasse };
 }

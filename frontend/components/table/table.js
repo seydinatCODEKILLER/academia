@@ -122,8 +122,12 @@ export function createDaisyUITable(config) {
   tableContainer.appendChild(table);
   tableContainer.appendChild(pagination);
 
-  // Initialisation des données
-  updateDaisyUITableData(tableId, data, 1, onAction);
+  tableContainer.cleanup = () => {
+    const tbody = document.getElementById(`${tableId}-body`);
+    if (tbody && table._clickHandler) {
+      tbody.removeEventListener("click", table._clickHandler);
+    }
+  };
 
   return tableContainer;
 }
@@ -145,7 +149,11 @@ export function updateDaisyUITableData(
 
   const config = table._tableConfig;
   const tbody = document.getElementById(`${tableId}-body`);
-  tbody.innerHTML = "";
+
+  // Ne vide le corps que si nécessaire
+  if (tbody.innerHTML !== "") {
+    tbody.innerHTML = "";
+  }
 
   // Mise à jour des données
   table.currentData = newData;
@@ -335,16 +343,28 @@ function updateDaisyUIPagination(
 /**
  * Configure les événements avec DaisyUI
  */
+/**
+ * Configure les événements avec DaisyUI
+ */
 function setupDaisyUIEvents(tableId) {
   const table = document.getElementById(tableId);
   const tbody = document.getElementById(`${tableId}-body`);
   if (!tbody || !table.handleAction) return;
 
-  tbody.addEventListener("click", (e) => {
+  // Supprime d'abord l'ancien écouteur s'il existe
+  if (table._clickHandler) {
+    tbody.removeEventListener("click", table._clickHandler);
+  }
+
+  // Crée un nouveau gestionnaire
+  table._clickHandler = (e) => {
     const actionItem = e.target.closest("[data-action]");
     if (actionItem) {
       e.preventDefault();
       table.handleAction(actionItem.dataset.action, actionItem.dataset.id);
     }
-  });
+  };
+
+  // Ajoute le nouvel écouteur
+  tbody.addEventListener("click", table._clickHandler);
 }

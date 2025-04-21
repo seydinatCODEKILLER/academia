@@ -1,7 +1,7 @@
 import { getAllFilieres } from "../../services/filiereService.js";
 import { getAllNiveaux } from "../../services/niveauxServices.js";
 
-export async function createClassForm() {
+export async function createClassForm(existingClass = null) {
   const form = document.createElement("form");
   form.className = "space-y-4 p-4 max-h-[70vh] overflow-y-auto";
 
@@ -10,6 +10,15 @@ export async function createClassForm() {
     await getAllNiveaux(),
     await getAllFilieres(),
   ]);
+
+  const defaultValue = {
+    libelle: "",
+    id_filiere: "",
+    id_niveau: "",
+    capacite_max: 30,
+    state: "disponible",
+    ...existingClass,
+  };
 
   form.innerHTML = `
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -20,7 +29,9 @@ export async function createClassForm() {
         <label class="label">
           <span class="label-text">Libellé *</span>
         </label>
-        <input type="text" placeholder="Nom de la classe" name="libelle" class="input input-bordered">
+        <input value="${
+          defaultValue.libelle
+        }" type="text" placeholder="Nom de la classe" name="libelle" class="input input-bordered">
         <div class="text-error text-xs mt-1 hidden" data-error="libelle"></div>
       </div>
       
@@ -33,7 +44,9 @@ export async function createClassForm() {
           ${filieres
             .map(
               (f) => `
-            <option value="${f.id}">${f.libelle}</option>
+            <option value="${f.id}" ${
+                f.id === defaultValue.id_filiere ? "selected" : ""
+              }>${f.libelle}</option>
           `
             )
             .join("")}
@@ -50,7 +63,9 @@ export async function createClassForm() {
           ${niveaux
             .map(
               (n) => `
-            <option value="${n.id}">${n.libelle}</option>
+            <option value="${n.id}" ${
+                n.id === defaultValue.id_niveau ? "selected" : ""
+              }>${n.libelle}</option>
           `
             )
             .join("")}
@@ -62,7 +77,9 @@ export async function createClassForm() {
         <label class="label">
           <span class="label-text">Capacité maximale *</span>
         </label>
-        <input type="number" placeholder="capacite de la classe" name="capacite_max" class="input input-bordered" min="1">
+        <input type="number" value="${
+          defaultValue.capacite_max
+        }" placeholder="capacite de la classe" name="capacite_max" class="input input-bordered" min="1">
         <div class="text-error text-xs mt-1 hidden" data-error="capacite_max"></div>
       </div>
     </div>
@@ -72,7 +89,8 @@ export async function createClassForm() {
         Annuler
       </button>
       <button type="submit" class="btn btn-primary">
-        <i class="ri-save-line mr-2"></i> Créer la classe
+        <i class="ri-save-line mr-2"></i> 
+         ${existingClass ? "Enregistrer" : "Créer"}
       </button>
     </div>
   `;
