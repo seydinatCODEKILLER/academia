@@ -1,3 +1,4 @@
+import { createIllustratedBanner } from "../../components/banner/banner.js";
 import { renderStudentCard } from "../../components/card/card.js";
 import { createClassFiltersForRp } from "../../components/filter/filter.js";
 import { createClassForm } from "../../components/form/form.js";
@@ -389,4 +390,15 @@ export async function showClassDetailsModal(classId) {
   } finally {
     loadingModal.close();
   }
+}
+
+export function renderClasseBannerForRp() {
+  const hero = createIllustratedBanner({
+    title: "Suivez vos classes en temps réel",
+    subtitle: "Une plateforme intuitive pour une gestion moderne",
+    illustrationUrl: "/frontend/assets/images/class.svg",
+    bgColor: "bg-purple-500",
+    textColor: "text-white",
+  });
+  document.getElementById("banner-container").appendChild(hero);
 }

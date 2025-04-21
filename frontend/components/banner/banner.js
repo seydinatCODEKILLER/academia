@@ -176,3 +176,76 @@ export function createModernBanner(config) {
 
   return banner;
 }
+
+/**
+ * Crée une bannière illustrée avec un fond à motif, un titre, un sous-titre et une image flottante
+ * @param {Object} config - Configuration de la bannière
+ * @param {string} config.title - Titre principal
+ * @param {string} config.subtitle - Sous-titre descriptif
+ * @param {string} config.illustrationUrl - URL de l'image illustrative
+ * @param {string} [config.bgColor='bg-blue-50'] - Couleur de fond principale
+ * @param {string} [config.pattern='bg-dots'] - Classe Tailwind pour motif (ex: 'bg-dots', 'bg-grid')
+ * @param {string} [config.textColor='text-gray-900'] - Couleur du texte
+ * @param {string} [config.altText='Illustration'] - Texte alternatif de l’image
+ * @returns {HTMLElement} Élément de la bannière
+ */
+export function createIllustratedBanner(config) {
+  const {
+    title = "Bienvenue dans notre plateforme",
+    subtitle = "Simplifiez la gestion avec style",
+    illustrationUrl = "/assets/illustration.png",
+    bgColor = "bg-blue-50",
+    pattern = "bg-dots",
+    textColor = "text-gray-900",
+    altText = "Illustration",
+  } = config;
+
+  const banner = document.createElement("div");
+  banner.className = [
+    "relative",
+    "w-full",
+    "rounded-xl",
+    "p-4",
+    "lg:p-7",
+    "flex",
+    "md:flex-row",
+    "items-center",
+    "justify-between",
+    bgColor,
+    pattern,
+    "shadow-sm",
+  ].join(" ");
+
+  const textContent = document.createElement("div");
+  textContent.className = "max-w-xl space-y-1";
+
+  const titleEl = document.createElement("h1");
+  titleEl.className = `text-xl lg:text-3xl font-bold ${textColor}`;
+  titleEl.textContent = title;
+
+  const subtitleEl = document.createElement("p");
+  subtitleEl.className = `text-sm font-medium lg:text-lg ${textColor} opacity-80`;
+  subtitleEl.textContent = subtitle;
+
+  textContent.appendChild(titleEl);
+  textContent.appendChild(subtitleEl);
+
+  // Illustration à droite (image en hauteur libre)
+  const illustration = document.createElement("img");
+  illustration.src = illustrationUrl;
+  illustration.alt = altText;
+  illustration.className = [
+    "object-cover",
+    "absolute",
+    "right-0",
+    "h-56",
+    "hidden",
+    "lg:block",
+    "pointer-events-none",
+  ].join(" ");
+
+  banner.appendChild(textContent);
+  banner.appendChild(illustration);
+
+  return banner;
+}

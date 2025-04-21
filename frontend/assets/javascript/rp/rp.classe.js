@@ -1,4 +1,5 @@
 import {
+  renderClasseBannerForRp,
   renderClassesTableRp,
   renderClasseTableFilterForRp,
   renderFloatingButtonAddClasse,
@@ -13,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   handleRpSidebar(user);
   renderRpHeader(user, "Mes classes");
   renderFloatingButtonAddClasse();
+  renderClasseBannerForRp();
   await renderClasseTableFilterForRp();
   await renderClassesTableRp();
 });
