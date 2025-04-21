@@ -1,8 +1,8 @@
-import { showNotification } from "../../../components/notifications/notification.js";
-import { navigateTo } from "../../../router/router.js";
-import { login } from "../../../services/authServices.js";
-import { setCurrentUser } from "../../../store/authStore.js";
-import { setNotification } from "../../../store/notificationStore.js";
+import { showNotification } from "../components/notifications/notification.js";
+import { navigateTo } from "../router/router.js";
+import { login } from "../services/authServices.js";
+import { setCurrentUser } from "../store/authStore.js";
+import { setNotification } from "../store/notificationStore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector("#loginForm");

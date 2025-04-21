@@ -116,3 +116,108 @@ export async function handleRestoreClass(classId) {
   if (!response.ok) throw new Error("Échec de la restauration");
   return await response.json();
 }
+
+export async function getClassByIdDetails(id) {
+  try {
+    // Récupération parallèle de toutes les données nécessaires
+    const [
+      classe,
+      filieres,
+      niveaux,
+      anneeScolaires,
+      classesAttaches,
+      attaches,
+      utilisateurs,
+      classesProfesseurs,
+      professeurs,
+      etudiants,
+      coursClasses,
+      cours,
+    ] = await Promise.all([
+      fetchData("classes", id),
+      fetchData("filieres"),
+      fetchData("niveaux"),
+      fetchData("annee_scolaire"),
+      fetchData("classes_attaches"),
+      fetchData("attaches"),
+      fetchData("utilisateurs"),
+      fetchData("classes_professeur"),
+      fetchData("professeurs"),
+      fetchData("etudiants"),
+      fetchData("cours_classes"),
+      fetchData("cours"),
+    ]);
+
+    if (!classe) return null;
+
+    // Construction de l'objet complet
+    return {
+      ...classe,
+      // Informations de base
+      filiere: filieres.find((f) => f.id === classe.id_filiere),
+      niveau: niveaux.find((n) => n.id === classe.id_niveau),
+      annee_scolaire: anneeScolaires.find((a) => a.id === classe.id_annee),
+
+      // Attachés pédagogiques
+      attaches: classesAttaches
+        .filter((ca) => ca.id_classe === id)
+        .map((ca) => ({
+          ...attaches.find((a) => a.id === ca.id_attache),
+          utilisateur: utilisateurs.find(
+            (u) =>
+              u.id ===
+              attaches.find((a) => a.id === ca.id_attache)?.id_utilisateur
+          ),
+        })),
+
+      // Professeurs
+      professeurs: classesProfesseurs
+        .filter((cp) => cp.id_classe === id)
+        .map((cp) => ({
+          ...professeurs.find((p) => p.id === cp.id_professeur),
+          utilisateur: utilisateurs.find(
+            (u) =>
+              u.id ===
+              professeurs.find((p) => p.id === cp.id_professeur)?.id_utilisateur
+          ),
+          date_affectation: cp.date_affectation,
+          est_principal: cp.est_principal,
+        })),
+
+      // Étudiants
+      etudiants: etudiants
+        .filter((e) => e.id_classe === id)
+        .map((e) => ({
+          ...e,
+          utilisateur: utilisateurs.find((u) => u.id === e.id_utilisateur),
+        })),
+
+      // Cours associés
+      cours: coursClasses
+        .filter((cc) => cc.id_classe === id)
+        .map((cc) => ({
+          ...cours.find((c) => c.id === cc.id_cours),
+          module: fetchData(
+            "modules",
+            cours.find((c) => c.id === cc.id_cours)?.id_module
+          ),
+        })),
+
+      // Statistiques
+      stats: {
+        nombre_etudiants: etudiants.filter((e) => e.id_classe === id).length,
+        nombre_professeurs: classesProfesseurs.filter(
+          (cp) => cp.id_classe === id
+        ).length,
+        taux_remplissage: Math.round(
+          (etudiants.filter((e) => e.id_classe === id).length /
+            classe.capacite_max) *
+            100
+        ),
+      },
+    };
+  } catch (error) {
+    console.error(`Erreur dans getClassById pour l'ID ${id}:`, error);
+    throw error;
+  }
+}

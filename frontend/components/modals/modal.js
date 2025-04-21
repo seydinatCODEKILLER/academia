@@ -9,20 +9,29 @@
  */
 export function createModal(config) {
   const {
-    id = `modal-${Math.random().toString(36)}`,
+    id = `modal-${Math.random().toString(36).substring(2)}`,
     title = "Modal",
     content = "",
     showCloseButton = true,
+    size = "md",
+    scrollable = false,
   } = config;
 
+  // Modal de base
   const modal = document.createElement("dialog");
   modal.id = id;
   modal.className = "modal";
 
+  // Boîte principale
   const modalBox = document.createElement("div");
-  modalBox.className = "modal-box";
+  modalBox.className = `modal-box w-full max-w-${size}`;
 
-  // En-tête du modal
+  // Si scrollable, ajout de hauteur fixe et scroll interne
+  if (scrollable) {
+    modalBox.classList.add("max-h-[90vh]", "overflow-y-auto");
+  }
+
+  // En-tête
   const modalHeader = document.createElement("div");
   modalHeader.className = "flex items-center justify-between mb-4";
 
@@ -32,7 +41,7 @@ export function createModal(config) {
 
   modalHeader.appendChild(modalTitle);
 
-  // Bouton fermer si activé
+  // Bouton de fermeture (optionnel)
   if (showCloseButton) {
     const closeButton = document.createElement("button");
     closeButton.className = "btn btn-sm btn-circle btn-ghost";
@@ -41,7 +50,7 @@ export function createModal(config) {
     modalHeader.appendChild(closeButton);
   }
 
-  // Contenu du modal
+  // Contenu
   const modalContent = document.createElement("div");
   modalContent.className = "py-4";
 
@@ -51,7 +60,7 @@ export function createModal(config) {
     modalContent.appendChild(content);
   }
 
-  // Pied de page du modal
+  // Footer
   const modalFooter = document.createElement("div");
   modalFooter.className = "modal-action";
 
