@@ -206,7 +206,7 @@ export function createIllustratedBanner(config) {
     "w-full",
     "rounded-xl",
     "p-4",
-    "lg:p-7",
+    "lg:p-8",
     "flex",
     "md:flex-row",
     "items-center",
