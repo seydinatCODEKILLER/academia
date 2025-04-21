@@ -1,3 +1,4 @@
+import { createProfesseurFiltersForRp } from "../../components/filter/filter.js";
 import { showEmptyStateModal } from "../../components/modals/modal.js";
 import {
   createDaisyUITable,
@@ -13,8 +14,11 @@ export async function renderProfesseursTableRp(filters = {}) {
     let professeurs = await getAllProfessorsBasic();
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      professeurs = professeurs.filter((prof) =>
-        prof.nom.toLowerCase().includes(searchTerm)
+      professeurs = professeurs.filter(
+        (prof) =>
+          prof.nom.toLowerCase().includes(searchTerm) ||
+          prof.prenom.toLowerCase().includes(searchTerm) ||
+          prof.email.toLowerCase().includes(searchTerm)
       );
     }
     const columns = [
@@ -137,4 +141,15 @@ export async function renderProfesseursTableRp(filters = {}) {
     console.error("Erreur:", error);
     showEmptyStateModal("Erreur lors du chargement des professeurs");
   }
+}
+
+export async function updateProfesseurTableWithFiltersForRp(filters = {}) {
+  await renderProfesseursTableRp(filters);
+}
+
+export async function renderProfesseurTableFilterForRp() {
+  const filters = createProfesseurFiltersForRp({
+    onFilter: (filters) => updateProfesseurTableWithFiltersForRp(filters),
+  });
+  document.getElementById("filters-container").appendChild(filters);
 }

@@ -1,4 +1,7 @@
-import { renderProfesseursTableRp } from "../../../helpers/rp/professeur.helpers.js";
+import {
+  renderProfesseursTableRp,
+  renderProfesseurTableFilterForRp,
+} from "../../../helpers/rp/professeur.helpers.js";
 import { initRouter } from "../../../router/router.js";
 import { getCurrentUser } from "../../../store/authStore.js";
 import { handleRpSidebar, renderRpHeader } from "../../../utils/rp.utils.js";
@@ -9,4 +12,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   handleRpSidebar(user);
   renderRpHeader(user, "Mes professeurs");
   await renderProfesseursTableRp();
+  await renderProfesseurTableFilterForRp();
 });
