@@ -138,7 +138,7 @@ export async function validateProfesseurData(
 
   if (isUpdate) {
     const originalProf = await getProfessorDetails(profId);
-    if (data.email !== originalProf.userInfo.email) {
+    if (data.email !== originalProf.informations.email) {
       const exists = await checkEmailExists(data.email);
       if (exists) {
         errors.email = "Cette email existe déjà";

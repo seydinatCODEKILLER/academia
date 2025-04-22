@@ -129,12 +129,6 @@
   "classes_professeur": [
     {
       "id_classe": "1",
-      "id_professeur": "1",
-      "date_affectation": "2025-04-05",
-      "id": "b701"
-    },
-    {
-      "id_classe": "1",
       "id_professeur": "2",
       "date_affectation": "2025-04-05",
       "id": "4521"
@@ -146,39 +140,45 @@
       "id": "b57a"
     },
     {
-      "id_classe": "2",
+      "id": "7604",
       "id_professeur": "1",
-      "date_affectation": "2025-04-05",
-      "id": "ac11"
+      "id_classe": "1",
+      "date_affectation": "2025-04-22"
     },
     {
-      "id_classe": "2",
+      "id": "63d4",
       "id_professeur": "2",
-      "date_affectation": "2025-04-05",
-      "id": "d2cf"
-    },
-    {
-      "id_classe": "3",
-      "id_professeur": "2",
-      "date_affectation": "2025-04-05",
-      "id": "2981"
-    },
-    {
-      "id_classe": "5",
-      "id_professeur": "1",
-      "date_affectation": "2025-04-05",
-      "id": "a1cc"
-    },
-    {
-      "id": "f4e6",
-      "id_professeur": "4",
       "id_classe": "2",
       "date_affectation": "2025-04-22"
     },
     {
-      "id": "eb8d",
-      "id_professeur": "4",
+      "id": "4a27",
+      "id_professeur": "2",
       "id_classe": "3",
+      "date_affectation": "2025-04-22"
+    },
+    {
+      "id": "9d32",
+      "id_professeur": "4",
+      "id_classe": "1",
+      "date_affectation": "2025-04-22"
+    },
+    {
+      "id": "5d1f",
+      "id_professeur": "4",
+      "id_classe": "8",
+      "date_affectation": "2025-04-22"
+    },
+    {
+      "id": "1fbc",
+      "id_professeur": "1",
+      "id_classe": "2",
+      "date_affectation": "2025-04-22"
+    },
+    {
+      "id": "f506",
+      "id_professeur": "1",
+      "id_classe": "1",
       "date_affectation": "2025-04-22"
     }
   ],
@@ -532,7 +532,7 @@
     {
       "id_utilisateur": "2",
       "specialite": "Informatique",
-      "grade": "Professeur",
+      "grade": "principal",
       "date_embauche": "2020-09-01",
       "id": "1"
     },
@@ -553,9 +553,9 @@
     {
       "id": "4",
       "id_utilisateur": "11",
-      "specialite": "Mathématiques",
+      "specialite": "chirurgien",
       "grade": "principal",
-      "date_embauche": "2025-04-22T14:29:47.917Z"
+      "date_embauche": "2025-04-22T17:42:21.920Z"
     }
   ],
   "responsables_pedagogiques": [
@@ -618,7 +618,7 @@
     },
     {
       "nom": "Sow",
-      "prenom": "Moussa",
+      "prenom": "Moussa v3",
       "email": "m.sow@ecole221.com",
       "password": "password123",
       "id_role": "2",
@@ -725,12 +725,12 @@
     },
     {
       "id": "11",
-      "nom": "Ndiaye",
-      "prenom": "Sidy",
-      "email": "sidy020@gmail.com",
+      "nom": "Fall",
+      "prenom": "Alwaly",
+      "email": "con020@gmail.com",
       "password": "ridendo",
       "id_role": "2",
-      "telephone": "774356789",
+      "telephone": "958777095",
       "adresse": "Dakar",
       "avatar": "https://images.pexels.com/photos/3992656/pexels-photo-3992656.png?auto=compress&cs=tinysrgb&w=600",
       "state": "disponible"

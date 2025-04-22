@@ -9,8 +9,14 @@ import {
   updateDaisyUITableData,
 } from "../../components/table/table.js";
 import { createFloatingButton } from "../../components/ui/floatingButton.js";
-import { handleProffRpSubmit } from "../../handler/rp/professeurRp.handler.js";
-import { getAllProfessorsBasic } from "../../services/professeurService.js";
+import {
+  handleProffRpSubmit,
+  handleProffRpUpdate,
+} from "../../handler/rp/professeurRp.handler.js";
+import {
+  getAllProfessorsBasic,
+  getProfessorDetails,
+} from "../../services/professeurService.js";
 import { createStyledElement } from "../../utils/function.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
 
@@ -124,7 +130,7 @@ export async function renderProfesseursTableRp(filters = {}) {
     };
 
     const handleAction = async (action, id) => {
-      if (action === "edit") console.log(id);
+      if (action === "edit") await showEditProfesseurModal(id);
       if (action === "archive") console.log(id);
       if (action === "details") console.log(id);
       if (action === "restore") console.log(id);
@@ -184,6 +190,29 @@ export async function showAddProfesseurModalRp() {
   form.onsubmit = async (e) => {
     e.preventDefault();
     const result = await handleProffRpSubmit(form);
+    if (result.success) {
+      modal.close();
+      await renderProfesseursTableRp();
+    }
+  };
+
+  document.getElementById("modal-professeurs-container").appendChild(modal);
+  modal.showModal();
+}
+
+export async function showEditProfesseurModal(profId) {
+  const professeur = await getProfessorDetails(profId);
+
+  const form = await createProfesseursForm(professeur);
+  const modal = createModal({
+    title: `Modifier ${professeur.informations.prenom}`,
+    size: "2xl",
+    content: form,
+  });
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const result = await handleProffRpUpdate(form, profId);
     if (result.success) {
       modal.close();
       await renderProfesseursTableRp();

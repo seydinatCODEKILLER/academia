@@ -16,6 +16,21 @@ export async function createUser(userData) {
   }
 }
 
+export async function updateUser(userData, id) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/utilisateurs/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+    return response.json();
+  } catch (error) {
+    throw new Error(
+      `erreur lors de la modification de l'utilisateur : ${error}`
+    );
+  }
+}
+
 /**
  * Vérifie si un email existe déjà dans la base de données
  * @param {string} email - L'email à vérifier

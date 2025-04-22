@@ -1,6 +1,7 @@
 import { getAvailableClasses } from "../../services/classeServices.js";
 import { getAllFilieres } from "../../services/filiereService.js";
 import { getAllNiveaux } from "../../services/niveauxServices.js";
+import { getClassesByProfessor } from "../../services/professeurService.js";
 
 export async function createClassForm(existingClass = null) {
   const form = document.createElement("form");
@@ -114,14 +115,26 @@ export async function createProfesseursForm(existingProfesseur = null) {
     telephone: "",
     avatar: "",
     password: "",
-    id_classe: [],
-    ...existingProfesseur,
+    classes: [],
+    ...(existingProfesseur
+      ? {
+          ...existingProfesseur.informations,
+          classes: await getClassesByProfessor(
+            existingProfesseur.ids.professeur
+          ),
+          id_utilisateur: existingProfesseur.ids.utilisateur,
+        }
+      : {}),
   };
 
   form.innerHTML = `
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <!-- Section 1: Informations de base -->
       <div class="col-span-full font-bold text-lg mb-2">Informations de la personnelle</div>
+
+       <input value="${
+         defaultValue.id_utilisateur || ""
+       }" type="hidden" name="id_utilisateur">
       
       <div class="form-control flex flex-col">
         <label class="label">
@@ -223,7 +236,9 @@ export async function createProfesseursForm(existingProfesseur = null) {
           <label class="card cursor-pointer hover:bg-base-200 transition-colors border border-gray-100">
             <div class="card-body p-4 ">
             <div class="flex items-center gap-2">
-              <input type="checkbox" name="classes" value="${c.id}" class="checkbox">
+              <input type="checkbox" name="classes" value="${c.id}"  ${
+              defaultValue.classes.some((cc) => cc.id === c.id) ? "checked" : ""
+            } class="checkbox">
               <h4 class="font-medium">${c.libelle}</h4>
               </div>
             </div>
