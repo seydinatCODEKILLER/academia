@@ -281,6 +281,9 @@ export async function submitInscription(data) {
     email: data.email,
     telephone: data.telephone,
     adresse: data.adresse,
+    password: data.password,
+    state: "disponible",
+    id_role: "4",
     avatar: data.avatar || "/assets/default-avatar.png",
   });
 

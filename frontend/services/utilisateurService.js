@@ -8,9 +8,6 @@ export async function createUser(userData) {
       body: JSON.stringify({
         id: String(await generateId("utilisateurs")),
         ...userData,
-        password: userData.password,
-        id_role: 4,
-        state: "disponible",
       }),
     });
     return response.json();

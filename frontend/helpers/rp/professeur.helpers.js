@@ -1,9 +1,15 @@
 import { createProfesseurFiltersForRp } from "../../components/filter/filter.js";
-import { showEmptyStateModal } from "../../components/modals/modal.js";
+import { createProfesseursForm } from "../../components/form/form.js";
+import {
+  createModal,
+  showEmptyStateModal,
+} from "../../components/modals/modal.js";
 import {
   createDaisyUITable,
   updateDaisyUITableData,
 } from "../../components/table/table.js";
+import { createFloatingButton } from "../../components/ui/floatingButton.js";
+import { handleProffRpSubmit } from "../../handler/rp/professeurRp.handler.js";
 import { getAllProfessorsBasic } from "../../services/professeurService.js";
 import { createStyledElement } from "../../utils/function.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
@@ -152,4 +158,38 @@ export async function renderProfesseurTableFilterForRp() {
     onFilter: (filters) => updateProfesseurTableWithFiltersForRp(filters),
   });
   document.getElementById("filters-container").appendChild(filters);
+}
+
+export function renderFloatingButtonAddProfesseur() {
+  const button = createFloatingButton({
+    id: "quick-add-btn",
+    icon: "ri-add-line",
+    title: "Création rapide",
+    color: "warning",
+    position: "bottom-right",
+    onClick: async () => await showAddProfesseurModalRp(),
+  });
+
+  document.getElementById("floatingButton").appendChild(button);
+}
+
+export async function showAddProfesseurModalRp() {
+  const form = await createProfesseursForm();
+  const modal = createModal({
+    title: "Ajouter une nouvelle professeur",
+    content: form,
+    size: "2xl",
+  });
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const result = await handleProffRpSubmit(form);
+    if (result.success) {
+      modal.close();
+      await renderProfesseursTableRp();
+    }
+  };
+
+  document.getElementById("modal-professeurs-container").appendChild(modal);
+  modal.showModal();
 }

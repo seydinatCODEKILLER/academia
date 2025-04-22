@@ -28,7 +28,7 @@ export function createModal(config) {
 
   // Si scrollable, ajout de hauteur fixe et scroll interne
   if (scrollable) {
-    modalBox.classList.add("max-h-[90vh]", "overflow-y-auto");
+    modalBox.classList.add("max-h-[85vh]", "overflow-y-auto");
   }
 
   // En-tête

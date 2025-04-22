@@ -131,50 +131,55 @@
       "id_classe": "1",
       "id_professeur": "1",
       "date_affectation": "2025-04-05",
-      "est_principal": 0,
       "id": "b701"
     },
     {
       "id_classe": "1",
       "id_professeur": "2",
       "date_affectation": "2025-04-05",
-      "est_principal": 0,
       "id": "4521"
     },
     {
       "id_classe": "1",
       "id_professeur": "3",
       "date_affectation": "2025-04-04",
-      "est_principal": 0,
       "id": "b57a"
     },
     {
       "id_classe": "2",
       "id_professeur": "1",
       "date_affectation": "2025-04-05",
-      "est_principal": 0,
       "id": "ac11"
     },
     {
       "id_classe": "2",
       "id_professeur": "2",
       "date_affectation": "2025-04-05",
-      "est_principal": 0,
       "id": "d2cf"
     },
     {
       "id_classe": "3",
       "id_professeur": "2",
       "date_affectation": "2025-04-05",
-      "est_principal": 0,
       "id": "2981"
     },
     {
       "id_classe": "5",
       "id_professeur": "1",
       "date_affectation": "2025-04-05",
-      "est_principal": 0,
       "id": "a1cc"
+    },
+    {
+      "id": "f4e6",
+      "id_professeur": "4",
+      "id_classe": "2",
+      "date_affectation": "2025-04-22"
+    },
+    {
+      "id": "eb8d",
+      "id_professeur": "4",
+      "id_classe": "3",
+      "date_affectation": "2025-04-22"
     }
   ],
   "config": [
@@ -544,6 +549,13 @@
       "grade": "principal",
       "date_embauche": "2025-04-05",
       "id": "3"
+    },
+    {
+      "id": "4",
+      "id_utilisateur": "11",
+      "specialite": "Mathématiques",
+      "grade": "principal",
+      "date_embauche": "2025-04-22T14:29:47.917Z"
     }
   ],
   "responsables_pedagogiques": [
@@ -708,7 +720,7 @@
       "telephone": "77678907",
       "adresse": "Yeumbeul ",
       "avatar": "https://images.pexels.com/photos/3992656/pexels-photo-3992656.png?auto=compress&cs=tinysrgb&w=600",
-      "id_role": 4,
+      "id_role": "4",
       "state": "disponible"
     },
     {
@@ -716,10 +728,11 @@
       "nom": "Ndiaye",
       "prenom": "Sidy",
       "email": "sidy020@gmail.com",
-      "telephone": "776890987",
+      "password": "ridendo",
+      "id_role": "2",
+      "telephone": "774356789",
       "adresse": "Dakar",
-      "avatar": "https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?auto=compress&cs=tinysrgb&w=600",
-      "id_role": 4,
+      "avatar": "https://images.pexels.com/photos/3992656/pexels-photo-3992656.png?auto=compress&cs=tinysrgb&w=600",
       "state": "disponible"
     }
   ]

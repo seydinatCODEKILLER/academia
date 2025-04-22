@@ -200,6 +200,19 @@ export async function renderClasseTableFilterForRp() {
   document.getElementById("filters-container").appendChild(filters);
 }
 
+export function renderClasseBannerForRp() {
+  const hero = createIllustratedBanner({
+    title: "Suivez vos classes en temps réel",
+    subtitle: "Une plateforme intuitive pour une gestion moderne",
+    illustrationUrl: "/frontend/assets/images/class.svg",
+    bgColor: "bg-purple-500",
+    textColor: "text-white",
+  });
+  document.getElementById("banner-container").appendChild(hero);
+}
+
+//Fonctionnalite d'ajout classe
+
 export function renderFloatingButtonAddClasse() {
   const button = createFloatingButton({
     id: "quick-add-btn",
@@ -234,6 +247,8 @@ export async function showAddClassModalRp() {
   modal.showModal();
 }
 
+//Fonctionnalite de modification de classe
+
 export async function showEditClassModal(classeId) {
   const classe = await getClasseById(classeId);
   console.log(classe);
@@ -256,6 +271,8 @@ export async function showEditClassModal(classeId) {
   document.getElementById("modal-classes-container").appendChild(modal);
   modal.showModal();
 }
+
+//Fonctionnalite d'archivage de classe
 
 export function showArchiveConfirmation(classId, classLibelle) {
   showConfirmationModal({
@@ -295,6 +312,8 @@ export function showRestoreConfirmation(classId, classLibelle) {
     },
   });
 }
+
+//Fonctionnalite de details des classes
 
 export async function showClassDetailsModal(classId) {
   const loadingModal = showLoadingModal("Chargement des détails...");
@@ -390,15 +409,4 @@ export async function showClassDetailsModal(classId) {
   } finally {
     loadingModal.close();
   }
-}
-
-export function renderClasseBannerForRp() {
-  const hero = createIllustratedBanner({
-    title: "Suivez vos classes en temps réel",
-    subtitle: "Une plateforme intuitive pour une gestion moderne",
-    illustrationUrl: "/frontend/assets/images/class.svg",
-    bgColor: "bg-purple-500",
-    textColor: "text-white",
-  });
-  document.getElementById("banner-container").appendChild(hero);
 }

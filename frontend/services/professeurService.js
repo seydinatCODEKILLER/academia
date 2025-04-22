@@ -1,4 +1,4 @@
-import { fetchData } from "./api.js";
+import { API_BASE_URL, fetchData, generateId } from "./api.js";
 
 export async function getAllProfessorsBasic() {
   try {
@@ -123,5 +123,21 @@ export async function getProfessorDetails(professorId) {
       error
     );
     throw error;
+  }
+}
+
+export async function createProfesseur(data) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/professeurs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: String(await generateId("professeurs")),
+        ...data,
+      }),
+    });
+    return response.json();
+  } catch (error) {
+    console.log(error);
   }
 }

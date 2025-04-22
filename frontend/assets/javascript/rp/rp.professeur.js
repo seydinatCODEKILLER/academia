@@ -1,4 +1,5 @@
 import {
+  renderFloatingButtonAddProfesseur,
   renderProfesseursTableRp,
   renderProfesseurTableFilterForRp,
 } from "../../../helpers/rp/professeur.helpers.js";
@@ -11,6 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = getCurrentUser();
   handleRpSidebar(user);
   renderRpHeader(user, "Mes professeurs");
+  renderFloatingButtonAddProfesseur();
   await renderProfesseursTableRp();
   await renderProfesseurTableFilterForRp();
 });

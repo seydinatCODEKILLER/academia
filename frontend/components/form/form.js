@@ -1,3 +1,4 @@
+import { getAvailableClasses } from "../../services/classeServices.js";
 import { getAllFilieres } from "../../services/filiereService.js";
 import { getAllNiveaux } from "../../services/niveauxServices.js";
 
@@ -91,6 +92,155 @@ export async function createClassForm(existingClass = null) {
       <button type="submit" class="btn btn-primary">
         <i class="ri-save-line mr-2"></i> 
          ${existingClass ? "Enregistrer" : "Créer"}
+      </button>
+    </div>
+  `;
+  return form;
+}
+
+export async function createProfesseursForm(existingProfesseur = null) {
+  const form = document.createElement("form");
+  form.className = "space-y-4 p-4 max-h-[70vh] overflow-y-auto";
+
+  const classes = await getAvailableClasses();
+
+  const defaultValue = {
+    nom: "",
+    prenom: "",
+    grade: "",
+    email: "",
+    specialite: "",
+    adresse: "",
+    telephone: "",
+    avatar: "",
+    password: "",
+    id_classe: [],
+    ...existingProfesseur,
+  };
+
+  form.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Section 1: Informations de base -->
+      <div class="col-span-full font-bold text-lg mb-2">Informations de la personnelle</div>
+      
+      <div class="form-control flex flex-col">
+        <label class="label">
+          <span class="label-text">Nom *</span>
+        </label>
+        <input value="${
+          defaultValue.nom
+        }" type="text" placeholder="Nom du professeur" name="nom" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="nom"></div>
+      </div>
+
+      <div class="form-control flex flex-col">
+        <label class="label">
+          <span class="label-text">prenom *</span>
+        </label>
+        <input value="${
+          defaultValue.prenom
+        }" type="text" placeholder="Prenom du professeur" name="prenom" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="prenom"></div>
+      </div>
+
+      <div class="form-control flex flex-col">
+        <label class="label">
+          <span class="label-text">Email *</span>
+        </label>
+        <input value="${
+          defaultValue.email
+        }" type="text" placeholder="Email du professeur" name="email" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="email"></div>
+      </div>
+
+      <div class="form-control flex flex-col">
+        <label class="label">
+          <span class="label-text">Adresse *</span>
+        </label>
+        <input value="${
+          defaultValue.adresse
+        }" type="text" placeholder="Adresse du professeur" name="adresse" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="adresse"></div>
+      </div>
+
+      <div class="form-control flex flex-col">
+        <label class="label">
+          <span class="label-text">Grade *</span>
+        </label>
+        <input value="${
+          defaultValue.grade
+        }" type="text" placeholder="Grade du professeur" name="grade" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="grade"></div>
+      </div>
+
+      <div class="form-control flex flex-col">
+        <label class="label">
+          <span class="label-text">Specialite *</span>
+        </label>
+        <input value="${
+          defaultValue.specialite
+        }" type="text" placeholder="Specialite du professeur" name="specialite" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="specialite"></div>
+      </div>
+
+      <div class="form-control flex flex-col">
+        <label class="label">
+          <span class="label-text">Telephone *</span>
+        </label>
+        <input value="${
+          defaultValue.telephone
+        }" type="text" placeholder="Telephone du professeur" name="telephone" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="telephone"></div>
+      </div>
+
+      <div class="form-control flex flex-col">
+        <label class="label">
+          <span class="label-text">Avatar *</span>
+        </label>
+        <input value="${
+          defaultValue.avatar
+        }" type="text" placeholder="Avatar du professeur" name="avatar" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="avatar"></div>
+      </div>
+
+      <div class="form-control flex flex-col">
+        <label class="label">
+          <span class="label-text">Password *</span>
+        </label>
+        <input value="${
+          defaultValue.password
+        }" type="text" placeholder="Password du professeur" name="password" class="input input-bordered">
+        <div class="text-error text-xs mt-1 hidden" data-error="password"></div>
+      </div>
+      
+      <div class="col-span-full font-bold text-lg mb-2">Affectation des classes</div>
+    </div>
+    
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2">
+        ${classes
+          .map(
+            (c) => `
+          <label class="card cursor-pointer hover:bg-base-200 transition-colors border border-gray-100">
+            <div class="card-body p-4 ">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" name="classes" value="${c.id}" class="checkbox">
+              <h4 class="font-medium">${c.libelle}</h4>
+              </div>
+            </div>
+          </label>
+        `
+          )
+          .join("")}
+            <div class="text-error text-xs mt-1 hidden col-span-full" data-error="classes"></div>
+      </div>
+
+    <div class="modal-action">
+      <button type="button" class="btn btn-ghost" onclick="this.closest('dialog').close()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary">
+        <i class="ri-save-line mr-2"></i> 
+         ${existingProfesseur ? "Enregistrer" : "Créer"}
       </button>
     </div>
   `;

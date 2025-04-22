@@ -2,6 +2,7 @@ import {
   checkExistingClass,
   getClasseById,
 } from "../services/classeServices.js";
+import { getProfessorDetails } from "../services/professeurService.js";
 import {
   checkEmailExists,
   checkMatriculeExists,
@@ -50,6 +51,7 @@ export async function validateClassData(
   } else if (data.libelle.length > 50) {
     errors.libelle = "Maximum 50 caractères";
   }
+
   if (!data.id_filiere) {
     errors.id_filiere = "Sélectionnez une filière";
   }
@@ -74,6 +76,78 @@ export async function validateClassData(
     const exists = await checkExistingClass(data.libelle);
     if (exists) {
       errors.libelle = "Cette classe existe déjà pour cette filière";
+    }
+  }
+
+  return Object.keys(errors).length > 0 ? errors : null;
+}
+
+export async function validateProfesseurData(
+  data,
+  isUpdate = false,
+  profId = null
+) {
+  const errors = {};
+
+  if (!data.nom?.trim()) {
+    errors.nom = "Le nom est requis";
+  } else if (data.nom.length > 50) {
+    errors.nom = "Maximum 50 caractères";
+  }
+
+  if (!data.prenom?.trim()) {
+    errors.prenom = "Le prenom est requis";
+  } else if (data.prenom.length > 50) {
+    errors.prenom = "Maximum 50 caractères";
+  }
+
+  if (!data.grade?.trim()) {
+    errors.grade = "Le grade est requis";
+  }
+
+  if (!data.specialite?.trim()) {
+    errors.specialite = "Le specialite est requis";
+  }
+
+  if (!data.telephone?.trim()) {
+    errors.telephone = "Le telephone est requis";
+  }
+
+  if (!data.password?.trim()) {
+    errors.password = "Le password est requis";
+  }
+
+  if (!data.avatar?.trim()) {
+    errors.avatar = "Le avatar est requis";
+  }
+
+  if (!data.adresse?.trim()) {
+    errors.adresse = "L'adresse est requis";
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!data.email) {
+    errors.email = "Email requis";
+  } else if (!emailRegex.test(data.email)) {
+    errors.email = "Email invalide";
+  }
+
+  if (!data.classes || data.classes.length === 0) {
+    errors.classes = "Affectez au moins une classe";
+  }
+
+  if (isUpdate) {
+    const originalProf = await getProfessorDetails(profId);
+    if (data.email !== originalProf.userInfo.email) {
+      const exists = await checkEmailExists(data.email);
+      if (exists) {
+        errors.email = "Cette email existe déjà";
+      }
+    }
+  } else {
+    const exists = await checkEmailExists(data.email);
+    if (exists) {
+      errors.email = "Cette email existe déjà";
     }
   }
 

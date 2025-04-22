@@ -221,3 +221,31 @@ export async function getClassByIdDetails(id) {
     throw error;
   }
 }
+
+export async function getAvailableClasses() {
+  try {
+    const classes = await fetchData("classes");
+    return classes
+      .filter((classe) => classe.state === "disponible")
+      .map((classe) => ({
+        id: classe.id,
+        libelle: classe.libelle,
+      }));
+  } catch (error) {
+    console.error("Erreur dans getAvailableClasses:", error);
+    throw error;
+  }
+}
+
+export async function createClassProfesseur(data) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/classes_professeur`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  } catch (error) {
+    console.log(error);
+  }
+}
