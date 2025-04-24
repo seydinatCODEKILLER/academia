@@ -224,7 +224,7 @@ export function createIllustratedBanner(config) {
   titleEl.textContent = title;
 
   const subtitleEl = document.createElement("p");
-  subtitleEl.className = `text-sm font-medium lg:text-lg ${textColor} opacity-80`;
+  subtitleEl.className = `text-sm font-medium lg:text-md ${textColor} opacity-80`;
   subtitleEl.textContent = subtitle;
 
   textContent.appendChild(titleEl);

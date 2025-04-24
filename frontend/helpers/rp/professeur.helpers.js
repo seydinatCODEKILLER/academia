@@ -1,3 +1,4 @@
+import { createIllustratedBanner } from "../../components/banner/banner.js";
 import { createProfesseurFiltersForRp } from "../../components/filter/filter.js";
 import { createProfesseursForm } from "../../components/form/form.js";
 import {
@@ -172,6 +173,17 @@ export async function renderProfesseurTableFilterForRp() {
     onFilter: (filters) => updateProfesseurTableWithFiltersForRp(filters),
   });
   document.getElementById("filters-container").appendChild(filters);
+}
+
+export function renderProfesseurBannerForRp() {
+  const hero = createIllustratedBanner({
+    title: "Suivez vos professeurs en temps réel",
+    subtitle: "Une plateforme intuitive pour une gestion moderne",
+    illustrationUrl: "/frontend/assets/images/teacher.svg",
+    bgColor: "bg-blue-500",
+    textColor: "text-white",
+  });
+  document.getElementById("banner-container").appendChild(hero);
 }
 
 export function renderFloatingButtonAddProfesseur() {
