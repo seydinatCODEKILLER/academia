@@ -225,3 +225,25 @@ export async function deleteClassProfesseur(profId, classId) {
     return false;
   }
 }
+
+export async function handleArchiveProfesseur(userId) {
+  const response = await fetch(`${API_BASE_URL}/utilisateurs/${userId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ state: "archiver" }),
+  });
+
+  if (!response.ok) throw new Error("Échec de l'archivage");
+  return await response.json();
+}
+
+export async function handleRestoreProfesseur(userId) {
+  const response = await fetch(`${API_BASE_URL}/utilisateurs/${userId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ state: "disponible" }),
+  });
+
+  if (!response.ok) throw new Error("Échec de la restauration");
+  return await response.json();
+}
