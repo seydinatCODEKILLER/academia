@@ -11,3 +11,7 @@ export function formatDate(dateString) {
   const options = { year: "numeric", month: "short", day: "numeric" };
   return new Date(dateString).toLocaleDateString("fr-FR", options);
 }
+
+export function getRandomColor() {
+  return Math.floor(Math.random() * 16777215);
+}

@@ -217,7 +217,7 @@
       "id_module": "1",
       "id_professeur": "1",
       "id_semestre": "1",
-      "date_cours": "2025-04-08",
+      "date_cours": "2025-03-08",
       "heure_debut": "08:00:00",
       "heure_fin": "10:00:00",
       "nombre_heures": 2,
@@ -590,16 +590,16 @@
   "semestres": [
     {
       "libelle": "Semestre 1",
-      "date_debut": "2023-09-15",
-      "date_fin": "2024-01-15",
-      "annee_scolaire": "2023-2024",
+      "date_debut": "2024-11-15",
+      "date_fin": "2025-04-15",
+      "annee_scolaire": "2024-2025",
       "id": "1"
     },
     {
       "libelle": "Semestre 2",
-      "date_debut": "2024-02-01",
-      "date_fin": "2024-06-30",
-      "annee_scolaire": "2023-2024",
+      "date_debut": "2025-04-20",
+      "date_fin": "2025-08-30",
+      "annee_scolaire": "2024-2025",
       "id": "2"
     }
   ],
