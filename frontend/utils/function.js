@@ -15,3 +15,16 @@ export function formatDate(dateString) {
 export function getRandomColor() {
   return Math.floor(Math.random() * 16777215);
 }
+
+export function colorState(state) {
+  switch (state) {
+    case "planifié":
+      return "success";
+    case "annuler":
+      return "danger";
+    case "archive":
+      return "warning";
+    default:
+      return "secondary";
+  }
+}

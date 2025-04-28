@@ -1,4 +1,4 @@
-import { getRandomColor } from "../../utils/function.js";
+import { colorState, getRandomColor } from "../../utils/function.js";
 
 /**
  * Crée un composant card pour afficher les cours avec DaisyUI
@@ -258,9 +258,25 @@ function createCoursCard(cours, actionsConfig, containerId) {
  ${cours.date_cours}
 `;
 
+  const salle = document.createElement("span");
+  salle.className = "badge badge-soft badge-primary";
+  salle.innerHTML = `
+    <i class="ri-calendar-check-line"></i>
+ ${cours.salle}
+`;
+
   extra.appendChild(debut);
   extra.appendChild(fin);
   extra.appendChild(date);
+  extra.appendChild(salle);
+
+  //State
+
+  const state = document.createElement("span");
+  state.className = `absolute top-3 right-2 badge badge-soft badge-${colorState(
+    cours.statut
+  )}`;
+  state.innerHTML = `${cours.statut}`;
 
   // Actions
   const cardActions = document.createElement("div");
@@ -296,6 +312,7 @@ function createCoursCard(cours, actionsConfig, containerId) {
   cardBody.appendChild(classesInfo);
   cardBody.appendChild(semestreInfo);
   cardBody.appendChild(extra);
+  cardBody.appendChild(state);
   cardBody.appendChild(cardActions);
 
   card.appendChild(cardHeader);

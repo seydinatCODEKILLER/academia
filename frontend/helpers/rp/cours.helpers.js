@@ -20,7 +20,7 @@ export async function renderCoursCardsRp(filters = {}) {
       const searchTerm = filters.search.toLowerCase();
       cours = cours.filter(
         (c) =>
-          c.module.nom_module.toLowerCase().includes(searchTerm) ||
+          c.module.libelle.toLowerCase().includes(searchTerm) ||
           `${c.professeur.utilisateur.prenom} ${c.professeur.utilisateur.nom}`
             .toLowerCase()
             .includes(searchTerm)
@@ -31,12 +31,8 @@ export async function renderCoursCardsRp(filters = {}) {
       cours = cours.filter((c) => c.semestre.id == filters.semestre);
     }
 
-    if (filters.module) {
-      cours = cours.filter((c) => c.module.id == filters.module);
-    }
-
-    if (filters.professeur) {
-      cours = cours.filter((c) => c.professeur.id == filters.professeur);
+    if (filters.annee) {
+      cours = cours.filter((c) => c.semestre.annee_scolaire == filters.annee);
     }
 
     // 3. Configuration des actions
