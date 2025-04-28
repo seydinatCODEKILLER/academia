@@ -4,6 +4,7 @@ import {
 } from "../../components/card/cardPaginated.js";
 import { createCoursFiltersForRp } from "../../components/filter/filter.js";
 import { showEmptyStateModal } from "../../components/modals/modal.js";
+import { createFloatingButton } from "../../components/ui/floatingButton.js";
 import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js";
 
 import { getAllCours } from "../../services/coursService.js";
@@ -103,7 +104,7 @@ export async function renderCoursCardsRp(filters = {}) {
       data: cours,
       actions: actionsConfig,
       onAction: handleAction,
-      itemsPerPage: 4,
+      itemsPerPage: 3,
       emptyMessage: "Aucun cours trouvé",
     });
 
@@ -137,4 +138,17 @@ export async function renderCoursCardFilterForRp() {
 
 export async function updateCoursCardWithFiltersForRp(filters = {}) {
   await renderCoursCardsRp(filters);
+}
+
+export function renderFloatingButtonAddCours() {
+  const button = createFloatingButton({
+    id: "quick-add-btn",
+    icon: "ri-add-line",
+    title: "Création rapide",
+    color: "warning",
+    position: "bottom-right",
+    onClick: () => alert("bonjour"),
+  });
+
+  document.getElementById("floatingButton").appendChild(button);
 }

@@ -168,7 +168,7 @@ function createCoursCard(cours, actionsConfig, containerId) {
 
   // 2. Header avec dégradé de couleur
   const cardHeader = document.createElement("div");
-  cardHeader.className = "p-4 text-white";
+  cardHeader.className = "p-3 text-white rounded";
   cardHeader.style.background = gradientStyle;
 
   // 3. Titre du module avec ombre pour meilleure lisibilité

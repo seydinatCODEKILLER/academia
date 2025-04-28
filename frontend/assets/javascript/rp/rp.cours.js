@@ -1,6 +1,7 @@
 import {
   renderCoursCardFilterForRp,
   renderCoursCardsRp,
+  renderFloatingButtonAddCours,
 } from "../../../helpers/rp/cours.helpers.js";
 import { initRouter } from "../../../router/router.js";
 import { getCurrentUser } from "../../../store/authStore.js";
@@ -11,6 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = getCurrentUser();
   handleRpSidebar(user);
   renderRpHeader(user, "Mes cours");
+  renderFloatingButtonAddCours();
   await renderCoursCardsRp();
   await renderCoursCardFilterForRp();
 });

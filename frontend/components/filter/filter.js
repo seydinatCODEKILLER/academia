@@ -470,10 +470,10 @@ export function createCoursFiltersForRp(config) {
   const { semestres = [], anneesScolaires = [], onFilter = () => {} } = config;
 
   const filtersContainer = document.createElement("div");
-  filtersContainer.className = " p-3 rounded-lg mb-6";
+  filtersContainer.className = "bg-yellow-100 p-3 rounded-lg mb-6";
 
   const title = document.createElement("h3");
-  title.className = "font-bold text-lg mb-4";
+  title.className = "font-medium text-lg mb-4";
   title.textContent = "Filtrer les cours";
   filtersContainer.appendChild(title);
 
