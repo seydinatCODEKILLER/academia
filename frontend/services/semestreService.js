@@ -1,0 +1,14 @@
+import { fetchData } from "./api.js";
+
+export async function getAllSemestres() {
+  try {
+    const semestres = await fetchData("semestres");
+    return semestres.map((s) => ({
+      id: s.id,
+      libelle: s.libelle,
+    }));
+  } catch (error) {
+    console.error("Erreur lors de la récupération des semestres:", error);
+    return [];
+  }
+}

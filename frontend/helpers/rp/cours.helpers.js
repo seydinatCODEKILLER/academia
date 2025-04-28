@@ -2,9 +2,12 @@ import {
   createCoursCards,
   updateCoursCardsData,
 } from "../../components/card/cardPaginated.js";
+import { createCoursFiltersForRp } from "../../components/filter/filter.js";
 import { showEmptyStateModal } from "../../components/modals/modal.js";
+import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js";
 
 import { getAllCours } from "../../services/coursService.js";
+import { getAllSemestres } from "../../services/semestreService.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
 
 export async function renderCoursCardsRp(filters = {}) {
@@ -117,4 +120,21 @@ export async function renderCoursCardsRp(filters = {}) {
     console.error("Erreur:", error);
     showEmptyStateModal("Erreur lors du chargement des cours");
   }
+}
+
+export async function renderCoursCardFilterForRp() {
+  const [semestres, anneesScolaires] = await Promise.all([
+    getAllSemestres(),
+    getAllAnneesScolaires(),
+  ]);
+  const filters = createCoursFiltersForRp({
+    semestres,
+    anneesScolaires,
+    onFilter: (filters) => updateCoursCardWithFiltersForRp(filters),
+  });
+  document.getElementById("filters-container").appendChild(filters);
+}
+
+export async function updateCoursCardWithFiltersForRp(filters = {}) {
+  await renderCoursCardsRp(filters);
 }
