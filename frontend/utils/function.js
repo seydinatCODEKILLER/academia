@@ -28,3 +28,9 @@ export function colorState(state) {
       return "secondary";
   }
 }
+
+export function calculateHeures(heure_debut, heure_fin) {
+  const debut = new Date(`1970-01-01T${heure_debut}`);
+  const fin = new Date(`1970-01-01T${heure_fin}`);
+  return (fin - debut) / (1000 * 60 * 60);
+}

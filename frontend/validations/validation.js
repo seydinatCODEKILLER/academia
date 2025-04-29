@@ -153,3 +153,29 @@ export async function validateProfesseurData(
 
   return Object.keys(errors).length > 0 ? errors : null;
 }
+
+export function validateCoursData(coursData) {
+  const errors = {};
+
+  if (!coursData.id_module) errors.id_module = "Module requis";
+  if (!coursData.id_professeur) errors.id_professeur = "Professeur requis";
+  if (!coursData.id_semestre) errors.id_semestre = "Semestre requis";
+  if (!coursData.date_cours) errors.date_cours = "Date requise";
+  if (!coursData.salle) errors.salle = "la salle requise";
+
+  if (!coursData.heure_debut) {
+    errors.heure_debut = "Heure de début requise";
+  }
+
+  if (!coursData.heure_fin) {
+    errors.heure_fin = "Heure de fin requise";
+  } else if (coursData.heure_debut >= coursData.heure_fin) {
+    errors.heure_fin = "L'heure de fin doit être après l'heure de début";
+  }
+
+  if (coursData.classes.length === 0) {
+    errors.classes = "Au moins une classe doit être sélectionnée";
+  }
+
+  return Object.keys(errors).length > 0 ? errors : null;
+}

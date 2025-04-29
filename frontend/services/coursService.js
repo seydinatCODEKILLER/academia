@@ -1,5 +1,5 @@
 import { getCurrentAcademicYear } from "./annees_scolaireService.js";
-import { fetchData } from "./api.js";
+import { API_BASE_URL, fetchData, generateId } from "./api.js";
 
 /**
  * Récupère tous les cours avec les informations de base
@@ -174,4 +174,54 @@ export async function getClassesForCours(id_cours) {
     );
     return [];
   }
+}
+
+export async function createCours(data) {
+  const response = await fetch(`${API_BASE_URL}/cours`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...data,
+      id: String(await generateId("cours")),
+    }),
+  });
+  if (!response.ok) throw new Error("Erreur lors de la création du cours");
+  return response.json();
+}
+
+export async function updateCours(data) {
+  const response = await fetch(`${API_BASE_URL}/cours/${data.id_cours}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error("Erreur lors de la mise à jour du cours");
+  return response.json();
+}
+
+export async function createCoursClasse(data) {
+  const response = await fetch(`${API_BASE_URL}/cours_classes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok)
+    throw new Error("Erreur lors de l'assignation de la classe");
+  return response.json();
+}
+
+export async function deleteCoursClasse(id_cours, id_classe) {
+  const response = await fetch(`${API_BASE_URL}/cours_classes`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id_cours, id_classe }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      "Erreur lors de la suppression de l'assignation classe-cours"
+    );
+  }
+
+  return response.json();
 }

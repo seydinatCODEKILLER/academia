@@ -9,6 +9,7 @@ import {
   showEmptyStateModal,
 } from "../../components/modals/modal.js";
 import { createFloatingButton } from "../../components/ui/floatingButton.js";
+import { handleCoursRpSubmit } from "../../handler/rp/coursRp.handler.js";
 import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js";
 
 import { getAllCours } from "../../services/coursService.js";
@@ -168,6 +169,27 @@ export async function showAddCoursModalRp() {
   form.onsubmit = async (e) => {
     e.preventDefault();
     const result = await handleCoursRpSubmit(form);
+    if (result.success) {
+      modal.close();
+      await renderCoursCardsRp();
+    }
+  };
+
+  document.getElementById("modal-cours-container").appendChild(modal);
+  modal.showModal();
+}
+
+export async function showEditCoursModalRp(existingCours) {
+  const form = await createCoursForm(existingCours);
+  const modal = createModal({
+    title: "Modifier le cours",
+    content: form,
+    size: "xl",
+  });
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const result = await handleCoursRpSubmit(form, existingCours);
     if (result.success) {
       modal.close();
       await renderCoursCardsRp();

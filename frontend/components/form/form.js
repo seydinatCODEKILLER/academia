@@ -273,7 +273,7 @@ export async function createProfesseursForm(existingProfesseur = null) {
 
 export async function createCoursForm(existingCours = null) {
   const form = document.createElement("form");
-  form.className = "space-y-4 p-4 max-h-[65vh] overflow-y-auto";
+  form.className = "space-y-4 p-4 max-h-[62vh] overflow-y-auto";
 
   const [modules, professeurs, semestres, classes] = await Promise.all([
     getAllModules(),
