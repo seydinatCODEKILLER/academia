@@ -6,6 +6,7 @@ export async function getAllSemestres() {
     return semestres.map((s) => ({
       id: s.id,
       libelle: s.libelle,
+      annee_scolaire: s.annee_scolaire,
     }));
   } catch (error) {
     console.error("Erreur lors de la récupération des semestres:", error);

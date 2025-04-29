@@ -155,3 +155,23 @@ export async function getCoursById(id_cours) {
     throw error;
   }
 }
+
+/**
+ * Récupère les IDs des classes associées à un cours
+ * @param {number} id_cours - L'ID du cours
+ * @returns {Promise<Array<number>>} Liste des IDs de classes
+ */
+export async function getClassesForCours(id_cours) {
+  try {
+    const coursClasses = await fetchData("cours_classes");
+    return coursClasses
+      .filter((item) => item.id_cours === id_cours)
+      .map((item) => item.id_classe);
+  } catch (error) {
+    console.error(
+      `Erreur lors de la récupération des classes pour le cours ${id_cours}:`,
+      error
+    );
+    return [];
+  }
+}

@@ -218,9 +218,9 @@ export function renderFloatingButtonAddClasse() {
     id: "quick-add-btn",
     icon: "ri-add-line",
     title: "Création rapide",
-    color: "accent",
+    color: "primary",
     position: "bottom-right",
-    onClick: () => showAddClassModalRp(),
+    onClick: async () => await showAddClassModalRp(),
   });
 
   document.getElementById("floatingButton").appendChild(button);

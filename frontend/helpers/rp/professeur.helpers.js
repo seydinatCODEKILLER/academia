@@ -191,7 +191,7 @@ export function renderFloatingButtonAddProfesseur() {
     id: "quick-add-btn",
     icon: "ri-add-line",
     title: "Création rapide",
-    color: "warning",
+    color: "info",
     position: "bottom-right",
     onClick: async () => await showAddProfesseurModalRp(),
   });

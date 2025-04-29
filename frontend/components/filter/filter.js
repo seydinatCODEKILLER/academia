@@ -323,7 +323,7 @@ export function createClassFiltersForRp(config) {
   } = config;
 
   const filtersContainer = document.createElement("div");
-  filtersContainer.className = "bg-base-200 p-3 rounded-lg mb-6";
+  filtersContainer.className = "bg-purple-200 p-3 rounded-lg mb-6";
 
   const title = document.createElement("h3");
   title.className = "font-bold text-lg mb-4";
@@ -429,7 +429,7 @@ export function createProfesseurFiltersForRp(config) {
   } = config;
 
   const filtersContainer = document.createElement("div");
-  filtersContainer.className = "bg-orange-50 p-3 rounded-lg mb-6";
+  filtersContainer.className = "bg-blue-100 p-3 rounded-lg mb-6";
 
   const title = document.createElement("h3");
   title.className = "font-bold text-lg mb-4";
@@ -529,7 +529,7 @@ export function createCoursFiltersForRp(config) {
 
   // Bouton réinitialiser
   const resetButton = document.createElement("button");
-  resetButton.className = "btn btn-outline";
+  resetButton.className = "btn btn-neutral";
   resetButton.innerHTML = '<i class="ri-refresh-line mr-2"></i> Réinitialiser';
   resetButton.addEventListener("click", () => {
     searchInput.value = "";

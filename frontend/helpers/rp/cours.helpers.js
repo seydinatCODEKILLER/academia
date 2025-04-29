@@ -3,7 +3,11 @@ import {
   updateCoursCardsData,
 } from "../../components/card/cardPaginated.js";
 import { createCoursFiltersForRp } from "../../components/filter/filter.js";
-import { showEmptyStateModal } from "../../components/modals/modal.js";
+import { createCoursForm } from "../../components/form/form.js";
+import {
+  createModal,
+  showEmptyStateModal,
+} from "../../components/modals/modal.js";
 import { createFloatingButton } from "../../components/ui/floatingButton.js";
 import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js";
 
@@ -147,8 +151,29 @@ export function renderFloatingButtonAddCours() {
     title: "Création rapide",
     color: "warning",
     position: "bottom-right",
-    onClick: () => alert("bonjour"),
+    onClick: async () => await showAddCoursModalRp(),
   });
 
   document.getElementById("floatingButton").appendChild(button);
+}
+
+export async function showAddCoursModalRp() {
+  const form = await createCoursForm();
+  const modal = createModal({
+    title: "Ajouter une nouvelle cours",
+    content: form,
+    size: "xl",
+  });
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const result = await handleCoursRpSubmit(form);
+    if (result.success) {
+      modal.close();
+      await renderCoursCardsRp();
+    }
+  };
+
+  document.getElementById("modal-cours-container").appendChild(modal);
+  modal.showModal();
 }
