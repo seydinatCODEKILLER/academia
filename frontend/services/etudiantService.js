@@ -70,3 +70,12 @@ export async function createStudent(studentData) {
     throw new Error(`erreur lors de la creation de l'etudiant : ${error}`);
   }
 }
+
+export async function getIdEtudiantByUserId(id_utilisateur) {
+  const etudiants = await fetchData("etudiants");
+  const etudiant = etudiants.find(
+    (item) => item.id_utilisateur == id_utilisateur
+  );
+  const actorId = etudiant ? etudiant.id : null;
+  return actorId;
+}
