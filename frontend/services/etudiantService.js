@@ -79,3 +79,188 @@ export async function getIdEtudiantByUserId(id_utilisateur) {
   const actorId = etudiant ? etudiant.id : null;
   return actorId;
 }
+
+export async function getStudentAbsenceStats(studentId) {
+  try {
+    const [absences, courses] = await Promise.all([
+      fetchData("absences"),
+      fetchData("cours"),
+    ]);
+
+    const studentAbsences = absences.filter((a) => a.id_etudiant == studentId);
+
+    let totalHours = 0;
+    const justified = [];
+    const pending = [];
+
+    studentAbsences.forEach((absence) => {
+      const course = courses.find((c) => c.id_cours === absence.id_cours);
+      const hours = course?.nombre_heures || 2;
+
+      totalHours += hours;
+
+      if (absence.justified === "justifier") {
+        justified.push(absence);
+      } else if (absence.justified === "en attente") {
+        pending.push(absence);
+      }
+    });
+
+    return {
+      totalHours,
+      justified: justified.length,
+      pending: pending.length,
+    };
+  } catch (error) {
+    console.error("Erreur stats absences:", error);
+    return {
+      totalHours: 0,
+      justified: 0,
+      pending: 0,
+    };
+  }
+}
+
+export async function getMonthlyAbsenceData(studentId) {
+  try {
+    // Récupérer les données nécessaires
+    const [absences, courses] = await Promise.all([
+      fetchData("absences"),
+      fetchData("cours"),
+    ]);
+
+    // Filtrer les absences de l'étudiant
+    const studentAbsences = absences.filter((a) => a.id_etudiant == studentId);
+
+    // Grouper par mois et calculer les stats
+    const monthlyData = studentAbsences.reduce((acc, absence) => {
+      const date = new Date(absence.date_absence);
+      const monthYear = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}`;
+
+      if (!acc[monthYear]) {
+        acc[monthYear] = {
+          total: 0,
+          justified: 0,
+          pending: 0,
+          hours: 0,
+        };
+      }
+
+      // Trouver le cours correspondant pour avoir la durée
+      const course = courses.find((c) => c.id_cours === absence.id_cours);
+      const hours = course?.nombre_heures || 2; // 2h par défaut
+
+      // Mettre à jour les stats
+      acc[monthYear].total++;
+      acc[monthYear].hours += hours;
+
+      if (absence.justified === "justifier") {
+        acc[monthYear].justified++;
+      } else if (absence.justified === "en attente") {
+        acc[monthYear].pending++;
+      }
+
+      return acc;
+    }, {});
+
+    // Convertir en tableau et trier par date
+    return Object.entries(monthlyData)
+      .map(([month, stats]) => ({
+        month,
+        ...stats,
+      }))
+      .sort((a, b) => a.month.localeCompare(b.month));
+  } catch (error) {
+    console.error("Erreur données mensuelles:", error);
+    return [];
+  }
+}
+
+export async function getTodaysCourses(studentId) {
+  try {
+    // 1. Récupérer les données nécessaires en parallèle
+    const [allCourses, studentClasses, modules, professors] = await Promise.all(
+      [
+        fetchData("cours"),
+        getStudentClasses(studentId),
+        fetchData("modules"),
+        fetchData("professeurs"),
+      ]
+    );
+
+    // 2. Filtrer les cours d'aujourd'hui
+    const today = new Date().toISOString().split("T")[0];
+    const todaysCourses = allCourses.filter((course) => {
+      return course.date_cours === today;
+    });
+
+    // 3. Filtrer les cours qui concernent l'étudiant
+    const relevantCourses = todaysCourses.filter((course) => {
+      // Récupérer les classes de ce cours
+      const courseClasses = course.classes || [];
+
+      // Vérifier si l'étudiant est dans une de ces classes
+      return studentClasses.some((studentClass) =>
+        courseClasses.includes(studentClass.id_classe)
+      );
+    });
+
+    // 4. Enrichir les données des cours
+    const enrichedCourses = await Promise.all(
+      relevantCourses.map(async (course) => {
+        // Trouver le module
+        const module = modules.find((m) => m.id_module === course.id_module);
+
+        // Trouver le professeur et son utilisateur
+        const professor = professors.find(
+          (p) => p.id_professeur === course.id_professeur
+        );
+        let professorUser = null;
+        if (professor) {
+          professorUser = await fetchData(
+            "utilisateurs",
+            professor.id_utilisateur
+          );
+        }
+
+        return {
+          ...course,
+          module: module || null,
+          professeur: professor
+            ? { ...professor, utilisateur: professorUser }
+            : null,
+        };
+      })
+    );
+
+    // 5. Trier les cours par heure de début
+    return enrichedCourses.sort((a, b) => {
+      return a.heure_debut.localeCompare(b.heure_debut);
+    });
+  } catch (error) {
+    console.error("Erreur dans getTodaysCourses:", error);
+    return [];
+  }
+}
+
+async function getStudentClasses(studentId) {
+  try {
+    const inscriptions = await fetchData("inscriptions");
+    const classes = await fetchData("classes");
+
+    return inscriptions
+      .filter((ins) => ins.id_etudiant == studentId && ins.statut === "validée")
+      .map((ins) => {
+        const classe = classes.find((c) => c.id_classe === ins.id_classe);
+        return {
+          id_classe: ins.id_classe,
+          libelle: classe?.libelle || "Classe inconnue",
+        };
+      });
+  } catch (error) {
+    console.error("Erreur getStudentClasses:", error);
+    return [];
+  }
+}

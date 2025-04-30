@@ -142,7 +142,7 @@ function createSidebarFooter(user, onLogout) {
   // Menu dropdown
   const dropdown = document.createElement("div");
   dropdown.className =
-    "dropdown dropdown-top w-10 h-10 flex justify-center items-center hover:bg-gray-50 hover:rounded border border-gray-200";
+    "dropdown dropdown-top w-10 h-10 flex justify-center items-center hover:bg-gray-50 rounded border border-gray-300";
   dropdown.innerHTML = `
     <i class="ri-expand-up-down-line" tabindex="0" role="button"></i>
     <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-44 p-2 shadow-sm">

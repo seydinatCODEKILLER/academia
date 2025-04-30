@@ -443,3 +443,132 @@ export function renderStudentCard(item, index) {
 
   return studentCard;
 }
+
+export function createCourseCard(course, index) {
+  // Créer l'élément principal
+  const courseCard = document.createElement("div");
+  courseCard.className =
+    "flex items-center gap-4 p-4 bg-base-100 rounded-lg border border-base-200 shadow-sm hover:bg-base-50 transition-colors";
+
+  // Numéro d'ordre (optionnel)
+  const order = document.createElement("div");
+  order.className =
+    "flex items-center justify-center h-8 w-8 rounded-full bg-base-300 text-sm font-medium";
+  order.textContent = index + 1;
+
+  // Avatar avec initiales du module
+  const avatar = document.createElement("div");
+  avatar.className =
+    "flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 text-blue-600 font-medium";
+
+  // Extraire les initiales (ex: "Programmation Java" -> "PJ")
+  const initials = course.module?.libelle
+    ? course.module.libelle
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .substring(0, 2)
+        .toUpperCase()
+    : "--";
+
+  avatar.textContent = initials;
+
+  // Contenu principal
+  const content = document.createElement("div");
+  content.className = "flex-1 flex flex-col gap-1";
+
+  // Nom du module
+  const moduleName = document.createElement("span");
+  moduleName.className = "font-medium text-gray-800";
+  moduleName.textContent = course.module?.libelle || "Module inconnu";
+
+  // Heures
+  const time = document.createElement("span");
+  time.className = "text-sm text-gray-600";
+  time.textContent = `${course.heure_debut} - ${course.heure_fin}`;
+
+  // Salle
+  const room = document.createElement("span");
+  room.className = "text-xs text-gray-500 flex items-center gap-1";
+  room.innerHTML = `<i class="ri-map-pin-line"></i> ${
+    course.salle || "Salle non précisée"
+  }`;
+
+  // Professeur
+  const professor = document.createElement("span");
+  professor.className = "text-xs text-gray-500 flex items-center gap-1";
+  professor.innerHTML = `<i class="ri-user-3-line"></i> ${
+    course.professeur?.utilisateur?.prenom || "Prénom"
+  } ${course.professeur?.utilisateur?.nom || "Nom"}`;
+
+  content.appendChild(moduleName);
+  content.appendChild(time);
+  content.appendChild(room);
+  content.appendChild(professor);
+
+  // Statut (optionnel)
+  const status = document.createElement("div");
+  status.className =
+    "text-xs px-2 py-1 rounded-full " +
+    (course.statut === "annulé"
+      ? "bg-red-100 text-red-600"
+      : course.statut === "effectué"
+      ? "bg-green-100 text-green-600"
+      : "bg-blue-100 text-blue-600");
+  status.textContent = course.statut || "planifié";
+
+  // Assembler la carte
+  courseCard.appendChild(order);
+  courseCard.appendChild(avatar);
+  courseCard.appendChild(content);
+  courseCard.appendChild(status);
+
+  return courseCard;
+}
+
+export function createEmptyCourseState(options = {}) {
+  const {
+    illustration = true,
+    title = "Aucun cours aujourd'hui",
+    message = "Vous n'avez aucun cours prévu pour cette journée",
+    actionText = "",
+    onAction = null,
+  } = options;
+
+  const emptyState = document.createElement("div");
+  emptyState.className =
+    "flex flex-col items-center justify-center py-8 px-4 text-center bg-white shadow-sm rounded-lg border border-gray-200";
+
+  if (illustration) {
+    const illustration = document.createElement("div");
+    illustration.className = "mb-4 text-blue-100";
+    illustration.innerHTML = `
+      <img src="/frontend/assets/images/recherche.png" alt="No Courses" class="w-24 h-24 mx-auto mb-4" />
+    `;
+    emptyState.appendChild(illustration);
+  }
+
+  const titleElement = document.createElement("h3");
+  titleElement.className = "text-lg font-medium text-gray-600 mb-1";
+  titleElement.textContent = title;
+  emptyState.appendChild(titleElement);
+
+  const messageElement = document.createElement("p");
+  messageElement.className = "text-sm text-gray-400 mb-4";
+  messageElement.textContent = message;
+  emptyState.appendChild(messageElement);
+
+  if (actionText && onAction) {
+    const actionButton = document.createElement("button");
+    actionButton.className =
+      "text-sm text-blue-500 hover:text-blue-700 flex items-center gap-1";
+    actionButton.innerHTML = `
+      <i class="ri-refresh-line"></i>
+      ${actionText}
+    `;
+    actionButton.addEventListener("click", onAction);
+    emptyState.appendChild(actionButton);
+  }
+
+  return emptyState;
+}

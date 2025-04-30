@@ -6,6 +6,11 @@ import {
   handleEtudiantSidebar,
   renderEtudiantHeader,
 } from "../../../utils/etudiant.utils.js";
+import {
+  renderCalendar,
+  renderCourseCard,
+  renderEtudiantStatsCards,
+} from "../../../helpers/etudiant/dashboard.helpers.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   initRouter();
@@ -14,4 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   handleEtudiantSidebar(user);
   renderEtudiantHeader(user, "Dashboard");
   const idEtudiant = await getIdEtudiantByUserId(user.id);
+  await renderEtudiantStatsCards(idEtudiant);
+  renderCalendar();
+  await renderCourseCard(idEtudiant);
 });
