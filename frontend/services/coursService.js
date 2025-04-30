@@ -1,10 +1,6 @@
 import { getCurrentAcademicYear } from "./annees_scolaireService.js";
 import { API_BASE_URL, fetchData, generateId } from "./api.js";
 
-/**
- * Récupère tous les cours avec les informations de base
- * @returns {Promise<Array>} Liste des cours avec les informations principales
- */
 export async function getAllCours() {
   try {
     // Récupère l'année en cours
@@ -67,12 +63,6 @@ export async function getAllCours() {
     throw error;
   }
 }
-
-/**
- * Récupère un cours spécifique avec tous ses détails par son ID
- * @param {number} id_cours - L'ID du cours à récupérer
- * @returns {Promise<Object>} Le cours avec tous ses détails
- */
 
 export async function getCoursById(id_cours) {
   try {
@@ -156,11 +146,6 @@ export async function getCoursById(id_cours) {
   }
 }
 
-/**
- * Récupère les IDs des classes associées à un cours
- * @param {number} id_cours - L'ID du cours
- * @returns {Promise<Array<number>>} Liste des IDs de classes
- */
 export async function getClassesForCours(id_cours) {
   try {
     const coursClasses = await fetchData("cours_classes");
@@ -228,4 +213,37 @@ export async function deleteCoursClasse(id_cours, id_classe) {
     console.error("Erreur deleteClasscours:", error);
     return false;
   }
+}
+
+export async function handleCancelCours(coursId) {
+  const response = await fetch(`${API_BASE_URL}/cours/${coursId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ statut: "annuler" }),
+  });
+
+  if (!response.ok) throw new Error("Échec de l'annulation du cours");
+  return await response.json();
+}
+
+export async function handleRestoreCours(coursId) {
+  const response = await fetch(`${API_BASE_URL}/cours/${coursId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ statut: "planifié" }),
+  });
+
+  if (!response.ok) throw new Error("Échec de l'annulation du cours");
+  return await response.json();
+}
+
+export async function handleArchiveCours(coursId) {
+  const response = await fetch(`${API_BASE_URL}/cours/${coursId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ statut: "archiver" }),
+  });
+
+  if (!response.ok) throw new Error("Échec de l'annulation du cours");
+  return await response.json();
 }

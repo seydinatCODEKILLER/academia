@@ -21,9 +21,11 @@ export function colorState(state) {
     case "planifié":
       return "success";
     case "annuler":
-      return "danger";
-    case "archive":
       return "warning";
+    case "archiver":
+      return "error";
+    case "effectué":
+      return "info";
     default:
       return "secondary";
   }

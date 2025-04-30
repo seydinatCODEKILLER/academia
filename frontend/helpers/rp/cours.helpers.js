@@ -12,9 +12,18 @@ import { createFloatingButton } from "../../components/ui/floatingButton.js";
 import { handleCoursRpSubmit } from "../../handler/rp/coursRp.handler.js";
 import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js";
 
-import { getAllCours, getCoursById } from "../../services/coursService.js";
+import {
+  getAllCours,
+  getCoursById,
+  handleArchiveCours,
+  handleCancelCours,
+  handleRestoreCours,
+} from "../../services/coursService.js";
 import { getAllSemestres } from "../../services/semestreService.js";
-import { showLoadingModal } from "../attacher/justificationHelpers.js";
+import {
+  showConfirmationModal,
+  showLoadingModal,
+} from "../attacher/justificationHelpers.js";
 
 export async function renderCoursCardsRp(filters = {}) {
   try {
@@ -51,8 +60,16 @@ export async function renderCoursCardsRp(filters = {}) {
         if (item.statut === "annuler") {
           return [
             {
+              name: "archive",
+              label: "Archiver",
+              icon: "ri-archive-line",
+              className: "text-error",
+              type: "direct",
+              showLabel: true,
+            },
+            {
               name: "restore",
-              label: "Restaurer",
+              label: "Restorer",
               icon: "ri-arrow-go-back-line",
               className: "text-success",
               type: "direct",
@@ -68,16 +85,11 @@ export async function renderCoursCardsRp(filters = {}) {
             className: "text-info",
           },
           {
-            name: "archive",
-            label: "Archiver",
+            name: "annuler",
+            label: "Annuler",
+            icon: "ri-close-line",
             icon: "ri-archive-line",
             className: "text-error",
-          },
-          {
-            name: "details",
-            label: "Détails",
-            icon: "ri-eye-line",
-            className: "text-primary",
           },
         ];
       },
@@ -94,11 +106,15 @@ export async function renderCoursCardsRp(filters = {}) {
           break;
         case "archive":
           console.log(id);
-          //   showDeleteConfirmation(id, coursItem.module.nom_module);
+          showArchiveCoursConfirmation(id);
           break;
-        case "details":
+        case "restore":
           console.log(id);
-          //   showCoursDetailsModal(coursItem);
+          showRestoreCoursConfirmation(id);
+          break;
+        case "annuler":
+          console.log(id);
+          showCancelCoursConfirmation(id);
           break;
       }
     };
@@ -201,4 +217,64 @@ export async function showEditCoursModalRp(id) {
 
   document.getElementById("modal-cours-container").appendChild(modal);
   modal.showModal();
+}
+
+function showCancelCoursConfirmation(courId) {
+  showConfirmationModal({
+    title: `Annuler le cours`,
+    content: "Cette cours ne sera plus disponible.",
+    confirmText: "Annuler le cours",
+    confirmClass: "btn-warning",
+    onConfirm: async () => {
+      const loading = showLoadingModal("Annulation en cours...");
+      try {
+        await handleCancelCours(courId);
+        await renderCoursCardsRp();
+      } catch (error) {
+        showEmptyStateModal("Erreur lors de l'annulation du cours");
+      } finally {
+        loading.close();
+      }
+    },
+  });
+}
+
+function showRestoreCoursConfirmation(courId) {
+  showConfirmationModal({
+    title: `Restorer le cours`,
+    content: "Cette cours sera de nouveau disponible.",
+    confirmText: "Restorer le cours",
+    confirmClass: "btn-success",
+    onConfirm: async () => {
+      const loading = showLoadingModal("Restauration en cours...");
+      try {
+        await handleRestoreCours(courId);
+        await renderCoursCardsRp();
+      } catch (error) {
+        showEmptyStateModal("Erreur lors de la restauration du cours");
+      } finally {
+        loading.close();
+      }
+    },
+  });
+}
+
+function showArchiveCoursConfirmation(courId) {
+  showConfirmationModal({
+    title: `Archiver le cours`,
+    content: "Cette cours sera plus disponible",
+    confirmText: "Archiver le cours",
+    confirmClass: "btn-error",
+    onConfirm: async () => {
+      const loading = showLoadingModal("Annulation en cours...");
+      try {
+        await handleArchiveCours(courId);
+        await renderCoursCardsRp();
+      } catch (error) {
+        showEmptyStateModal("Erreur lors de l'archivage du cours");
+      } finally {
+        loading.close();
+      }
+    },
+  });
 }
