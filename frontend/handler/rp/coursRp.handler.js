@@ -5,6 +5,7 @@ import {
   createCoursClasse,
   deleteCoursClasse,
   getClassesForCours,
+  updateCours,
 } from "../../services/coursService.js";
 import { calculateHeures } from "../../utils/function.js";
 import { validateCoursData } from "../../validations/validation.js";
@@ -96,24 +97,37 @@ async function submitCoursUpdateData(updatedData) {
     ),
   });
 
-  await updateCoursClasses(updatedData.id_cours, updatedData.classes);
+  // Convertir les classes en nombres
+  const classesIds = updatedData.classes;
+  await updateCoursClasses(updatedData.id_cours, classesIds);
+
   return coursUpdated;
 }
 
 async function updateCoursClasses(id_cours, newClassesIds) {
-  const currentClasses = await getClassesForCours(id_cours);
+  try {
+    const currentClasses = await getClassesForCours(id_cours);
 
-  const classesToRemove = currentClasses.filter(
-    (id) => !newClassesIds.includes(id)
-  );
-  await Promise.all(
-    classesToRemove.map((id_classe) => deleteCoursClasse(id_cours, id_classe))
-  );
+    // Trouver les différences
+    const classesToRemove = currentClasses.filter(
+      (id) => !newClassesIds.includes(id)
+    );
 
-  const classesToAdd = newClassesIds.filter(
-    (id) => !currentClasses.includes(id)
-  );
-  await assignClassesToCours(id_cours, classesToAdd);
+    const classesToAdd = newClassesIds.filter(
+      (id) => !currentClasses.includes(id)
+    );
+
+    // Exécuter les opérations en parallèle
+    await Promise.all([
+      ...classesToRemove.map((id) => deleteCoursClasse(id_cours, id)),
+      ...classesToAdd.map((id) =>
+        createCoursClasse({ id_cours, id_classe: id })
+      ),
+    ]);
+  } catch (error) {
+    console.error("Erreur dans updateCoursClasses:", error);
+    throw new Error("Échec de la mise à jour des classes du cours");
+  }
 }
 
 async function assignClassesToCours(id_cours, classesIds) {

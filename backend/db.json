@@ -285,10 +285,11 @@
       "id_semestre": "2",
       "date_cours": "2025-04-30",
       "heure_debut": "21:32",
-      "heure_fin": "23:32",
-      "salle": "Salle A1",
-      "nombre_heures": 2,
-      "statut": "planifié"
+      "heure_fin": "22:32",
+      "salle": "Salle A3",
+      "nombre_heures": 1,
+      "statut": "planifié",
+      "id_cours": "7"
     }
   ],
   "cours_classes": [
@@ -323,7 +324,7 @@
       "id_classe": "1"
     },
     {
-      "id": "cf13",
+      "id": "21eb",
       "id_cours": "7",
       "id_classe": "2"
     }

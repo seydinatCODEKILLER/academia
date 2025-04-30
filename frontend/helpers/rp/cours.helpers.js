@@ -12,7 +12,7 @@ import { createFloatingButton } from "../../components/ui/floatingButton.js";
 import { handleCoursRpSubmit } from "../../handler/rp/coursRp.handler.js";
 import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js";
 
-import { getAllCours } from "../../services/coursService.js";
+import { getAllCours, getCoursById } from "../../services/coursService.js";
 import { getAllSemestres } from "../../services/semestreService.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
 
@@ -90,7 +90,7 @@ export async function renderCoursCardsRp(filters = {}) {
       switch (action) {
         case "edit":
           console.log(id);
-          //   await showEditCoursModal(id);
+          await showEditCoursModalRp(id);
           break;
         case "archive":
           console.log(id);
@@ -179,7 +179,10 @@ export async function showAddCoursModalRp() {
   modal.showModal();
 }
 
-export async function showEditCoursModalRp(existingCours) {
+export async function showEditCoursModalRp(id) {
+  const existingCours = await getCoursById(id);
+  console.log(existingCours);
+
   const form = await createCoursForm(existingCours);
   const modal = createModal({
     title: "Modifier le cours",

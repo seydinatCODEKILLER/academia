@@ -295,7 +295,7 @@ export async function createCoursForm(existingCours = null) {
     ...(existingCours
       ? {
           ...existingCours,
-          classes: await getClassesForCours(existingCours.id_cours),
+          classes: await getClassesForCours(existingCours.id),
         }
       : {}),
   };
@@ -307,7 +307,7 @@ export async function createCoursForm(existingCours = null) {
       
       ${
         existingCours
-          ? `<input type="hidden" name="id_cours" value="${existingCours.id_cours}">`
+          ? `<input type="hidden" name="id_cours" value="${existingCours.id}">`
           : ""
       }
       
@@ -449,7 +449,7 @@ export async function createCoursForm(existingCours = null) {
                 type="checkbox" 
                 name="classes" 
                 value="${c.id}" 
-                ${defaultValue.classes.includes(c.id_classe) ? "checked" : ""} 
+                ${defaultValue.classes.includes(c.id) ? "checked" : ""} 
                 class="checkbox"
               >
               <h4 class="font-medium">${c.libelle}</h4>

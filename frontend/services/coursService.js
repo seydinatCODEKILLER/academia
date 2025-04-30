@@ -104,7 +104,7 @@ export async function getCoursById(id_cours) {
     // Récupère les classes associées
     const classesIds = await fetchData("cours_classes").then((cc) =>
       cc
-        .filter((item) => item.id_cours === cours.id_cours)
+        .filter((item) => item.id_cours === cours.id)
         .map((item) => item.id_classe)
     );
     const classes = await Promise.all(
@@ -113,7 +113,7 @@ export async function getCoursById(id_cours) {
 
     // Récupère les absences liées à ce cours
     const absences = await fetchData("absences").then((abs) =>
-      abs.filter((a) => a.id_cours === cours.id_cours)
+      abs.filter((a) => a.id_cours === cours.id)
     );
 
     // Pour chaque absence, on peut récupérer des détails supplémentaires
@@ -165,7 +165,7 @@ export async function getClassesForCours(id_cours) {
   try {
     const coursClasses = await fetchData("cours_classes");
     return coursClasses
-      .filter((item) => item.id_cours === id_cours)
+      .filter((item) => item.id_cours == id_cours)
       .map((item) => item.id_classe);
   } catch (error) {
     console.error(
@@ -211,17 +211,21 @@ export async function createCoursClasse(data) {
 }
 
 export async function deleteCoursClasse(id_cours, id_classe) {
-  const response = await fetch(`${API_BASE_URL}/cours_classes`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id_cours, id_classe }),
-  });
+  try {
+    const allAffectations = await fetchData("cours_classes");
+    const affectationId = allAffectations.find(
+      (item) => item.id_cours === id_cours && item.id_classe === id_classe
+    )?.id;
 
-  if (!response.ok) {
-    throw new Error(
-      "Erreur lors de la suppression de l'assignation classe-cours"
-    );
+    if (!affectationId) return false;
+
+    await fetch(`${API_BASE_URL}/cours_classes/${affectationId}`, {
+      method: "DELETE",
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Erreur deleteClasscours:", error);
+    return false;
   }
-
-  return response.json();
 }
