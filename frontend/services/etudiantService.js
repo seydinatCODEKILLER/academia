@@ -434,7 +434,7 @@ export async function getStudentAbsences(studentId) {
               specialite: professor.specialite,
               grade: professor.grade,
               utilisateur: {
-                id_utilisateur: professorUser.id_utilisateur,
+                id_utilisateur: professorUser.id,
                 nom: professorUser.nom,
                 prenom: professorUser.prenom,
                 avatar: professorUser.avatar,

@@ -1,20 +1,37 @@
+import { createIllustratedBanner } from "../../components/banner/banner.js";
 import {
   createAbsenceCards,
   updateAbsenceCardsData,
 } from "../../components/card/cardAbsence.js";
+import { createJustificationFiltersForEtudiant } from "../../components/filter/filter.js";
 import { createJustificationForm } from "../../components/form/form.js";
 import {
   createModal,
   showEmptyStateModal,
 } from "../../components/modals/modal.js";
 import { handleJustificationSubmit } from "../../handler/etudiant/justificationEtudiant.handler.js";
+import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js";
 import { getStudentAbsences } from "../../services/etudiantService.js";
+import { getAllSemestres } from "../../services/semestreService.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
 
 export async function renderAbsenceCardEtudiant(idEtudiant, filters = {}) {
   try {
     const loadingModal = showLoadingModal("Chargement des absences...");
-    const absencesData = await getStudentAbsences(idEtudiant);
+    let absencesData = await getStudentAbsences(idEtudiant);
+    console.log(absencesData);
+
+    // 2. Filtrage des données
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      absencesData = absencesData.filter(
+        (c) =>
+          c.cours.module.libelle.toLowerCase().includes(searchTerm) ||
+          `${c.professeur.utilisateur.prenom} ${c.professeur.utilisateur.nom}`
+            .toLowerCase()
+            .includes(searchTerm)
+      );
+    }
 
     // 2. Configurer les actions possibles
     const actionsConfig = {
@@ -110,4 +127,36 @@ export async function showAddJustificationsModalEtudiant(
 
   document.getElementById("modal-absence-container").appendChild(modal);
   modal.showModal();
+}
+
+export function rendeJustificationBannerForEtudiant() {
+  const hero = createIllustratedBanner({
+    title: "Suivez vos absence en temps réel",
+    subtitle: "Une plateforme intuitive pour une gestion moderne",
+    illustrationUrl: "/frontend/assets/images/teacher.svg",
+    bgColor: "bg-blue-50",
+    textColor: "text-blue-600",
+  });
+  document.getElementById("banner-container").appendChild(hero);
+}
+
+export async function renderJustificationCardFilterForEtudiant(idEtudiant) {
+  const [semestres, anneesScolaires] = await Promise.all([
+    getAllSemestres(),
+    getAllAnneesScolaires(),
+  ]);
+  const filters = createJustificationFiltersForEtudiant({
+    semestres,
+    anneesScolaires,
+    onFilter: (filters) =>
+      updateJustificationCardWithFiltersForEtudiant(idEtudiant, filters),
+  });
+  document.getElementById("filters-container").appendChild(filters);
+}
+
+export async function updateJustificationCardWithFiltersForEtudiant(
+  idEtudiant,
+  filters = {}
+) {
+  await renderAbsenceCardEtudiant(idEtudiant, filters);
 }

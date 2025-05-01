@@ -5,7 +5,11 @@ import {
   handleEtudiantSidebar,
   renderEtudiantHeader,
 } from "../../../utils/etudiant.utils.js";
-import { renderAbsenceCardEtudiant } from "../../../helpers/etudiant/absence.helpers.js";
+import {
+  rendeJustificationBannerForEtudiant,
+  renderAbsenceCardEtudiant,
+  renderJustificationCardFilterForEtudiant,
+} from "../../../helpers/etudiant/absence.helpers.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   initRouter();
@@ -14,4 +18,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderEtudiantHeader(user, "Absences");
   const idEtudiant = await getIdEtudiantByUserId(user.id);
   await renderAbsenceCardEtudiant(idEtudiant);
+  await renderJustificationCardFilterForEtudiant(idEtudiant);
+  rendeJustificationBannerForEtudiant();
 });
