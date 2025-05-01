@@ -42,6 +42,19 @@ export function colorStateAbsence(state) {
   }
 }
 
+export function colorStateJustification(state) {
+  switch (state) {
+    case "accepter":
+      return "success";
+    case "refuser":
+      return "error";
+    case "en attente":
+      return "warning";
+    default:
+      return "secondary";
+  }
+}
+
 export function calculateHeures(heure_debut, heure_fin) {
   const debut = new Date(`1970-01-01T${heure_debut}`);
   const fin = new Date(`1970-01-01T${heure_fin}`);
