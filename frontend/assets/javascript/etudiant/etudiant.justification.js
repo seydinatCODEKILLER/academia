@@ -5,7 +5,11 @@ import {
   handleEtudiantSidebar,
   renderEtudiantHeader,
 } from "../../../utils/etudiant.utils.js";
-import { renderJustificationCardEtudiant } from "../../../helpers/etudiant/justification.helpers.js";
+import {
+  rendeJustificationBannerForEtudiant,
+  renderJustificationCardEtudiant,
+  renderJustificationCardFilterForEtudiant,
+} from "../../../helpers/etudiant/justification.helpers.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   initRouter();
@@ -14,4 +18,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderEtudiantHeader(user, "Justification");
   const idEtudiant = await getIdEtudiantByUserId(user.id);
   await renderJustificationCardEtudiant(idEtudiant);
+  await renderJustificationCardFilterForEtudiant(idEtudiant);
+  rendeJustificationBannerForEtudiant();
 });

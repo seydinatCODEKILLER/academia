@@ -668,3 +668,63 @@ export function createJustificationFiltersForEtudiant(config) {
 
   return filtersContainer;
 }
+
+export function createAbsenceFiltersForEtudiant(config) {
+  const { statut = [], onFilter = () => {} } = config;
+
+  const filtersContainer = document.createElement("div");
+  filtersContainer.className = "bg-purple-100 p-3 rounded-lg mb-6";
+
+  const title = document.createElement("h3");
+  title.className = "font-medium text-lg mb-4";
+  title.textContent = "Filtrer les cours";
+  filtersContainer.appendChild(title);
+
+  const filtersGrid = document.createElement("div");
+  filtersGrid.className = "grid grid-cols-1 md:grid-cols-4 gap-4";
+
+  // Champ de recherche
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.placeholder = "Rechercher une absence...";
+  searchInput.className = "input input-bordered w-full col-span-2";
+  searchInput.addEventListener("input", (e) => {
+    onFilter({
+      search: e.target.value,
+      statut: statutSelect.value,
+    });
+  });
+
+  // Filtre par statut
+  const statutSelect = document.createElement("select");
+  statutSelect.className = "select select-bordered w-full";
+  statutSelect.innerHTML = `
+    <option value="">Toutes les statut</option>
+    ${statut
+      .map((s) => `<option value="${s.libelle}">${s.libelle}</option>`)
+      .join("")}
+  `;
+  statutSelect.addEventListener("change", (e) => {
+    onFilter({
+      statut: e.target.value,
+      search: searchInput.value,
+    });
+  });
+
+  // Bouton réinitialiser
+  const resetButton = document.createElement("button");
+  resetButton.className = "btn btn-neutral";
+  resetButton.innerHTML = '<i class="ri-refresh-line mr-2"></i> Réinitialiser';
+  resetButton.addEventListener("click", () => {
+    searchInput.value = "";
+    statutSelect.value = "";
+    onFilter({ search: "", statut: "" });
+  });
+
+  filtersGrid.appendChild(searchInput);
+  filtersGrid.appendChild(statutSelect);
+  filtersGrid.appendChild(resetButton);
+  filtersContainer.appendChild(filtersGrid);
+
+  return filtersContainer;
+}
