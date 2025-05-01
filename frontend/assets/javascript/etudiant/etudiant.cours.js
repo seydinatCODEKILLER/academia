@@ -6,6 +6,7 @@ import {
   handleEtudiantSidebar,
   renderEtudiantHeader,
 } from "../../../utils/etudiant.utils.js";
+import { renderCoursCardsEtudiant } from "../../../helpers/etudiant/cours.helpers.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   initRouter();
@@ -14,4 +15,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   handleEtudiantSidebar(user);
   renderEtudiantHeader(user, "Cours");
   const idEtudiant = await getIdEtudiantByUserId(user.id);
+  await renderCoursCardsEtudiant(idEtudiant);
 });

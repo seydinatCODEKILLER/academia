@@ -1,3 +1,4 @@
+import { getCurrentAcademicYear } from "./annees_scolaireService.js";
 import { API_BASE_URL, fetchData, generateId } from "./api.js";
 
 export async function getEtudiantById(id) {
@@ -262,5 +263,101 @@ async function getStudentClasses(studentId) {
   } catch (error) {
     console.error("Erreur getStudentClasses:", error);
     return [];
+  }
+}
+
+export async function getStudentCourses(studentId) {
+  try {
+    const [
+      currentYear,
+      inscriptions,
+      classes,
+      allCourses,
+      allSemesters,
+      courseClasses,
+    ] = await Promise.all([
+      getCurrentAcademicYear(), // Ex: "2024-2025"
+      fetchData("inscriptions"),
+      fetchData("classes"),
+      fetchData("cours"),
+      fetchData("semestres"),
+      fetchData("cours_classes"),
+    ]);
+
+    // 1. Trouver l’inscription active et validée pour l’année scolaire en cours
+    const validInscription = inscriptions.find(
+      (ins) =>
+        ins.id_etudiant == studentId &&
+        ins.statut === "validée" &&
+        ins.annee_scolaire === currentYear
+    );
+
+    if (!validInscription) return [];
+
+    const studentClasseId = validInscription.id_classe;
+
+    // 2. Identifier les semestres de l’année en cours
+    const semestresEnCours = allSemesters.filter(
+      (s) => s.annee_scolaire === currentYear
+    );
+
+    // 3. Récupérer les cours liés à ces semestres
+    const coursEnCours = allCourses.filter((cours) =>
+      semestresEnCours.some((sem) => sem.id === cours.id_semestre)
+    );
+
+    // 4. Récupérer les cours associés à la classe de l’étudiant
+    const coursIdsClasse = courseClasses
+      .filter((cc) => cc.id_classe == studentClasseId)
+      .map((cc) => cc.id_cours);
+
+    const studentCourses = coursEnCours.filter((cours) =>
+      coursIdsClasse.includes(cours.id)
+    );
+
+    // 5. Enrichir chaque cours
+    const enrichedCourses = await Promise.all(
+      studentCourses.map(async (course) => {
+        const [module, professor, semester, courseClassesList] =
+          await Promise.all([
+            fetchData("modules", course.id_module),
+            fetchData("professeurs", course.id_professeur).then(
+              async (prof) => {
+                const user = await fetchData(
+                  "utilisateurs",
+                  prof.id_utilisateur
+                );
+                return { ...prof, utilisateur: user };
+              }
+            ),
+            fetchData("semestres", course.id_semestre),
+            Promise.all(
+              courseClasses
+                .filter((cc) => cc.id_cours === course.id)
+                .map((cc) => fetchData("classes", cc.id_classe))
+            ),
+          ]);
+
+        return {
+          ...course,
+          module,
+          professeur: professor,
+          semestre: semester,
+          classes: courseClassesList,
+        };
+      })
+    );
+
+    return enrichedCourses.sort(
+      (a, b) =>
+        new Date(b.date_cours) - new Date(a.date_cours) ||
+        a.heure_debut.localeCompare(b.heure_debut)
+    );
+  } catch (error) {
+    console.error(
+      `Erreur lors de la récupération des cours pour l'étudiant ${studentId}:`,
+      error
+    );
+    throw error;
   }
 }
