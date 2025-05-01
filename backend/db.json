@@ -1,12 +1,12 @@
 {
   "absences": [
     {
-      "id_etudiant": "4",
+      "id_etudiant": "1",
       "id_cours": "1",
       "date_absence": "2025-04-15",
       "heure_marquage": "2025-04-15 14:22:50",
       "id_marqueur": "2",
-      "justified": "justifier",
+      "justified": "en attente",
       "id": "9"
     }
   ],
@@ -488,13 +488,13 @@
   "justifications": [
     {
       "id_absence": "9",
-      "id_etudiant": "4",
-      "date_justification": "2025-04-15 16:09:32",
-      "motif": "J'etais fortement malade avec de grave fievre",
-      "pieces_jointes": "jr_67fe84bc23acd.jpg",
+      "id_etudiant": "1",
+      "date_justification": null,
+      "motif": "",
+      "pieces_jointes": "",
       "statut": "en attente",
-      "id_traitant": "1",
-      "date_traitement": "2025-04-19 14:00:02",
+      "id_traitant": "",
+      "date_traitement": "",
       "commentaire_traitement": null,
       "id": "2"
     }

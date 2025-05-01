@@ -361,3 +361,106 @@ export async function getStudentCourses(studentId) {
     throw error;
   }
 }
+
+/**
+ * Récupère toutes les absences d'un étudiant avec les détails complets
+ * @param {number} studentId - ID de l'étudiant
+ * @returns {Promise<Array>} Tableau des absences avec détails complets
+ */
+export async function getStudentAbsences(studentId) {
+  try {
+    // Récupération parallèle des données nécessaires
+    const [
+      absences,
+      cours,
+      modules,
+      professeurs,
+      utilisateurs,
+      justifications,
+    ] = await Promise.all([
+      fetchData("absences"),
+      fetchData("cours"),
+      fetchData("modules"),
+      fetchData("professeurs"),
+      fetchData("utilisateurs"),
+      fetchData("justifications"),
+    ]);
+
+    // Filtrer les absences de l'étudiant
+    const studentAbsences = absences.filter(
+      (absence) => absence.id_etudiant === studentId
+    );
+
+    // Enrichir chaque absence avec les détails
+    return studentAbsences.map((absence) => {
+      const relatedCourse = cours.find((c) => c.id === absence.id_cours);
+      const module = modules.find((m) => m.id === relatedCourse?.id_module);
+      const professor = professeurs.find(
+        (p) => p.id === relatedCourse?.id_professeur
+      );
+      const professorUser = utilisateurs.find(
+        (u) => u.id === professor?.id_utilisateur
+      );
+      const markerUser = utilisateurs.find((u) => u.id === absence.id_marqueur);
+      const justification = justifications.find(
+        (j) => j.id_absence === absence.id
+      );
+
+      return {
+        id_absence: absence.id,
+        date_absence: absence.date_absence,
+        heure_marquage: absence.heure_marquage,
+        justified: absence.justified,
+        cours: relatedCourse
+          ? {
+              id_cours: relatedCourse.id,
+              date_cours: relatedCourse.date_cours,
+              heure_debut: relatedCourse.heure_debut,
+              heure_fin: relatedCourse.heure_fin,
+              salle: relatedCourse.salle,
+              statut: relatedCourse.statut,
+              module: module
+                ? {
+                    id_module: module.id,
+                    libelle: module.libelle,
+                    code_module: module.code_module,
+                  }
+                : null,
+            }
+          : null,
+        professeur: professorUser
+          ? {
+              id_professeur: professor.id,
+              specialite: professor.specialite,
+              grade: professor.grade,
+              utilisateur: {
+                id_utilisateur: professorUser.id_utilisateur,
+                nom: professorUser.nom,
+                prenom: professorUser.prenom,
+                avatar: professorUser.avatar,
+              },
+            }
+          : null,
+        marqueur: markerUser
+          ? {
+              id_utilisateur: markerUser.id,
+              nom: markerUser.nom,
+              prenom: markerUser.prenom,
+            }
+          : null,
+        justification: justification
+          ? {
+              id_justification: justification.id,
+              date_justification: justification.date_justification,
+              motif: justification.motif,
+              statut: justification.statut,
+              pieces_jointes: justification.pieces_jointes,
+            }
+          : null,
+      };
+    });
+  } catch (error) {
+    console.error("Erreur dans getStudentAbsences:", error);
+    throw error;
+  }
+}
