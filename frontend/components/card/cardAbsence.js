@@ -375,7 +375,9 @@ function setupCardsEvents(containerId) {
  * Rend un dropdown DaisyUI pour les actions
  */
 function renderDaisyUIDropdown(item, actionsConfig, tableId) {
-  const dropdownId = `dropdown-${tableId}-${item.id}`;
+  console.log(item);
+
+  const dropdownId = `dropdown-${tableId}-${item.id_absence}`;
 
   // Si actionsConfig.items est une fonction, on l'appelle avec l'item
   const actions =
@@ -393,7 +395,7 @@ function renderDaisyUIDropdown(item, actionsConfig, tableId) {
           .map(
             (action) => `
           <li>
-            <a data-action="${action.name}" data-id="${item.id}" 
+            <a data-action="${action.name}" data-id="${item.id_absence}" 
                class="${action.className || ""}">
               <i class="${action.icon}"></i>${action.label}
             </a>

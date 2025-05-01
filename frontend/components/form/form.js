@@ -475,3 +475,65 @@ export async function createCoursForm(existingCours = null) {
 
   return form;
 }
+
+export async function createJustificationForm(absence) {
+  const form = document.createElement("form");
+  form.className = "space-y-4 p-4";
+
+  form.innerHTML = `
+    <div class="grid grid-cols-1 gap-4 mb-4">
+      <!-- Informations sur l'absence -->
+      <div class="bg-base-200 p-4 rounded-lg">
+        <h4 class="font-bold mb-2">Informations sur l'absence</h4>
+        <p><strong>Date:</strong> ${absence.date_absence}</p>
+        <p><strong>Cours:</strong> ${
+          absence.cours?.module?.libelle || "Non spécifié"
+        }</p>
+        <p><strong>Heures:</strong> ${absence.cours?.heure_debut} - ${
+    absence.cours?.heure_fin
+  }</p>
+      </div>
+      
+      <!-- Champ motif -->
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Motif de l'absence *</span>
+        </label>
+        <textarea 
+          name="motif" 
+          class="textarea textarea-bordered h-24" 
+          placeholder="Décrivez le motif de votre absence..."
+          required
+        ></textarea>
+        <div class="text-error text-xs mt-1 hidden" data-error="motif"></div>
+      </div>
+      
+      <!-- Champ pièce jointe -->
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Pièce jointe (optionnel)</span>
+        </label>
+        <input 
+          type="file" 
+          name="piece_jointe" 
+          class="file-input file-input-bordered w-full"
+          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+        >
+        <div class="label-text-alt mt-1">Formats acceptés: JPG, PNG, PDF, DOC (max 5MB)</div>
+        <div class="text-error text-xs mt-1 hidden" data-error="piece_jointe"></div>
+      </div>
+    </div>
+    
+    <div class="modal-action">
+      <button type="button" class="btn btn-ghost" onclick="this.closest('dialog').close()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary">
+        <i class="ri-send-plane-line mr-2"></i> 
+        Envoyer la justification
+      </button>
+    </div>
+  `;
+
+  return form;
+}

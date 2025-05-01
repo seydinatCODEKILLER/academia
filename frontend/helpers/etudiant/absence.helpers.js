@@ -2,7 +2,11 @@ import {
   createAbsenceCards,
   updateAbsenceCardsData,
 } from "../../components/card/cardAbsence.js";
-import { showEmptyStateModal } from "../../components/modals/modal.js";
+import { createJustificationForm } from "../../components/form/form.js";
+import {
+  createModal,
+  showEmptyStateModal,
+} from "../../components/modals/modal.js";
 import { getStudentAbsences } from "../../services/etudiantService.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
 
@@ -48,10 +52,10 @@ export async function renderAbsenceCardEtudiant(idEtudiant, filters = {}) {
     const handleAction = async (action, id) => {
       switch (action) {
         case "details":
-          alert("details clicked");
+          alert(`details clicked ${id}`);
           break;
         case "justifier":
-          alert("justifier clicked");
+          await showAddJustificationsModalEtudiant(id, idEtudiant);
           break;
         case "restore":
           console.log(id);
@@ -83,4 +87,36 @@ export async function renderAbsenceCardEtudiant(idEtudiant, filters = {}) {
       error.message
     );
   }
+}
+
+export async function showAddJustificationsModalEtudiant(
+  absenceId,
+  idEtudiant
+) {
+  const absences = await getStudentAbsences(idEtudiant);
+  const absence = absences.find((a) => a.id_absence === absenceId);
+
+  if (!absence) {
+    throw new Error("Absence introuvable");
+  }
+
+  const form = await createJustificationForm(absence);
+  const modal = createModal({
+    title: "Demande de justification d'absence",
+    content: form,
+    size: "lg",
+  });
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const result = await handleJustificationSubmit(form, absenceId);
+
+    if (result.success) {
+      modal.close();
+      await renderAbsenceCardEtudiant(absence.id_etudiant);
+    }
+  };
+
+  document.getElementById("modal-absence-container").appendChild(modal);
+  modal.showModal();
 }
