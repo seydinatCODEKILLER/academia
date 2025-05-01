@@ -47,3 +47,21 @@ export function calculateHeures(heure_debut, heure_fin) {
   const fin = new Date(`1970-01-01T${heure_fin}`);
   return (fin - debut) / (1000 * 60 * 60);
 }
+
+export async function processUploadedFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      resolve({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        data: event.target.result.split(",")[1],
+      });
+    };
+
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+}

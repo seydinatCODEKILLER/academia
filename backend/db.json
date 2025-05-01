@@ -6,7 +6,7 @@
       "date_absence": "2025-04-15",
       "heure_marquage": "2025-04-15 14:22:50",
       "id_marqueur": "2",
-      "justified": "en attente",
+      "justified": "justifier",
       "id": "9"
     }
   ],
@@ -487,16 +487,16 @@
   ],
   "justifications": [
     {
+      "id": "1",
       "id_absence": "9",
+      "motif": "mouhamed mou sell mi",
       "id_etudiant": "1",
-      "date_justification": null,
-      "motif": "",
-      "pieces_jointes": "",
+      "date_justification": "2025-05-01T16:39:04.463Z",
       "statut": "en attente",
-      "id_traitant": "",
-      "date_traitement": "",
-      "commentaire_traitement": null,
-      "id": "2"
+      "id_traitant": null,
+      "pieces_jointes": null,
+      "date_traitement": null,
+      "commentaire_traitement": null
     }
   ],
   "modules": [

@@ -417,7 +417,7 @@ function renderDaisyUIDirectActions(item, actionsConfig) {
       (action) => `
     <button class="btn btn-sm ${action.className || "btn-ghost"}"
             data-action="${action.name}"
-            data-id="${item.id}"
+            data-id="${item.id_absence}"
             title="${action.label}">
       <i class="${action.icon}"></i>
       ${action.showLabel ? action.label : ""}

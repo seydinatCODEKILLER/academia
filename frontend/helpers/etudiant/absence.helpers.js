@@ -7,6 +7,7 @@ import {
   createModal,
   showEmptyStateModal,
 } from "../../components/modals/modal.js";
+import { handleJustificationSubmit } from "../../handler/etudiant/justificationEtudiant.handler.js";
 import { getStudentAbsences } from "../../services/etudiantService.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
 
@@ -14,31 +15,24 @@ export async function renderAbsenceCardEtudiant(idEtudiant, filters = {}) {
   try {
     const loadingModal = showLoadingModal("Chargement des absences...");
     const absencesData = await getStudentAbsences(idEtudiant);
-    console.log(absencesData);
 
     // 2. Configurer les actions possibles
     const actionsConfig = {
       type: "dropdown",
       items: (item) => {
-        if (item.statut === "archiver") {
+        if (item.justified === "justifier") {
           return [
             {
-              name: "restore",
-              label: "Restorer",
+              name: "archive",
+              label: "Archiver",
               icon: "ri-arrow-go-back-line",
-              className: "text-success",
+              className: "text-error",
               type: "direct",
               showLabel: true,
             },
           ];
         }
         return [
-          {
-            name: "details",
-            label: "Details",
-            icon: "ri-information-line",
-            className: "text-info",
-          },
           {
             name: "justifier",
             label: " Justifier",
@@ -51,14 +45,11 @@ export async function renderAbsenceCardEtudiant(idEtudiant, filters = {}) {
 
     const handleAction = async (action, id) => {
       switch (action) {
-        case "details":
-          alert(`details clicked ${id}`);
-          break;
         case "justifier":
           await showAddJustificationsModalEtudiant(id, idEtudiant);
           break;
-        case "restore":
-          console.log(id);
+        case "archive":
+          alert(`archive clicked ${id}`);
           break;
       }
     };
@@ -109,7 +100,7 @@ export async function showAddJustificationsModalEtudiant(
 
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const result = await handleJustificationSubmit(form, absenceId);
+    const result = await handleJustificationSubmit(form, absenceId, idEtudiant);
 
     if (result.success) {
       modal.close();

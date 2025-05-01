@@ -495,32 +495,16 @@ export async function createJustificationForm(absence) {
       </div>
       
       <!-- Champ motif -->
-      <div class="form-control">
+      <div class="form-control col-span-full">
         <label class="label">
           <span class="label-text">Motif de l'absence *</span>
         </label>
         <textarea 
           name="motif" 
-          class="textarea textarea-bordered h-24" 
+          class="textarea textarea-bordered h-24 w-full" 
           placeholder="Décrivez le motif de votre absence..."
-          required
         ></textarea>
         <div class="text-error text-xs mt-1 hidden" data-error="motif"></div>
-      </div>
-      
-      <!-- Champ pièce jointe -->
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text">Pièce jointe (optionnel)</span>
-        </label>
-        <input 
-          type="file" 
-          name="piece_jointe" 
-          class="file-input file-input-bordered w-full"
-          accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-        >
-        <div class="label-text-alt mt-1">Formats acceptés: JPG, PNG, PDF, DOC (max 5MB)</div>
-        <div class="text-error text-xs mt-1 hidden" data-error="piece_jointe"></div>
       </div>
     </div>
     

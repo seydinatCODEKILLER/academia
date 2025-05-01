@@ -179,3 +179,11 @@ export function validateCoursData(coursData) {
 
   return Object.keys(errors).length > 0 ? errors : null;
 }
+
+export function validateJustificationData(justificationData) {
+  const errors = {};
+
+  if (!justificationData.motif) errors.motif = "le motif est obligatoire";
+
+  return Object.keys(errors).length > 0 ? errors : null;
+}
