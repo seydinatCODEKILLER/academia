@@ -6,7 +6,10 @@ import {
   handleEtudiantSidebar,
   renderEtudiantHeader,
 } from "../../../utils/etudiant.utils.js";
-import { renderCoursCardsEtudiant } from "../../../helpers/etudiant/cours.helpers.js";
+import {
+  renderCoursCardFilterForEtudiant,
+  renderCoursCardsEtudiant,
+} from "../../../helpers/etudiant/cours.helpers.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   initRouter();
@@ -16,4 +19,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderEtudiantHeader(user, "Cours");
   const idEtudiant = await getIdEtudiantByUserId(user.id);
   await renderCoursCardsEtudiant(idEtudiant);
+  await renderCoursCardFilterForEtudiant(idEtudiant);
 });

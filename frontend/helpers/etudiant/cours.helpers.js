@@ -60,7 +60,7 @@ export async function renderCoursCardsEtudiant(idEtudiant, filters = {}) {
   }
 }
 
-export async function renderCoursCardFilterForEtudiant() {
+export async function renderCoursCardFilterForEtudiant(idEtudiant) {
   const [semestres, anneesScolaires] = await Promise.all([
     getAllSemestres(),
     getAllAnneesScolaires(),
@@ -68,11 +68,15 @@ export async function renderCoursCardFilterForEtudiant() {
   const filters = createCoursFiltersForEtudiant({
     semestres,
     anneesScolaires,
-    onFilter: (filters) => updateCoursCardWithFiltersForEtudiant(filters),
+    onFilter: (filters) =>
+      updateCoursCardWithFiltersForEtudiant(idEtudiant, filters),
   });
   document.getElementById("filters-container").appendChild(filters);
 }
 
-export async function updateCoursCardWithFiltersForEtudiant(filters = {}) {
-  await renderCoursCardsEtudiant(filters);
+export async function updateCoursCardWithFiltersForEtudiant(
+  idEtudiant,
+  filters = {}
+) {
+  await renderCoursCardsEtudiant(idEtudiant, filters);
 }
