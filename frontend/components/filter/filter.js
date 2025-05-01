@@ -640,13 +640,13 @@ export function createJustificationFiltersForEtudiant(config) {
   filtersContainer.appendChild(title);
 
   const filtersGrid = document.createElement("div");
-  filtersGrid.className = "grid grid-cols-1 md:grid-cols-3 gap-4";
+  filtersGrid.className = "grid grid-cols-1 md:grid-cols-4 gap-4";
 
   // Champ de recherche
   const searchInput = document.createElement("input");
   searchInput.type = "text";
   searchInput.placeholder = "Rechercher une absence...";
-  searchInput.className = "input input-bordered w-full";
+  searchInput.className = "input input-bordered w-full col-span-2";
   searchInput.addEventListener("input", (e) => {
     onFilter({
       search: e.target.value,
