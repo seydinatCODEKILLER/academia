@@ -1,3 +1,4 @@
+import { createIllustratedBanner } from "../../components/banner/banner.js";
 import {
   createCoursCards,
   updateCoursCardsData,
@@ -79,4 +80,15 @@ export async function updateCoursCardWithFiltersForEtudiant(
   filters = {}
 ) {
   await renderCoursCardsEtudiant(idEtudiant, filters);
+}
+
+export function rendeCoursBannerForEtudiant() {
+  const hero = createIllustratedBanner({
+    title: "Suivez vos cours en temps réel",
+    subtitle: "Une plateforme intuitive pour une gestion moderne",
+    illustrationUrl: "/frontend/assets/images/teacher.svg",
+    bgColor: "bg-purple-500",
+    textColor: "text-white",
+  });
+  document.getElementById("banner-container").appendChild(hero);
 }

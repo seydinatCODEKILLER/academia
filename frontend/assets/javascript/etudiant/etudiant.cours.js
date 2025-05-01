@@ -7,6 +7,7 @@ import {
   renderEtudiantHeader,
 } from "../../../utils/etudiant.utils.js";
 import {
+  rendeCoursBannerForEtudiant,
   renderCoursCardFilterForEtudiant,
   renderCoursCardsEtudiant,
 } from "../../../helpers/etudiant/cours.helpers.js";
@@ -17,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = getCurrentUser();
   handleEtudiantSidebar(user);
   renderEtudiantHeader(user, "Cours");
+  rendeCoursBannerForEtudiant();
   const idEtudiant = await getIdEtudiantByUserId(user.id);
   await renderCoursCardsEtudiant(idEtudiant);
   await renderCoursCardFilterForEtudiant(idEtudiant);
