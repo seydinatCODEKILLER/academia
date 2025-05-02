@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://unpkg.com/cally"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5.0.0-beta.1/daisyui.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.min.css"
+      rel="stylesheet"
+    />
+    <title>Dashboard | Professeur</title>
+  </head>
+  <body
+    class="flex h-screen inset-0 bg-gradient-to-r from-indigo-50/50 to-white"
+  >
+    <div id="sidebar-container"></div>
+    <div class="w-full lg:ml-56">
+      <div id="header"></div>
+      <div id="stats-section" class="px-3"></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 mt-5 gap-4 px-3">
+        <div id="charts-container"></div>
+        <div id="charts1-container"></div>
+        <div id="daily-courses-section"></div>
+      </div>
+    </div>
+    <div id="notifications" class="fixed top-4 right-4 space-y-2"></div>
+  </body>
+  <script
+    type="module"
+    src="../../assets/javascript/professeurs/dashboard.js"
+  ></script>
+</html>

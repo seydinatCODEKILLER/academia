@@ -362,11 +362,6 @@ export async function getStudentCourses(studentId) {
   }
 }
 
-/**
- * Récupère toutes les absences d'un étudiant avec les détails complets
- * @param {number} studentId - ID de l'étudiant
- * @returns {Promise<Array>} Tableau des absences avec détails complets
- */
 export async function getStudentAbsences(studentId) {
   try {
     // Récupération parallèle des données nécessaires

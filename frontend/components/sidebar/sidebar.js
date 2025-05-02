@@ -132,7 +132,7 @@ function createSidebarFooter(user, onLogout) {
   const userInfo = document.createElement("div");
   userInfo.className = "flex gap-1";
   userInfo.innerHTML = `
-    <img src="${user.avatar}" alt="Avatar" class="w-10 h-10 rounded object-cover">
+    <img src="${user.avatar}" alt="Avatar" class="w-9 h-9 rounded object-cover">
     <div class="flex flex-col">
       <span class="text-sm text-purple-500 font-medium">${user.role}</span>
       <p class="font-medium text-gray-800 text-sm">${user.name}</p>

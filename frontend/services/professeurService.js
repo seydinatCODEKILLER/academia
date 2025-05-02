@@ -247,3 +247,198 @@ export async function handleRestoreProfesseur(userId) {
   if (!response.ok) throw new Error("Échec de la restauration");
   return await response.json();
 }
+
+export async function getProfessorDailyCourses(professorId, date) {
+  try {
+    // Récupération parallèle des données nécessaires
+    const [allCourses, modules, classes, semestres] = await Promise.all([
+      fetchData("cours"),
+      fetchData("modules"),
+      fetchData("classes"),
+      fetchData("semestres"),
+    ]);
+
+    // Filtrer les cours du professeur pour la date spécifiée
+    const dailyCourses = allCourses.filter((course) => {
+      return (
+        course.id_professeur === professorId &&
+        course.date_cours === date &&
+        course.statut !== "annulé"
+      );
+    });
+
+    // Enrichir les données des cours
+    return dailyCourses.map((course) => {
+      const module = modules.find((m) => m.id === course.id_module);
+      const semester = semestres.find((s) => s.id === course.id_semestre);
+      const courseClasses = classes.filter(
+        (c) => course.classes && course.classes.includes(c.id)
+      );
+
+      return {
+        id: course.id_cours,
+        date: course.date_cours,
+        heure_debut: course.heure_debut,
+        heure_fin: course.heure_fin,
+        salle: course.salle,
+        statut: course.statut,
+        module: module
+          ? {
+              id: module.id_module,
+              libelle: module.libelle,
+              code: module.code_module,
+            }
+          : null,
+        semestre: semester
+          ? {
+              id: semester.id_semestre,
+              libelle: semester.libelle,
+            }
+          : null,
+        classes: courseClasses.map((c) => ({
+          id: c.id_classe,
+          libelle: c.libelle,
+        })),
+      };
+    });
+  } catch (error) {
+    console.error("Erreur dans getProfessorDailyCourses:", error);
+    throw error;
+  }
+}
+
+export async function calculateProfessorAbsenteeismRate(professorId) {
+  try {
+    // Récupération parallèle des données
+    const [allAbsences, allCourses, allStudents, professors] =
+      await Promise.all([
+        fetchData("absences"),
+        fetchData("cours"),
+        fetchData("etudiants"),
+        fetchData("professeurs"),
+      ]);
+
+    // Vérifier que le professeur existe
+    const professor = professors.find((p) => p.id === professorId);
+    if (!professor) {
+      throw new Error("Professeur non trouvé");
+    }
+
+    // Filtrer les cours du professeur
+    const professorCourses = allCourses.filter(
+      (course) => course.id_professeur === professorId
+    );
+
+    // Groupement des étudiants par classe
+    const studentsByClass = {};
+    allStudents.forEach((student) => {
+      if (student.id_classe) {
+        if (!studentsByClass[student.id_classe]) {
+          studentsByClass[student.id_classe] = [];
+        }
+        studentsByClass[student.id_classe].push(student.id);
+      }
+    });
+
+    // Calcul des statistiques par cours
+    const coursesStats = professorCourses.map((course) => {
+      const courseAbsences = allAbsences.filter(
+        (a) => a.id_cours === course.id
+      );
+      const courseClasses = course.classes || [];
+
+      // Calcul du nombre total d'étudiants concernés par ce cours
+      let totalStudents = 0;
+      courseClasses.forEach((classId) => {
+        totalStudents += studentsByClass[classId]?.length || 0;
+      });
+
+      // Nombre d'absences pour ce cours
+      const absentCount = courseAbsences.length;
+      const presentCount = totalStudents - absentCount;
+
+      return {
+        courseId: course.id,
+        courseName: course.module?.libelle || `Cours #${course.id}`,
+        date: course.date_cours,
+        heure: `${course.heure_debut} - ${course.heure_fin}`,
+        totalStudents,
+        absentCount,
+        presentCount,
+        absenteeRate:
+          totalStudents > 0 ? (absentCount / totalStudents) * 100 : 0,
+        presenceRate:
+          totalStudents > 0 ? (presentCount / totalStudents) * 100 : 0,
+      };
+    });
+
+    // Calcul des statistiques globales pour le professeur
+    const globalStats = {
+      totalCourses: professorCourses.length,
+      totalStudents: Object.values(studentsByClass).flat().length,
+      totalAbsences: allAbsences.filter((a) =>
+        professorCourses.some((c) => c.id === a.id_cours)
+      ).length,
+      coursesStats,
+    };
+
+    // Ajout du taux global
+    globalStats.globalAbsenteeRate =
+      globalStats.totalStudents > 0
+        ? (globalStats.totalAbsences / globalStats.totalStudents) * 100
+        : 0;
+
+    return {
+      professorInfo: {
+        id: professor.id,
+        nom: professor.utilisateur?.nom || "Inconnu",
+        prenom: professor.utilisateur?.prenom || "Inconnu",
+        specialite: professor.specialite,
+      },
+      ...globalStats,
+    };
+  } catch (error) {
+    console.error("Erreur dans calculateProfessorAbsenteeismRate:", error);
+    throw error;
+  }
+}
+
+export async function getAbsenteeismStats(professorId) {
+  try {
+    // Récupérer les stats spécifiques au professeur
+    const stats = await calculateProfessorAbsenteeismRate(professorId);
+
+    // Utiliser coursesStats plutôt que les stats brutes
+    const topStats = stats.coursesStats
+      .sort((a, b) => b.absenteeRate - a.absenteeRate)
+      .slice(0, 10);
+
+    return {
+      labels: topStats.map(
+        (stat) => `${stat.courseName.substring(0, 20)}...\n${stat.date}`
+      ),
+      presenceData: topStats.map((stat) => stat.presenceRate),
+      absenceData: topStats.map((stat) => stat.absenteeRate),
+      rawData: topStats,
+      // Ajouter les infos globales et du professeur
+      globalStats: {
+        professorName: `${stats.professorInfo.prenom} ${stats.professorInfo.nom}`,
+        globalAbsenteeRate: stats.globalAbsenteeRate,
+        totalCourses: stats.totalCourses,
+        totalAbsences: stats.totalAbsences,
+      },
+    };
+  } catch (error) {
+    console.error("Erreur dans getAbsenteeismStats:", error);
+    throw error;
+  }
+}
+
+export async function getIdProfeseurByUserId(id_utilisateur) {
+  const professeurs = await fetchData("professeurs");
+  const prof = professeurs.find(
+    (item) => item.id_utilisateur == id_utilisateur
+  );
+  const actorId = prof ? prof.id : null;
+  return actorId;
+}
