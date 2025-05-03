@@ -444,6 +444,51 @@ export function renderStudentCard(item, index) {
   return studentCard;
 }
 
+export function renderStudentCardForProfessor(item, index) {
+  const studentCard = document.createElement("div");
+  studentCard.className =
+    "flex items-center gap-4 p-4 bg-base-100 rounded-lg border border-base-200 shadow-sm";
+
+  // Rang
+  const rank = document.createElement("div");
+  rank.className =
+    "flex items-center justify-center h-8 w-8 rounded-full bg-base-300 text-sm font-medium";
+  rank.textContent = index + 1;
+
+  // Avatar
+  const avatar = document.createElement("img");
+  avatar.src = item?.avatar || "/assets/default-avatar.png";
+  avatar.alt = "Avatar";
+  avatar.className = "h-10 w-10 rounded-full object-cover";
+
+  // Infos étudiant
+  const name = document.createElement("div");
+  name.className = "flex flex-col";
+
+  const fullName = document.createElement("span");
+  fullName.className = "font-medium text-gray-800";
+  fullName.textContent = `${item?.prenom || ""} ${item?.nom || ""}`;
+
+  const matricule = document.createElement("span");
+  matricule.className = "text-xs text-gray-500";
+  matricule.textContent = `Matricule : ${item.matricule}`;
+
+  const email = document.createElement("span");
+  email.className = "text-xs text-gray-500";
+  email.textContent = item.email || "Email non renseigné";
+
+  name.appendChild(fullName);
+  name.appendChild(matricule);
+  name.appendChild(email);
+
+  // Assembler la carte
+  studentCard.appendChild(rank);
+  studentCard.appendChild(avatar);
+  studentCard.appendChild(name);
+
+  return studentCard;
+}
+
 export function createCourseCard(course, index) {
   // Créer l'élément principal
   const courseCard = document.createElement("div");

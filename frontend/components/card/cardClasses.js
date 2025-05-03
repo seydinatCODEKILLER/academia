@@ -348,7 +348,7 @@ function renderDaisyUIDropdown(item, actionsConfig, tableId) {
           .map(
             (action) => `
           <li>
-            <a data-action="${action.name}" data-id="${item.id_absence}" 
+            <a data-action="${action.name}" data-id="${item.id}" 
                class="${action.className || ""}">
               <i class="${action.icon}"></i>${action.label}
             </a>
@@ -370,7 +370,7 @@ function renderDaisyUIDirectActions(item, actionsConfig) {
       (action) => `
     <button class="btn btn-sm ${action.className || "btn-ghost"}"
             data-action="${action.name}"
-            data-id="${item.id_absence}"
+            data-id="${item.id}"
             title="${action.label}">
       <i class="${action.icon}"></i>
       ${action.showLabel ? action.label : ""}
