@@ -442,3 +442,210 @@ export async function getIdProfeseurByUserId(id_utilisateur) {
   const actorId = prof ? prof.id : null;
   return actorId;
 }
+
+export async function getProfessorClassesBasic(professorId) {
+  try {
+    const [classesProfesseur, classes, filieres, niveaux] = await Promise.all([
+      fetchData("classes_professeur"),
+      fetchData("classes"),
+      fetchData("filieres"),
+      fetchData("niveaux"),
+    ]);
+
+    return classesProfesseur
+      .filter((cp) => cp.id_professeur === professorId.toString())
+      .map((cp) => {
+        const classe = classes.find(
+          (c) => c.id.toString() === cp.id_classe.toString()
+        );
+        if (!classe) return null;
+
+        const filiere = filieres.find(
+          (f) => f.id.toString() === classe.id_filiere.toString()
+        );
+        const niveau = niveaux.find(
+          (n) => n.id.toString() === classe.id_niveau.toString()
+        );
+
+        return {
+          id: classe.id,
+          libelle: classe.libelle,
+          capacite_max: classe.capacite_max,
+          statut: classe.state,
+          filiere: filiere?.libelle || "Inconnue",
+          niveau: niveau?.libelle || "Inconnu",
+          est_principal: cp.est_principal || false,
+        };
+      })
+      .filter(Boolean);
+  } catch (error) {
+    console.error("Erreur récupération basique des classes:", error);
+    throw error;
+  }
+}
+
+// export async function getProfessorClassesDetailed(professorId) {
+//   try {
+//     // Récupération de toutes les données nécessaires
+//     const [
+//       classesProfesseur,
+//       classes,
+//       filieres,
+//       niveaux,
+//       anneeScolaires,
+//       professeurs,
+//       modules,
+//       cours,
+//       coursClasses,
+//     ] = await Promise.all([
+//       fetchData("classes_professeur"),
+//       fetchData("classes"),
+//       fetchData("filieres"),
+//       fetchData("niveaux"),
+//       fetchData("annee_scolaire"),
+//       fetchData("professeurs"),
+//       fetchData("modules"),
+//       fetchData("cours"),
+//       fetchData("cours_classes"),
+//     ]);
+
+//     // 1. Filtrer les classes du professeur
+//     const professorClassesIds = classesProfesseur
+//       .filter((cp) => cp.id_professeur === professorId.toString())
+//       .map((cp) => cp.id_classe);
+
+//     if (professorClassesIds.length === 0) return [];
+
+//     // 2. Trouver les modules enseignés par ce professeur (via les cours)
+//     const professorModuleIds = [
+//       ...new Set(
+//         cours
+//           .filter((c) => c.id_professeur === professorId.toString())
+//           .map((c) => c.id_module)
+//       ),
+//     ];
+
+//     // 3. Enrichir les données des classes
+//     const detailedClasses = classes
+//       .filter((classe) => professorClassesIds.includes(classe.id.toString()))
+//       .map((classe) => {
+//         const filiere = filieres.find(
+//           (f) => f.id.toString() === classe.id_filiere.toString()
+//         );
+//         const niveau = niveaux.find(
+//           (n) => n.id.toString() === classe.id_niveau.toString()
+//         );
+//         const anneeScolaire = anneeScolaires.find(
+//           (a) => a.id.toString() === (classe.id_annee || "").toString()
+//         );
+
+//         // Professeurs associés à cette classe
+//         const classProfessors = classesProfesseur
+//           .filter((cp) => cp.id_classe === classe.id.toString())
+//           .map((cp) => {
+//             const prof = professeurs.find(
+//               (p) => p.id.toString() === cp.id_professeur.toString()
+//             );
+//             return prof
+//               ? {
+//                   id: prof.id,
+//                   nom: prof.nom,
+//                   prenom: prof.prenom,
+//                   specialite: prof.specialite,
+//                   est_principal: cp.est_principal || false,
+//                 }
+//               : null;
+//           })
+//           .filter(Boolean);
+
+//         // Modules enseignés dans cette classe par ce professeur
+//         const classModules = modules
+//           .filter(
+//             (m) =>
+//               m.id_filiere.toString() === classe.id_filiere.toString() &&
+//               m.id_niveau.toString() === classe.id_niveau.toString() &&
+//               professorModuleIds.includes(m.id.toString())
+//           )
+//           .map((m) => ({
+//             id: m.id,
+//             code: m.code_module,
+//             libelle: m.libelle,
+//             heures_total: m.nombre_heures_total,
+//             // Ajouter les cours associés
+//             cours: cours
+//               .filter(
+//                 (c) =>
+//                   c.id_module.toString() === m.id.toString() &&
+//                   c.id_professeur.toString() === professorId.toString()
+//               )
+//               .map((c) => ({
+//                 id: c.id,
+//                 date: c.date_cours,
+//                 heure_debut: c.heure_debut,
+//                 heure_fin: c.heure_fin,
+//                 salle: c.salle,
+//                 statut: c.statut,
+//               })),
+//           }));
+
+//         // Étudiants inscrits dans cette classe
+//         const students = fetchData("etudiants").then((etudiants) =>
+//           etudiants
+//             .filter(
+//               (e) =>
+//                 e.id_classe && e.id_classe.toString() === classe.id.toString()
+//             )
+//             .map((e) => ({
+//               id: e.id,
+//               matricule: e.matricule,
+//               nom: e.nom,
+//               prenom: e.prenom,
+//             }))
+//         );
+
+//         return {
+//           id: classe.id,
+//           libelle: classe.libelle,
+//           capacite_max: classe.capacite_max,
+//           statut: classe.state,
+//           date_creation: classe.date_creation,
+//           filiere: {
+//             id: filiere?.id || null,
+//             libelle: filiere?.libelle || "Inconnue",
+//             description: filiere?.description || "",
+//           },
+//           niveau: {
+//             id: niveau?.id || null,
+//             libelle: niveau?.libelle || "Inconnu",
+//           },
+//           annee_scolaire: anneeScolaire
+//             ? {
+//                 id: anneeScolaire.id,
+//                 libelle: anneeScolaire.libelle,
+//                 date_debut: anneeScolaire.date_debut,
+//                 date_fin: anneeScolaire.date_fin,
+//                 est_active: anneeScolaire.est_active,
+//               }
+//             : null,
+//           professeurs: classProfessors,
+//           modules: classModules,
+//           etudiants: students,
+//           est_principal:
+//             classesProfesseur.find(
+//               (cp) =>
+//                 cp.id_classe === classe.id.toString() &&
+//                 cp.id_professeur === professorId.toString()
+//             )?.est_principal || false,
+//           nombre_etudiants: students.length,
+//         };
+//       });
+
+//     return detailedClasses;
+//   } catch (error) {
+//     console.error(
+//       "Erreur lors de la récupération détaillée des classes:",
+//       error
+//     );
+//     throw error;
+//   }
+// }

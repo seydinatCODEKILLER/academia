@@ -16,6 +16,17 @@ export function getRandomColor() {
   return Math.floor(Math.random() * 16777215);
 }
 
+export function colorStateClasse(state) {
+  switch (state) {
+    case "disponible":
+      return "success";
+    case "archiver":
+      return "error";
+    default:
+      return "secondary";
+  }
+}
+
 export function colorState(state) {
   switch (state) {
     case "planifié":
