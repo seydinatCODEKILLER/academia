@@ -728,3 +728,96 @@ export function createAbsenceFiltersForEtudiant(config) {
 
   return filtersContainer;
 }
+
+export function createClasseFiltersForProfessor(config) {
+  const {
+    filieres = [],
+    niveaux = [],
+    onFilter = (filters) => updateClassesTableWithFilters(filters),
+  } = config;
+
+  const filtersContainer = document.createElement("div");
+  filtersContainer.className = " p-2 rounded-lg mb-4";
+
+  const titleContainer = document.createElement("div");
+
+  titleContainer.className = "flex items-center mb-4 gap-3";
+  const title = document.createElement("h3");
+  title.textContent = "Filtrer les classes";
+  title.className = "font-semibold text-lg mr-2";
+  const titleIcon = document.createElement("i");
+  titleIcon.className = "ri-equalizer-line";
+
+  titleContainer.appendChild(titleIcon);
+  titleContainer.appendChild(title);
+  filtersContainer.appendChild(titleContainer);
+
+  const filtersGrid = document.createElement("div");
+  filtersGrid.className = "grid grid-cols-1 md:grid-cols-5 gap-4";
+
+  // Champ de recherche
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.placeholder = "Rechercher une classe...";
+  searchInput.className = "input input-bordered col-span-2 w-full";
+  searchInput.addEventListener("input", (e) => {
+    onFilter({
+      search: e.target.value,
+      filiere: filiereSelect.value,
+      niveau: niveauSelect.value,
+    });
+  });
+
+  // Filtre par filière
+  const filiereSelect = document.createElement("select");
+  filiereSelect.className = "select select-bordered w-full";
+  filiereSelect.innerHTML = `
+    <option value="">Toutes les filières</option>
+    ${filieres
+      .map((f) => `<option value="${f.libelle}">${f.libelle}</option>`)
+      .join("")}
+  `;
+  filiereSelect.addEventListener("change", (e) => {
+    onFilter({
+      filiere: e.target.value,
+      search: searchInput.value,
+      niveau: niveauSelect.value,
+    });
+  });
+
+  // Filtre par niveaux
+  const niveauSelect = document.createElement("select");
+  niveauSelect.className = "select select-bordered w-full";
+  niveauSelect.innerHTML = `
+    <option value="">Toutes les niveaux</option>
+    ${niveaux
+      .map((n) => `<option value="${n.libelle}">${n.libelle}</option>`)
+      .join("")}
+  `;
+  niveauSelect.addEventListener("change", (e) => {
+    onFilter({
+      niveau: e.target.value,
+      filiere: filiereSelect.value,
+      search: searchInput.value,
+    });
+  });
+
+  // Bouton réinitialiser
+  const resetButton = document.createElement("button");
+  resetButton.className = "btn btn-outline";
+  resetButton.innerHTML = '<i class="ri-refresh-line mr-2"></i> Réinitialiser';
+  resetButton.addEventListener("click", () => {
+    searchInput.value = "";
+    filiereSelect.value = "";
+    niveauSelect.value = "";
+    onFilter({ search: "", filiere: "", niveau: "" });
+  });
+
+  filtersGrid.appendChild(searchInput);
+  filtersGrid.appendChild(filiereSelect);
+  filtersGrid.appendChild(niveauSelect);
+  filtersGrid.appendChild(resetButton);
+  filtersContainer.appendChild(filtersGrid);
+
+  return filtersContainer;
+}

@@ -1,8 +1,12 @@
+import { createIllustratedBanner } from "../../components/banner/banner.js";
 import {
   createProfessorClassesCards,
   updateProfessorClassesCardsData,
 } from "../../components/card/cardClasses.js";
+import { createClasseFiltersForProfessor } from "../../components/filter/filter.js";
 import { showEmptyStateModal } from "../../components/modals/modal.js";
+import { getAllFilieres } from "../../services/filiereService.js";
+import { getAllNiveaux } from "../../services/niveauxServices.js";
 import { getProfessorClassesBasic } from "../../services/professeurService.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
 
@@ -16,8 +20,14 @@ export async function renderClasseCardProfesseur(idProfesseur, filters = {}) {
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       classes = classes.filter((c) =>
-        c.filieres.toLowerCase().includes(searchTerm)
+        c.libelle.toLowerCase().includes(searchTerm)
       );
+    }
+    if (filters.filiere) {
+      classes = classes.filter((classe) => classe.filiere == filters.filiere);
+    }
+    if (filters.niveau) {
+      classes = classes.filter((classe) => classe.niveau == filters.niveau);
     }
 
     // 2. Configurer les actions possibles
@@ -52,10 +62,10 @@ export async function renderClasseCardProfesseur(idProfesseur, filters = {}) {
     const classesCards = createProfessorClassesCards({
       containerId: "classes-cards",
       data: classes,
-      itemsPerPage: 4,
+      itemsPerPage: 3,
       actions: actionsConfig,
       onAction: handleAction,
-      emptyMessage: "Aucune absence enregistrée pour cet étudiant",
+      emptyMessage: "Aucune classe enregistrée pour cet professeur",
     });
 
     // 6. Rendu dans le DOM
@@ -69,4 +79,36 @@ export async function renderClasseCardProfesseur(idProfesseur, filters = {}) {
     console.error("Erreur:", error);
     showEmptyStateModal("Erreur lors du chargement des classes", error.message);
   }
+}
+
+export async function renderClasseCardFilterForProfessor(idProfesseur) {
+  const [filieres, niveaux] = await Promise.all([
+    getAllFilieres(),
+    getAllNiveaux(),
+  ]);
+  const filters = createClasseFiltersForProfessor({
+    filieres,
+    niveaux,
+    onFilter: (filters) =>
+      updateClasseCardWithFiltersForProfessor(idProfesseur, filters),
+  });
+  document.getElementById("filters-container").appendChild(filters);
+}
+
+export async function updateClasseCardWithFiltersForProfessor(
+  idProfesseur,
+  filters = {}
+) {
+  await renderClasseCardProfesseur(idProfesseur, filters);
+}
+
+export function renderClasseBannerForProfessor() {
+  const hero = createIllustratedBanner({
+    title: "Suivez vos classes en temps réel",
+    subtitle: "Une plateforme intuitive pour une gestion moderne",
+    illustrationUrl: "/frontend/assets/images/class.svg",
+    bgColor: "bg-gray-700",
+    textColor: "text-white",
+  });
+  document.getElementById("banner-container").appendChild(hero);
 }
