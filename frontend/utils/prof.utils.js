@@ -27,12 +27,12 @@ export function handleProfSidebar(user) {
       },
       {
         text: "Mes cours",
-        path: "/frontend/pages/professeurs/professeurs.html",
+        path: "/frontend/pages/professeurs/cours.html",
         icon: "ri-group-3-line",
       },
       {
         text: "Gestion absences",
-        path: "/frontend/pages/professeurs/cours.html",
+        path: "/frontend/pages/professeurs/absence.html",
         icon: "ri-megaphone-line",
       },
     ],

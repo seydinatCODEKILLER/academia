@@ -1,13 +1,6 @@
-import {
-  renderClasseBannerForProfessor,
-  renderClasseCardFilterForProfessor,
-  renderClasseCardProfesseur,
-} from "../../../helpers/professeur/classe.helpers.js";
+import { displayProfessorCalendar } from "../../../helpers/professeur/cours.helpers.js";
 import { initRouter } from "../../../router/router.js";
-import {
-  getIdProfeseurByUserId,
-  getProfessorClassesDetailed,
-} from "../../../services/professeurService.js";
+import { getIdProfeseurByUserId } from "../../../services/professeurService.js";
 import { getCurrentUser } from "../../../store/authStore.js";
 import { handleNotifications } from "../../../store/notificationStore.js";
 import {
@@ -20,9 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   handleNotifications();
   const user = getCurrentUser();
   handleProfSidebar(user);
-  renderProfHeader(user, "Classe");
-  renderClasseBannerForProfessor();
+  renderProfHeader(user, "Cours");
   const idProfesseur = await getIdProfeseurByUserId(user.id);
-  await renderClasseCardProfesseur(idProfesseur);
-  await renderClasseCardFilterForProfessor(idProfesseur);
+  await displayProfessorCalendar(idProfesseur);
 });

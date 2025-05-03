@@ -1,3 +1,4 @@
+import { getWeekdayIndex, isInWeek } from "../utils/function.js";
 import { API_BASE_URL, fetchData, generateId } from "./api.js";
 
 export async function getAllProfessorsBasic() {
@@ -589,5 +590,58 @@ export async function getProfessorClassesDetailed(professorId, classId) {
       error
     );
     throw error;
+  }
+}
+
+export async function getProfessorWeeklyCourses(professorId, weekOffset = 0) {
+  try {
+    // 1. Récupérer toutes les données nécessaires
+    const [courses, classes, modules, courseClasses] = await Promise.all([
+      fetchData("cours"),
+      fetchData("classes"),
+      fetchData("modules"),
+      fetchData("cours_classes"),
+    ]);
+
+    // 2. Filtrer les cours du professeur pour la semaine demandée
+    const weekCourses = courses.filter((course) => {
+      return (
+        course.id_professeur === professorId &&
+        isInWeek(course.date_cours, weekOffset)
+      );
+    });
+
+    // 3. Enrichir les données
+    return await Promise.all(
+      weekCourses.map(async (course) => {
+        const module = modules.find((m) => m.id === course.id_module) || {};
+
+        const associatedClasses = courseClasses
+          .filter((cc) => cc.id_cours === course.id)
+          .map((cc) => {
+            const classe = classes.find((c) => c.id === cc.id_classe);
+            return classe ? classe.libelle : "Classe inconnue";
+          });
+
+        // Convertir l'heure "HH:MM:SS" en heures numériques
+        const startHour = parseInt(course.heure_debut.split(":")[0]);
+        const endHour = parseInt(course.heure_fin.split(":")[0]);
+
+        return {
+          id: course.id,
+          module: module.libelle || "Module non spécifié",
+          classRoom: course.salle || "Salle non spécifiée",
+          day: getWeekdayIndex(course.date_cours),
+          startHour: startHour,
+          endHour: endHour,
+          date: course.date_cours,
+          classes: associatedClasses,
+          statut: course.statut || "planifié",
+        };
+      })
+    );
+  } catch (error) {
+    console.error("Erreur dans getProfessorWeeklyCourses:", error);
+    throw new Error("Impossible de charger les cours");
   }
 }
