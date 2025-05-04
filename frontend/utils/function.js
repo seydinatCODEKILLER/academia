@@ -99,21 +99,14 @@ export function getCurrentWeekNumber() {
 
 function convertDayToIndex(dateString) {
   const date = new Date(dateString);
-  return date.getDay(); // Retourne 0 (dimanche) à 6 (samedi)
+  return date.getDay();
 }
 
-// Pour obtenir l'index correspondant à vos jours (Lundi=0 à Samedi=5)
 export function getWeekdayIndex(dateString) {
   const dayIndex = convertDayToIndex(dateString);
-  return dayIndex === 0 ? 6 : dayIndex - 1; // Transforme dimanche(0)->6, lundi(1)->0, etc.
+  return dayIndex === 0 ? 6 : dayIndex - 1;
 }
 
-/**
- * Vérifie si une date est dans la semaine courante avec un décalage
- * @param {string} dateString - Date au format YYYY-MM-DD
- * @param {number} weekOffset - Décalage en semaines (0 = semaine actuelle)
- * @returns {boolean} - True si la date est dans la semaine demandée
- */
 export function isInWeek(dateString, weekOffset = 0) {
   try {
     // 1. Convertir la date à vérifier
@@ -134,11 +127,6 @@ export function isInWeek(dateString, weekOffset = 0) {
   }
 }
 
-/**
- * Calcule le début et fin de semaine avec décalage
- * @param {number} weekOffset - Décalage en semaines
- * @returns {Object} - { startOfWeek, endOfWeek } (Dates JS)
- */
 function calculateWeekRange(weekOffset = 0) {
   const now = new Date();
 
@@ -153,4 +141,22 @@ function calculateWeekRange(weekOffset = 0) {
   endOfWeek.setHours(23, 59, 59, 999);
 
   return { startOfWeek, endOfWeek };
+}
+
+export function getDayName(day) {
+  const dayIndex = convertDayToIndex(day);
+  const days = [
+    "Dimanche",
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi",
+  ];
+  return days[dayIndex] || "Jour non spécifié";
+}
+
+export function formatTimeRange(startHour, endHour) {
+  return `${startHour}h - ${endHour}h`;
 }
