@@ -1,3 +1,4 @@
+import { renderCoursCardsProfeesor } from "../../../helpers/professeur/absence.helpers.js";
 import { initRouter } from "../../../router/router.js";
 import { getIdProfeseurByUserId } from "../../../services/professeurService.js";
 import { getCurrentUser } from "../../../store/authStore.js";
@@ -12,4 +13,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   handleProfSidebar(user);
   renderProfHeader(user, "Absences");
   const idProfesseur = await getIdProfeseurByUserId(user.id);
+  await renderCoursCardsProfeesor(idProfesseur);
 });
