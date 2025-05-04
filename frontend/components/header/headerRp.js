@@ -41,7 +41,7 @@ export function createResponsiveRPHeader(config) {
   const breadcrumb = document.createElement("div");
   breadcrumb.className = "flex items-center text-sm text-gray-600";
   breadcrumb.innerHTML = `
-    <a href="/frontend/pages/rp/dashboard.html" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center">
+    <a class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center">
       <i class="ri-home-4-line mr-2"></i>Accueil
     </a>
     <span class="mx-2 text-gray-400 dark:text-gray-500">/</span>
