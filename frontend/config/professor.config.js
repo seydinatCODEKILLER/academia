@@ -10,3 +10,17 @@ export const getActionsConfigAbsence = () => ({
     },
   ],
 });
+
+export const getActionsConfigClasses = () => ({
+  type: "dropdown",
+  items: (item) => [
+    {
+      name: "details",
+      label: "Details",
+      icon: "ri-arrow-go-back-line",
+      className: "text-error",
+      type: "direct",
+      showLabel: true,
+    },
+  ],
+});
