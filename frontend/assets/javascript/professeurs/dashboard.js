@@ -1,6 +1,6 @@
 import {
   renderAbsenteeismChart,
-  renderOtherStatisqueData,
+  renderProfessorStatistics,
 } from "../../../helpers/professeur/dashboard.helpers.js";
 import { initRouter } from "../../../router/router.js";
 import { getIdProfeseurByUserId } from "../../../services/professeurService.js";
@@ -19,5 +19,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderProfHeader(user, "Dashboard");
   const idProfesseur = await getIdProfeseurByUserId(user.id);
   await renderAbsenteeismChart(idProfesseur);
-  await renderOtherStatisqueData(idProfesseur);
+  await renderProfessorStatistics(idProfesseur);
 });

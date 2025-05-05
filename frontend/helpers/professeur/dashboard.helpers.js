@@ -110,48 +110,68 @@ export async function renderAbsenteeismChart(professorId) {
   }
 }
 
-export async function renderOtherStatisqueData(professorId) {
+const createStatItem = (title, value, isError = false) => {
+  const statDiv = document.createElement("div");
+  statDiv.className = "stat";
+
+  statDiv.innerHTML = `
+    <div class="stat-title">${title}</div>
+    <div class="stat-value ${isError ? "text-error" : ""}">${value}</div>
+  `;
+
+  return statDiv;
+};
+
+const createStatsPanel = (stats) => {
+  const panel = document.createElement("div");
+  panel.className = "bg-white p-4 rounded-lg mt-4";
+
+  const title = document.createElement("h3");
+  title.className = "font-bold mb-2";
+  title.textContent = "Statistiques globales";
+  panel.appendChild(title);
+
+  const statsGrid = document.createElement("div");
+  statsGrid.className = "grid grid-cols-1 md:grid-cols-3 gap-4";
+
+  // Ajout des statistiques
+  statsGrid.appendChild(
+    createStatItem(
+      "Taux d'absence moyen",
+      `${stats.globalAbsenteeRate.toFixed(1)}%`,
+      true
+    )
+  );
+
+  statsGrid.appendChild(
+    createStatItem("Total d'absences", stats.totalAbsences)
+  );
+
+  statsGrid.appendChild(createStatItem("Cours concernés", stats.totalCourses));
+
+  panel.appendChild(statsGrid);
+  return panel;
+};
+
+const showStatisticsError = () => {
+  const container = document.getElementById("charts1-container");
+  container.innerHTML = `
+    <div class="alert alert-error">
+      <i class="ri-alert-line"></i>
+      Erreur lors du chargement des statistiques d'absentéisme
+    </div>
+  `;
+};
+
+export const renderProfessorStatistics = async (professorId) => {
+  const container = document.getElementById("charts1-container");
+  container.innerHTML = "";
+
   try {
-    const chartsContainer = document.getElementById("charts1-container");
-
-    // Nettoyer avant d'ajouter
-    chartsContainer.innerHTML = "";
-
-    // Ajouter un encart avec les stats globales
     const stats = await getAbsenteeismStats(professorId);
-    const statsPanel = document.createElement("div");
-    statsPanel.className = "bg-white p-4 rounded-lg mt-4";
-    statsPanel.innerHTML = `
-      <h3 class="font-bold mb-2">Statistiques globales</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="stat">
-          <div class="stat-title">Taux d'absence moyen</div>
-          <div class="stat-value text-error">${stats.globalStats.globalAbsenteeRate.toFixed(
-            1
-          )}%</div>
-        </div>
-        <div class="stat">
-          <div class="stat-title">Total d'absences</div>
-          <div class="stat-value">${stats.globalStats.totalAbsences}</div>
-        </div>
-        <div class="stat">
-          <div class="stat-title">Cours concernés</div>
-          <div class="stat-value">${stats.globalStats.totalCourses}</div>
-        </div>
-      </div>
-    `;
-    chartsContainer.appendChild(statsPanel);
+    container.appendChild(createStatsPanel(stats.globalStats));
   } catch (error) {
-    console.error(
-      "Erreur lors du chargement du graphique d'absentéisme:",
-      error
-    );
-    const chartsContainer = document.getElementById("charts1-container");
-    chartsContainer.innerHTML = `
-      <div class="alert alert-error">
-        <i class="ri-alert-line"></i>
-        Erreur lors du chargement des statistiques d'absentéisme
-      </div>
-    `;
+    console.error("Erreur lors du chargement des statistiques:", error);
+    showStatisticsError();
   }
-}
+};
