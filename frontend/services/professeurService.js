@@ -652,17 +652,26 @@ export async function markStudentsAbsent(absences) {
       return { success: false, message: "Aucune absence à enregistrer" };
     }
 
-    const idAbsence = String(await generateId("absences"));
+    // Récupère le dernier ID utilisé et prépare un compteur local
+    let latestId = await generateId("absences");
+    let currentId = parseInt(latestId) - 1; // car generateId retourne +1 déjà
 
-    const absencesToSave = absences.map((absence) => ({
-      id: idAbsence,
-      id_etudiant: absence.studentId,
-      id_cours: absence.courseId,
-      date_absence: new Date().toISOString().split("T")[0],
-      heure_marquage: new Date().toISOString().replace("T", " ").split(".")[0],
-      id_marqueur: absence.id_marqueur,
-      justified: absence.justified,
-    }));
+    const absencesToSave = absences.map((absence) => {
+      currentId += 1;
+
+      return {
+        id: String(currentId),
+        id_etudiant: absence.studentId,
+        id_cours: absence.courseId,
+        date_absence: new Date().toISOString().split("T")[0],
+        heure_marquage: new Date()
+          .toISOString()
+          .replace("T", " ")
+          .split(".")[0],
+        id_marqueur: absence.id_marqueur,
+        justified: absence.justified,
+      };
+    });
 
     // Enregistrer chaque absence
     const results = await Promise.all(

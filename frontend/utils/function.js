@@ -160,3 +160,11 @@ export function getDayName(day) {
 export function formatTimeRange(startHour, endHour) {
   return `${startHour}h - ${endHour}h`;
 }
+
+export const groupStudentsByClass = (students, classes) => {
+  const result = {};
+  classes.forEach((classe) => {
+    result[classe.id] = students.filter((s) => s.id_classe === classe.id);
+  });
+  return result;
+};

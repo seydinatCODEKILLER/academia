@@ -6,7 +6,7 @@ import {
   createModal,
   showEmptyStateModal,
 } from "../../components/modals/modal.js";
-import { createClassSwitcher } from "../../components/ui/switcher.js";
+import { createClassSwitcher } from "../../components/switcher/switcher.js";
 import { getCoursRemasteredById } from "../../services/coursService.js";
 import { getProfessorWeeklyCourses } from "../../services/professeurService.js";
 import { formatDate } from "../../utils/function.js";

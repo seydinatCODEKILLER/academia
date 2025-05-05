@@ -5,9 +5,6 @@ import {
   removeAbsence,
 } from "../../services/professeurService.js";
 
-/**
- * Groupe les étudiants par classe
- */
 function groupStudentsByClass(students, classes) {
   const result = {};
 
@@ -19,9 +16,6 @@ function groupStudentsByClass(students, classes) {
   return result;
 }
 
-/**
- * Crée un composant de navigation entre les classes avec gestion des absences
- */
 export async function createClassSwitcher(
   classes,
   students,
@@ -103,9 +97,6 @@ export async function createClassSwitcher(
   return container;
 }
 
-/**
- * Affiche la liste des étudiants d'une classe
- */
 async function renderStudentsList(
   classId,
   studentsByClass,
@@ -218,9 +209,6 @@ async function renderStudentsList(
   return container;
 }
 
-/**
- * Change l'affichage pour une autre classe
- */
 async function switchClassTab(
   classId,
   studentsByClass,
