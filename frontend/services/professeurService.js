@@ -645,3 +645,75 @@ export async function getProfessorWeeklyCourses(professorId, weekOffset = 0) {
     throw new Error("Impossible de charger les cours");
   }
 }
+
+export async function markStudentsAbsent(absences) {
+  try {
+    if (!absences || absences.length === 0) {
+      return { success: false, message: "Aucune absence à enregistrer" };
+    }
+
+    const idAbsence = String(await generateId("absences"));
+
+    const absencesToSave = absences.map((absence) => ({
+      id: idAbsence,
+      id_etudiant: absence.studentId,
+      id_cours: absence.courseId,
+      date_absence: new Date().toISOString().split("T")[0],
+      heure_marquage: new Date().toISOString().replace("T", " ").split(".")[0],
+      id_marqueur: absence.id_marqueur,
+      justified: absence.justified,
+    }));
+
+    // Enregistrer chaque absence
+    const results = await Promise.all(
+      absencesToSave.map(async (absence) => {
+        return await createData("absences", absence);
+      })
+    );
+
+    return {
+      success: true,
+      message: `${absences.length} absence(s) enregistrée(s) avec succès`,
+      data: results,
+    };
+  } catch (error) {
+    console.error("Erreur lors de l'enregistrement des absences:", error);
+    return {
+      success: false,
+      message: error.message || "Erreur lors de l'enregistrement des absences",
+    };
+  }
+}
+
+async function createData(endpoint, data) {
+  const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  return response.json();
+}
+
+export async function fetchExistingAbsences(courseId) {
+  try {
+    const allAbsences = await fetchData("absences");
+    return allAbsences.filter((absence) => absence.id_cours === courseId);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des absences:", error);
+    return [];
+  }
+}
+
+export async function removeAbsence(absenceId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/absences/${absenceId}`, {
+      method: "DELETE",
+    });
+    return response.ok;
+  } catch (error) {
+    console.error("Erreur lors de la suppression de l'absence:", error);
+    return false;
+  }
+}

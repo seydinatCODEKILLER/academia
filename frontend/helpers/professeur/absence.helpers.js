@@ -2,8 +2,14 @@ import {
   createCoursCardsProfessor,
   updateCoursCardsDataProfessor,
 } from "../../components/card/cardCours.js";
-import { showEmptyStateModal } from "../../components/modals/modal.js";
+import {
+  createModal,
+  showEmptyStateModal,
+} from "../../components/modals/modal.js";
+import { createClassSwitcher } from "../../components/ui/switcher.js";
+import { getCoursRemasteredById } from "../../services/coursService.js";
 import { getProfessorWeeklyCourses } from "../../services/professeurService.js";
+import { formatDate } from "../../utils/function.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
 
 export async function renderCoursCardsProfeesor(idProfessor, filters = {}) {
@@ -46,7 +52,7 @@ export async function renderCoursCardsProfeesor(idProfessor, filters = {}) {
     const handleAction = async (action, id) => {
       switch (action) {
         case "absence":
-          console.log(id);
+          await showMarkAbsenceModal(id, idProfessor);
           break;
       }
     };
@@ -72,5 +78,74 @@ export async function renderCoursCardsProfeesor(idProfessor, filters = {}) {
   } catch (error) {
     console.error("Erreur:", error);
     showEmptyStateModal("Erreur lors du chargement des cours");
+  }
+}
+
+export async function showMarkAbsenceModal(id, idProfesseur) {
+  // 1. Récupérer les données complètes du cours
+  const loading = showLoadingModal("Chargement des informations...");
+  try {
+    const fullCourse = await getCoursRemasteredById(id);
+
+    // 2. Créer le contenu du modal
+    const modalContent = document.createElement("div");
+    modalContent.className = "flex flex-col h-full";
+
+    // Section supérieure - Infos du cours
+    const courseInfoSection = document.createElement("div");
+    courseInfoSection.className = "border-b pb-4 mb-4";
+    courseInfoSection.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h4 class="font-semibold">Module</h4>
+          <p>${fullCourse.module.libelle}</p>
+        </div>
+        <div>
+          <h4 class="font-semibold">Date</h4>
+          <p>${formatDate(fullCourse.date_cours)}</p>
+        </div>
+        <div>
+          <h4 class="font-semibold">Horaire</h4>
+          <p>${fullCourse.heure_debut} - ${fullCourse.heure_fin}</p>
+        </div>
+        <div>
+          <h4 class="font-semibold">Salle</h4>
+          <p>${fullCourse.salle}</p>
+        </div>
+      </div>
+    `;
+
+    // Section inférieure - Gestion des absences
+    const absenceSection = document.createElement("div");
+    absenceSection.className = "flex-1 overflow-hidden";
+
+    // Créer le composant de navigation entre classes
+    const classSwitcher = await createClassSwitcher(
+      fullCourse.classes,
+      fullCourse.etudiants,
+      id,
+      idProfesseur
+    );
+    absenceSection.appendChild(classSwitcher);
+
+    // Assemblage
+    modalContent.appendChild(courseInfoSection);
+    modalContent.appendChild(absenceSection);
+
+    // Créer le modal
+    const modal = createModal({
+      title: "Marquer les absences",
+      content: modalContent,
+      size: "xl",
+      scrollable: true,
+    });
+
+    document.getElementById("modal-cours-container").appendChild(modal);
+    modal.showModal();
+  } catch (error) {
+    console.error("Erreur:", error);
+    showEmptyStateModal("Erreur de chargement des données");
+  } finally {
+    loading.close();
   }
 }

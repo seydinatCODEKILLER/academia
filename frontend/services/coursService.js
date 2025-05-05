@@ -247,3 +247,103 @@ export async function handleArchiveCours(coursId) {
   if (!response.ok) throw new Error("Échec de l'annulation du cours");
   return await response.json();
 }
+
+export async function getCoursRemasteredById(id_cours) {
+  try {
+    // Récupère l'année en cours
+    const anneeEnCours = await getCurrentAcademicYear();
+
+    // Récupère le cours
+    const cours = await fetchData("cours", id_cours);
+    if (!cours) {
+      throw new Error("Cours non trouvé");
+    }
+
+    // Vérifie que le cours appartient à l'année en cours
+    const semestre = await fetchData("semestres", cours.id_semestre);
+    if (semestre.annee_scolaire !== anneeEnCours) {
+      throw new Error(
+        "Ce cours ne fait pas partie de l'année scolaire en cours"
+      );
+    }
+
+    // Récupère les détails de base
+    const module = await fetchData("modules", cours.id_module);
+    const professeur = await fetchData("professeurs", cours.id_professeur);
+    const utilisateurProfesseur = await fetchData(
+      "utilisateurs",
+      professeur.id_utilisateur
+    );
+
+    // Récupère les classes associées (sans les élèves)
+    const classesIds = await fetchData("cours_classes").then((cc) =>
+      cc
+        .filter((item) => item.id_cours === cours.id)
+        .map((item) => item.id_classe)
+    );
+    const classes = await Promise.all(
+      classesIds.map((id) => fetchData("classes", id))
+    );
+
+    // Récupère TOUS les élèves des classes associées (séparément)
+    const etudiantsIds = await fetchData("etudiants").then((etudiants) =>
+      etudiants.filter((e) => classesIds.includes(e.id_classe)).map((e) => e.id)
+    );
+
+    const etudiants = await Promise.all(
+      etudiantsIds.map(async (id) => {
+        const etudiant = await fetchData("etudiants", id);
+        const utilisateurEtudiant = await fetchData(
+          "utilisateurs",
+          etudiant.id_utilisateur
+        );
+        return {
+          ...etudiant,
+          utilisateur: utilisateurEtudiant,
+        };
+      })
+    );
+
+    // Récupère les absences
+    const absences = await fetchData("absences").then((abs) =>
+      abs.filter((a) => a.id_cours === cours.id)
+    );
+
+    const absencesAvecDetails = await Promise.all(
+      absences.map(async (absence) => {
+        const etudiant = await fetchData("etudiants", absence.id_etudiant);
+        const utilisateurEtudiant = await fetchData(
+          "utilisateurs",
+          etudiant.id_utilisateur
+        );
+        return {
+          ...absence,
+          etudiant: {
+            ...etudiant,
+            utilisateur: utilisateurEtudiant,
+          },
+        };
+      })
+    );
+
+    return {
+      ...cours,
+      module,
+      professeur: {
+        ...professeur,
+        utilisateur: utilisateurProfesseur,
+      },
+      semestre,
+      classes, // Liste des classes (sans élèves)
+      etudiants, // Liste de tous les élèves (séparée)
+      absences: absencesAvecDetails,
+      annee_scolaire: anneeEnCours,
+    };
+  } catch (error) {
+    console.error(
+      `Erreur lors de la récupération du cours ${id_cours}:`,
+      error
+    );
+    throw error;
+  }
+}
