@@ -7,79 +7,72 @@ import {
   showEmptyStateModal,
 } from "../../components/modals/modal.js";
 import { createClassSwitcher } from "../../components/switcher/switcher.js";
+import { getActionsConfigAbsence } from "../../config/professor.config.js";
 import { getCoursRemasteredById } from "../../services/coursService.js";
 import { getProfessorWeeklyCourses } from "../../services/professeurService.js";
 import { formatDate } from "../../utils/function.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
 
-export async function renderCoursCardsProfeesor(idProfessor, filters = {}) {
+const createActionHandler = (idProfessor) => ({
+  absence: async (id) => await showMarkAbsenceModal(id, idProfessor),
+});
+
+const filterCourses = (courses, filters) => {
+  let filtered = [...courses];
+
+  if (filters.search) {
+    const searchTerm = filters.search.toLowerCase();
+    filtered = filtered.filter((c) =>
+      c.module.libelle.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  if (filters.statut) {
+    filtered = filtered.filter((c) => c.statut == filters.statut);
+  }
+
+  return filtered;
+};
+
+const renderCards = (courses, idProfessor, containerId) => {
+  const actionHandler = createActionHandler(idProfessor);
+
+  return createCoursCardsProfessor({
+    containerId,
+    data: courses,
+    onAction: (action, id) => actionHandler[action]?.(id),
+    actions: getActionsConfigAbsence(),
+    itemsPerPage: 3,
+    emptyMessage: "Aucun cours trouvé",
+  });
+};
+
+export const renderProfessorCourseCards = async (idProfessor, filters = {}) => {
+  const loadingModal = showLoadingModal("Chargement des cours...");
+  const container = document.getElementById("cours-container");
+
   try {
-    const loadingModal = showLoadingModal("Chargement des cours...");
-
     // 1. Récupération des données
-    let cours = await getProfessorWeeklyCourses(idProfessor, 0);
-    console.log(cours);
+    const courses = await getProfessorWeeklyCourses(idProfessor, 0);
+    console.log(courses);
 
-    // 2. Filtrage des données
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      cours = cours.filter((c) =>
-        c.module.libelle.toLowerCase().includes(searchTerm)
-      );
-    }
+    // 2. Filtrage
+    const filteredCourses = filterCourses(courses, filters);
 
-    if (filters.statut) {
-      cours = cours.filter((c) => c.statut == filters.statut);
-    }
-
-    // 3. Configuration des actions
-    const actionsConfig = {
-      items: (item) => {
-        return [
-          {
-            name: "absence",
-            label: "Marquer absence",
-            icon: "ri-user-unfollow-line",
-            className: "text-neutral",
-            showLabel: true,
-            type: "direct",
-          },
-        ];
-      },
-    };
-
-    // 4. Gestion des actions
-    const handleAction = async (action, id) => {
-      switch (action) {
-        case "absence":
-          await showMarkAbsenceModal(id, idProfessor);
-          break;
-      }
-    };
-
-    // 5. Création du composant Cards
-    const cardsContainer = createCoursCardsProfessor({
-      containerId: "cours-cards",
-      data: cours,
-      onAction: handleAction,
-      actions: actionsConfig,
-      itemsPerPage: 3,
-      emptyMessage: "Aucun cours trouvé",
-    });
-
-    // 6. Rendu dans le DOM
-    const container = document.getElementById("cours-container");
+    // 3. Rendu
     container.innerHTML = "";
-    container.appendChild(cardsContainer);
-    loadingModal.close();
+    const cards = renderCards(filteredCourses, idProfessor, "cours-cards");
+    container.appendChild(cards);
 
-    // 7. Mise à jour initiale
-    updateCoursCardsDataProfessor("cours-cards", cours, 1);
+    // 4. Mise à jour initiale
+    updateCoursCardsDataProfessor("cours-cards", filteredCourses, 1);
   } catch (error) {
     console.error("Erreur:", error);
     showEmptyStateModal("Erreur lors du chargement des cours");
+  } finally {
+    loadingModal.close();
   }
-}
+};
 
 export const createCourseInfoSection = (course) => {
   const section = document.createElement("div");
