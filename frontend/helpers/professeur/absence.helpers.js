@@ -81,58 +81,64 @@ export async function renderCoursCardsProfeesor(idProfessor, filters = {}) {
   }
 }
 
-export async function showMarkAbsenceModal(id, idProfesseur) {
-  // 1. Récupérer les données complètes du cours
-  const loading = showLoadingModal("Chargement des informations...");
-  try {
-    const fullCourse = await getCoursRemasteredById(id);
+export const createCourseInfoSection = (course) => {
+  const section = document.createElement("div");
+  section.className = "border-b pb-4 mb-4";
 
-    // 2. Créer le contenu du modal
-    const modalContent = document.createElement("div");
-    modalContent.className = "flex flex-col h-full";
-
-    // Section supérieure - Infos du cours
-    const courseInfoSection = document.createElement("div");
-    courseInfoSection.className = "border-b pb-4 mb-4";
-    courseInfoSection.innerHTML = `
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <h4 class="font-semibold">Module</h4>
-          <p>${fullCourse.module.libelle}</p>
-        </div>
-        <div>
-          <h4 class="font-semibold">Date</h4>
-          <p>${formatDate(fullCourse.date_cours)}</p>
-        </div>
-        <div>
-          <h4 class="font-semibold">Horaire</h4>
-          <p>${fullCourse.heure_debut} - ${fullCourse.heure_fin}</p>
-        </div>
-        <div>
-          <h4 class="font-semibold">Salle</h4>
-          <p>${fullCourse.salle}</p>
-        </div>
+  section.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold">Module</h4>
+        <p>${course.module.libelle}</p>
       </div>
-    `;
+      <div>
+        <h4 class="font-semibold">Date</h4>
+        <p>${formatDate(course.date_cours)}</p>
+      </div>
+      <div>
+        <h4 class="font-semibold">Horaire</h4>
+        <p>${course.heure_debut} - ${course.heure_fin}</p>
+      </div>
+      <div>
+        <h4 class="font-semibold">Salle</h4>
+        <p>${course.salle}</p>
+      </div>
+    </div>
+  `;
 
-    // Section inférieure - Gestion des absences
-    const absenceSection = document.createElement("div");
-    absenceSection.className = "flex-1 overflow-hidden";
+  return section;
+};
 
-    // Créer le composant de navigation entre classes
-    const classSwitcher = await createClassSwitcher(
-      fullCourse.classes,
-      fullCourse.etudiants,
-      id,
-      idProfesseur
+export const createAbsenceSection = async (
+  classes,
+  students,
+  courseId,
+  professorId
+) => {
+  const section = document.createElement("div");
+  section.className = "flex-1 overflow-hidden";
+
+  const classSwitcher = await createClassSwitcher(
+    classes,
+    students,
+    courseId,
+    professorId
+  );
+
+  section.appendChild(classSwitcher);
+  return section;
+};
+
+export const showAbsenceManagementModal = async (courseId, professorId) => {
+  const loading = showLoadingModal("Chargement des informations...");
+
+  try {
+    const course = await getCoursRemasteredById(courseId);
+    const modalContent = await buildAbsenceModalContent(
+      course,
+      courseId,
+      professorId
     );
-    absenceSection.appendChild(classSwitcher);
-
-    // Assemblage
-    modalContent.appendChild(courseInfoSection);
-    modalContent.appendChild(absenceSection);
-
-    // Créer le modal
     const modal = createModal({
       title: "Marquer les absences",
       content: modalContent,
@@ -148,4 +154,29 @@ export async function showMarkAbsenceModal(id, idProfesseur) {
   } finally {
     loading.close();
   }
-}
+};
+
+const buildAbsenceModalContent = async (course, courseId, professorId) => {
+  const modalContent = document.createElement("div");
+  modalContent.className = "flex flex-col h-full";
+
+  // Section supérieure - Infos du cours
+  const courseInfo = createCourseInfoSection(course);
+
+  // Section inférieure - Gestion des absences
+  const absenceSection = await createAbsenceSection(
+    course.classes,
+    course.etudiants,
+    courseId,
+    professorId
+  );
+
+  modalContent.appendChild(courseInfo);
+  modalContent.appendChild(absenceSection);
+
+  return modalContent;
+};
+
+export const showMarkAbsenceModal = async (courseId, professorId) => {
+  await showAbsenceManagementModal(courseId, professorId);
+};
