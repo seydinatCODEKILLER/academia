@@ -1,5 +1,11 @@
 import { createResponsiveAttacheHeader } from "../components/header/header.js";
+import {
+  createNotificationPanel,
+  toggleNotificationPanel,
+} from "../components/notifications/notificationPanel.js";
 import { createSidebar, setActiveLink } from "../components/sidebar/sidebar.js";
+import { showAddJustificationsModalEtudiant } from "../helpers/etudiant/absence.helpers.js";
+import { buildJustificationModal } from "../helpers/etudiant/absenceJustificationModal.js";
 import { navigateTo } from "../router/router.js";
 
 export function handleEtudiantSidebar(user) {
@@ -50,6 +56,33 @@ export function renderEtudiantHeader(user, currentPage = "Dashboard") {
     currentPage: currentPage,
     userName: user.prenom,
     notificationCount: 2,
+    onNotificationClick: toggleNotificationPanel,
   });
   document.getElementById("header").appendChild(header);
+}
+
+export async function renderNotifcatonPannel(userId) {
+  const panel = await createNotificationPanel(userId, handleNotifications);
+  document.getElementById("notifications-panel").appendChild(panel);
+}
+
+async function handleNotifications(action, notification) {
+  switch (action) {
+    case "accept":
+      break;
+    case "justify":
+      await showJustificationModalFromNotification(notification);
+      break;
+    case "details":
+      alert(`Details Justification de l'absence pour le cours ${id}`);
+      break;
+  }
+}
+
+async function showJustificationModalFromNotification(notification) {
+  await buildJustificationModal(
+    notification.metadata.absence_id,
+    notification.receiver_id,
+    () => {}
+  );
 }

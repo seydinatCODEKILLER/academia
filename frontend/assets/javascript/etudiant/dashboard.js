@@ -5,6 +5,7 @@ import { getIdEtudiantByUserId } from "../../../services/etudiantService.js";
 import {
   handleEtudiantSidebar,
   renderEtudiantHeader,
+  renderNotifcatonPannel,
 } from "../../../utils/etudiant.utils.js";
 import {
   renderCalendar,
@@ -19,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   handleEtudiantSidebar(user);
   renderEtudiantHeader(user, "Dashboard");
   const idEtudiant = await getIdEtudiantByUserId(user.id);
+  await renderNotifcatonPannel(idEtudiant);
   await renderEtudiantStatsCards(idEtudiant);
   renderCalendar();
   await renderCourseCard(idEtudiant);

@@ -69,3 +69,7 @@ export async function checkMatriculeExists(matricule) {
     return false;
   }
 }
+
+export async function getUser(id) {
+  return await fetchData("utilisateurs", id);
+}

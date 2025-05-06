@@ -1,7 +1,7 @@
 {
   "absences": [
     {
-      "id_etudiant": "1",
+      "id_etudiant": "4",
       "id_cours": "1",
       "date_absence": "2025-04-15",
       "heure_marquage": "2025-04-15 14:22:50",
@@ -483,9 +483,9 @@
     {
       "id": "1",
       "id_absence": "9",
-      "motif": "mouhamed mou sell mi",
-      "id_etudiant": "1",
-      "date_justification": "2025-05-01T16:39:04.463Z",
+      "motif": "maladifs",
+      "id_etudiant": "4",
+      "date_justification": "2025-05-06T00:37:41.815Z",
       "statut": "en attente",
       "id_traitant": null,
       "pieces_jointes": null,
@@ -544,7 +544,25 @@
       "id": "4"
     }
   ],
-  "notifications": [],
+  "notifications": [
+    {
+      "id": "1",
+      "type": "absence_marked",
+      "sender_id": "2",
+      "receiver_id": "4",
+      "message": "Vous avez été marqué absent pour le cours de Mathématiques du 15/11",
+      "is_read": false,
+      "created_at": "2023-11-15T09:30:00Z",
+      "metadata": {
+        "course_name": "Mathématiques",
+        "course_id": "6",
+        "absence_id": "9",
+        "date": "2023-11-15",
+        "time": "08:00-10:00",
+        "room": "Salle A12"
+      }
+    }
+  ],
   "professeurs": [
     {
       "id_utilisateur": "2",

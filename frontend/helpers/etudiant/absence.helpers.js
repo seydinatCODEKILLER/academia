@@ -14,6 +14,7 @@ import { getAllAnneesScolaires } from "../../services/annees_scolaireService.js"
 import { getStudentAbsences } from "../../services/etudiantService.js";
 import { getAllSemestres } from "../../services/semestreService.js";
 import { showLoadingModal } from "../attacher/justificationHelpers.js";
+import { buildJustificationModal } from "./absenceJustificationModal.js";
 
 export async function renderAbsenceCardEtudiant(idEtudiant, filters = {}) {
   try {
@@ -101,32 +102,9 @@ export async function showAddJustificationsModalEtudiant(
   absenceId,
   idEtudiant
 ) {
-  const absences = await getStudentAbsences(idEtudiant);
-  const absence = absences.find((a) => a.id_absence === absenceId);
-
-  if (!absence) {
-    throw new Error("Absence introuvable");
-  }
-
-  const form = await createJustificationForm(absence);
-  const modal = createModal({
-    title: "Demande de justification d'absence",
-    content: form,
-    size: "lg",
+  await buildJustificationModal(absenceId, idEtudiant, () => {
+    renderAbsenceCardEtudiant(idEtudiant);
   });
-
-  form.onsubmit = async (e) => {
-    e.preventDefault();
-    const result = await handleJustificationSubmit(form, absenceId, idEtudiant);
-
-    if (result.success) {
-      modal.close();
-      await renderAbsenceCardEtudiant(absence.id_etudiant);
-    }
-  };
-
-  document.getElementById("modal-absence-container").appendChild(modal);
-  modal.showModal();
 }
 
 export function rendeJustificationBannerForEtudiant() {
