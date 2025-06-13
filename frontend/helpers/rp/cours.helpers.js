@@ -27,7 +27,7 @@ import {
 
 export async function renderCoursCardsRp(filters = {}) {
   try {
-    const loadingModal = showLoadingModal("Chargement des cours...");
+    // const loadingModal = showLoadingModal("Chargement des cours...");
 
     // 1. Récupération des données
     let cours = await getAllCours();
@@ -134,7 +134,7 @@ export async function renderCoursCardsRp(filters = {}) {
     container.innerHTML = "";
     container.appendChild(cardsContainer);
 
-    loadingModal.close();
+    // loadingModal.close();
 
     // 7. Mise à jour initiale
     updateCoursCardsData("cours-cards", cours, 1, handleAction);

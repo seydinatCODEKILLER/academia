@@ -48,7 +48,7 @@ const renderCards = (courses, idProfessor, containerId) => {
 };
 
 export const renderProfessorCourseCards = async (idProfessor, filters = {}) => {
-  const loadingModal = showLoadingModal("Chargement des cours...");
+  // const loadingModal = showLoadingModal("Chargement des cours...");
   const container = document.getElementById("cours-container");
 
   try {
@@ -70,7 +70,7 @@ export const renderProfessorCourseCards = async (idProfessor, filters = {}) => {
     console.error("Erreur:", error);
     showEmptyStateModal("Erreur lors du chargement des cours");
   } finally {
-    loadingModal.close();
+    // loadingModal.close();
   }
 };
 

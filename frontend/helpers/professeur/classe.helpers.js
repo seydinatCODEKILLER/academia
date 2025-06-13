@@ -63,7 +63,7 @@ export const renderClasseCardProfesseur = async (
   idProfesseur,
   filters = {}
 ) => {
-  const loadingModal = showLoadingModal("Chargement des classes...");
+  // const loadingModal = showLoadingModal("Chargement des classes...");
   const container = document.getElementById("classes-container");
 
   try {
@@ -89,7 +89,7 @@ export const renderClasseCardProfesseur = async (
     console.error("Erreur:", error);
     showEmptyStateModal("Erreur lors du chargement des classes", error.message);
   } finally {
-    loadingModal.close();
+    // loadingModal.close();
   }
 };
 

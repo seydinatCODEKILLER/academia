@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = getCurrentUser();
   handleSidebar(user);
   renderAttacheHeader(user, "Demandes justifications");
-  renderBannerForJustification();
+  // renderBannerForJustification();
   const idAttacher = await getIdAttacherByUserId(user.id);
   await renderJustificationsTableFilter(idAttacher);
   await renderJustificationsTable(idAttacher);

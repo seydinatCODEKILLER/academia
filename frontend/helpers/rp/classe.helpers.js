@@ -33,7 +33,7 @@ import {
 
 export async function renderClassesTableRp(filters = {}) {
   try {
-    const loadingModal = showLoadingModal("Chargement des classes...");
+    // const loadingModal = showLoadingModal("Chargement des classes...");
     let classes = await getAllClassesBasic();
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
@@ -173,7 +173,7 @@ export async function renderClassesTableRp(filters = {}) {
     const container = document.getElementById("classes-container");
     container.innerHTML = "";
     container.appendChild(table);
-    loadingModal.close();
+    // loadingModal.close();
     updateDaisyUITableData("classes-table", classes, 1, handleAction);
   } catch (error) {
     console.error("Erreur:", error);

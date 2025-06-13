@@ -28,7 +28,7 @@ import {
 
 export async function renderProfesseursTableRp(filters = {}) {
   try {
-    const loadingModal = showLoadingModal("Chargement des professeurs...");
+    // const loadingModal = showLoadingModal("Chargement des professeurs...");
     let professeurs = await getAllProfessorsBasic();
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
@@ -156,7 +156,7 @@ export async function renderProfesseursTableRp(filters = {}) {
     const container = document.getElementById("professeurs-container");
     container.innerHTML = "";
     container.appendChild(table);
-    loadingModal.close();
+    // loadingModal.close();
     updateDaisyUITableData("professeurs-table", professeurs, 1, handleAction);
   } catch (error) {
     console.error("Erreur:", error);

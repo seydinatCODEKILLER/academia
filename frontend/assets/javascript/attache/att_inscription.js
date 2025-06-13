@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = getCurrentUser();
   handleSidebar(user);
   renderAttacheHeader(user, "Inscriptions");
-  renderBannerForInscription();
+  // renderBannerForInscription();
   const idAttacher = await getIdAttacherByUserId(user.id);
   renderFloatingButtonAdd(idAttacher);
   await renderInscriptionsFilters(idAttacher);

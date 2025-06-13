@@ -95,8 +95,8 @@ function createSidebarNavigation(links, onNavigate) {
 
   links.forEach((link) => {
     const li = document.createElement("li");
-    li.className = `py-2 px-4 hover:bg-gray-50 hover:rounded ${
-      link.active ? "bg-purple-50 border border-purple-400" : ""
+    li.className = `py-2 px-4 ${
+      link.active ? "bg-purple-500 text-white shadow-lg rounded-3xl" : ""
     }`;
 
     const a = document.createElement("a");
@@ -192,17 +192,22 @@ export function setActiveLink(path) {
 
   // Retirer active de tous les liens
   sidebar.querySelectorAll("li").forEach((li) => {
-    li.classList.remove("bg-purple-50", "border-purple-400");
+    li.classList.remove(
+      "bg-purple-500",
+      "text-white",
+      "rounded-3xl",
+      "shadow-lg"
+    );
   });
 
   // Ajouter active au lien correspondant
   const activeLink = sidebar.querySelector(`a[href="${path}"]`);
   if (activeLink) {
     activeLink.parentElement.classList.add(
-      "bg-purple-50",
-      "border",
-      "rounded",
-      "border-purple-400"
+      "bg-purple-500",
+      "text-white",
+      "rounded-3xl",
+      "shadow-lg"
     );
   }
 }

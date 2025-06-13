@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = getCurrentUser();
   handleSidebar(user);
   renderAttacheHeader(user, "Mes classes");
-  renderBannerForClasse();
+  // renderBannerForClasse();
   const idAttacher = await getIdAttacherByUserId(user.id);
   await renderClasseTableFilter(idAttacher);
   await renderClassesTable(idAttacher);

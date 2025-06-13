@@ -323,7 +323,7 @@ export function createClassFiltersForRp(config) {
   } = config;
 
   const filtersContainer = document.createElement("div");
-  filtersContainer.className = "bg-purple-200 p-3 rounded-lg mb-6";
+  filtersContainer.className = "bg-purple-50 p-3 rounded-lg mb-6";
 
   const title = document.createElement("h3");
   title.className = "font-bold text-lg mb-4";
@@ -429,7 +429,7 @@ export function createProfesseurFiltersForRp(config) {
   } = config;
 
   const filtersContainer = document.createElement("div");
-  filtersContainer.className = "bg-blue-100 p-3 rounded-lg mb-6";
+  filtersContainer.className = "p-3 rounded-lg mb-6";
 
   const title = document.createElement("h3");
   title.className = "font-bold text-lg mb-4";
@@ -470,7 +470,7 @@ export function createCoursFiltersForRp(config) {
   const { semestres = [], anneesScolaires = [], onFilter = () => {} } = config;
 
   const filtersContainer = document.createElement("div");
-  filtersContainer.className = "bg-yellow-100 p-3 rounded-lg mb-6";
+  filtersContainer.className = "p-3 rounded-lg mb-6";
 
   const title = document.createElement("h3");
   title.className = "font-medium text-lg mb-4";
