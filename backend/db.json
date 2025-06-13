@@ -41,7 +41,7 @@
       "id_filiere": "1",
       "id_niveau": "1",
       "id_annee": "1",
-      "capacite_max": "26",
+      "capacite_max": "22",
       "state": "disponible",
       "id": "1"
     },
@@ -643,7 +643,7 @@
       "nom": "Ndiaye",
       "prenom": "Aminata",
       "email": "rp@ecole221.com",
-      "password": "liverppol",
+      "password": "liverpool",
       "id_role": "1",
       "avatar": "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600",
       "telephone": "771234567",
@@ -652,7 +652,7 @@
       "id": "1"
     },
     {
-      "nom": "Sow",
+      "nom": "Sow02",
       "prenom": "Moussa",
       "email": "m.sow@ecole221.com",
       "password": "password123",
